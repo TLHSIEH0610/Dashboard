@@ -1,0 +1,40 @@
+{
+    "CurrentFile":[
+        {
+            "FileName" : "FOTA_XLM",
+            "FileType" : "xml",
+            "UploadDate": "2020-09-08",
+            "Size": 20
+        },
+        {
+            "FileName" : "015E110000000001",
+            "FileType" : "txt",
+            "UploadDate": "2020-08-08",
+            "Size": 40
+        },
+        {
+            "FileName" : "m300_20181121102749",
+            "FileType" : "img",
+            "UploadDate": "2020-09-08",
+            "Size": 25
+        },
+        {
+            "FileName" : "m350_201811AF102749",
+            "FileType" : "img",
+            "UploadDate": "2020-09-10",
+            "Size": 33
+        },
+        {
+            "FileName" : "015FcKWzx7sMqVGtN_HqAAAU",
+            "FileType" : "txt",
+            "UploadDate": "2020-09-01",
+            "Size": 56
+        },
+        {
+            "FileName" : "015FFAovVz31BgmpYH3eAAAd",
+            "FileType" : "txt",
+            "UploadDate": "2020-09-02",
+            "Size": 126
+        }
+    ]
+}

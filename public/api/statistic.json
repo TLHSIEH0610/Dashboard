@@ -1,0 +1,20 @@
+{
+    "response": {
+        "statistic": {
+            "obj": {
+                "health": {
+                    "up": 84,
+                    "warning": 0,
+                    "critical": 10,
+                    "offline": 0
+                },
+                "sim": {
+                    "excellent": 100,
+                    "good": 0,
+                    "fair": 0,
+                    "poor": 0
+                }
+            }
+        }
+    }
+}

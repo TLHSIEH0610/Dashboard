@@ -1,0 +1,16 @@
+.table{
+    max-width: 1000px !important;
+    text-align: center;
+    th{
+        text-align: center !important;
+    } 
+    td{
+        border-top: 1px #D3D3D3 solid;
+        border-bottom: 1px #D3D3D3 solid;
+        text-align: center;
+    }
+}
+
+.clickBtn{
+    margin-right: 15px;
+}

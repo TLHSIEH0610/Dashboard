@@ -1,0 +1,60 @@
+.StyledTree {
+    line-height: 1.5;
+}
+.StyledFile{
+    padding-left: 20px;
+    display: flex;
+    align-items: center;
+    a{
+        color: black;
+        text-decoration: none;
+    }
+    span {
+      margin-left: 5px;
+    }
+}
+
+.StyledFolder{
+    padding-left: 20px;
+    .folderlabel {
+        display: flex;
+        align-items: center;
+        a{
+            color: black;
+            text-decoration: none;
+        }
+        span {
+          margin-left: 5px;
+        }
+    }
+}
+
+.Collapsible{
+    overflow: hidden;
+    height: auto;
+    &.hide{
+        height: 0;
+    }
+}
+.Flink{
+    text-decoration: none;
+}
+.up, .excellent{
+    color: #28a745;
+    margin-right: 5px;
+}
+.warning, .good{
+    color: #ffc107;
+    margin-right: 5px;
+}
+.critical, .fair{
+    color: #dc3545;
+    margin-right: 5px;
+}
+.offline, .poor{
+    color: #343a40;
+    margin-right: 5px;
+}
+.setting{
+    color: black;
+}

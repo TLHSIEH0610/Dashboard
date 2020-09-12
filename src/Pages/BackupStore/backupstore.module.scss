@@ -1,0 +1,18 @@
+.container{
+    margin: 0 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+}
+.icon{
+    font-size: 30px;
+    margin: 10px;
+}
+.wrap{
+    width: 87vw;
+    padding: 0 15px;
+    display: flex;
+    // justify-content: center;
+}
+

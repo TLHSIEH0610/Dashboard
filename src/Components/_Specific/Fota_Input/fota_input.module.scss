@@ -1,0 +1,48 @@
+.addbtn{
+    margin: 6px;
+}
+
+.actionbtn{
+    margin-bottom: 21px;
+    display: flex;
+}
+
+.card{
+    margin: 0 auto;
+    // margin-right: 10px !important;
+    width: 100%;
+}
+
+.table{
+    // width: 650px !important;
+    margin-right: 5px;
+    text-align: center; 
+    td{
+        border-top: 1px #D3D3D3 solid;
+        border-bottom: 1px #D3D3D3 solid;
+    }
+}
+
+.disable{
+    background-color: #DCDCDC !important;
+}
+
+.form{
+    display: flex;
+
+}
+.input{
+    margin-left: 6px;
+}
+.group{
+    display: flex;
+    flex-direction: row !important;
+}
+
+.EdtiDeleBtn{
+    display: flex;
+    
+}
+.EdtiBtn{
+    margin-right: 10px;
+}
