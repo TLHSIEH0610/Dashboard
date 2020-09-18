@@ -8,18 +8,26 @@
 }
 
 .card{
-    margin: 0 auto;
-    // margin-right: 10px !important;
-    width: 100%;
+    width: auto;
 }
 
 .table{
-    // width: 650px !important;
+    width: 90%;
     margin-right: 5px;
-    text-align: center; 
+    
     td{
         border-top: 1px #D3D3D3 solid;
         border-bottom: 1px #D3D3D3 solid;
+        text-align: center; 
+    }
+    th{
+        text-align: center !important; 
+    }
+}
+
+@media(max-width: 768px){
+    .table{
+        width:70%
     }
 }
 
@@ -41,8 +49,10 @@
 
 .EdtiDeleBtn{
     display: flex;
+    justify-content: center;
     
 }
 .EdtiBtn{
     margin-right: 10px;
 }
+

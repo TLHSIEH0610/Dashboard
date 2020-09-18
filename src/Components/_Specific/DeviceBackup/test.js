@@ -65,12 +65,6 @@ const [action, setAction] = useState([])
     return item.FileType === "img"
   })
 
-  function RepositoryFilter(key) {
-    console.log(key)
-    // let thisaction = key
-    // console.log( thisaction.action, thisaction.key)
-  }
-
   const onFinish = (values) => {
     console.log("Received values of form:", values);
   };

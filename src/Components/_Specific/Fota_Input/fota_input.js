@@ -2,21 +2,13 @@ import React, { Fragment, useEffect, useState, useRef } from 'react'
 import axios from 'axios'
 import { Form, Input, Button, Card, Upload, message, Modal, Table, Space } from 'antd';
 import styles from './fota_input.module.scss'
-import { UploadOutlined, SearchOutlined } from '@ant-design/icons'
-import reqwest from 'reqwest';
+import {  SearchOutlined } from '@ant-design/icons'
 import FOTAform from './form'
 import Highlighter from 'react-highlight-words';
 
 
 const validateMessages = {
     required: '${label} is required!',
-    // types: {
-    //     email: '${label} is not validate email!',
-    //     number: '${label} is not a validate number!',
-    // },
-    // number: {
-    //     range: '${label} must be between ${min} and ${max}',
-    // },
 };
 
 const Fota_Input = () => {
@@ -98,45 +90,6 @@ const Fota_Input = () => {
     };
     const [fileList, setFileList] = useState([])
     const [uploading, setUploading] = useState(false)
-    const handleUpload = () => {
-        const formData = new FormData();
-        fileList.forEach(file => {
-            formData.append('files[]', file);
-        });
-        setUploading(true)
-
-        // You can use any AJAX library you like
-        reqwest({
-            url: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
-            method: 'post',
-            processData: false,
-            data: formData,
-            success: () => {
-                setFileList([])
-                setUploading(false)
-                message.success('upload successfully.');
-            },
-            error: () => {
-                setUploading(false)
-                message.error('upload failed.');
-            },
-        });
-    };
-    const props2 = {
-        onRemove: file => {
-            const index = fileList.indexOf(file);
-            const newFileList = fileList.slice();
-            newFileList.splice(index, 1);
-            setFileList(newFileList)
-        },
-        beforeUpload: file => {
-            setFileList(
-                [...fileList, file]
-            );
-            return false;
-        },
-        fileList,
-    };
 
     const DataToXMLString = (newXml) => {
         let str = ''
@@ -263,19 +216,26 @@ const Fota_Input = () => {
         {
             title: 'ModelName',
             dataIndex: 'ModelName',
-            width: '30%',
+            width: '20%',
             ...getColumnSearchProps('ModelName')
         },
         {
             title: 'name',
             dataIndex: 'name',
-            width: '30%',
+            width: '25%',
             ...getColumnSearchProps('name')
+        },
+        {
+            title: 'MD5',
+            dataIndex: 'MD5',
+            width: '25%',
+            responsive: ['md'],
+            ...getColumnSearchProps('MD5')
         },
         {
             title: 'Action',
             dataIndex: 'action',
-            width: '30%',
+            width: '20%',
             render: ( text, record, index) => (
                 <Fragment>
                     <div className={styles.EdtiDeleBtn} key={index}>
@@ -320,7 +280,7 @@ const Fota_Input = () => {
                     onCancel={handleCancel}
                     destroyOnClose={true}
                     okButtonProps={{ form: 'category-editor-form', key: 'submit', htmlType: 'submit' }}
-                    width={'70vw'}
+                    calssName={styles.modal}
                     centered
                     scroll
                     maskStyle={{ background: 'transparent' }}
@@ -384,25 +344,13 @@ const Fota_Input = () => {
                     onCancel={handleCancel}
                     destroyOnClose={true}
                     okButtonProps={{ form: 'category-add-form', key: 'submit', htmlType: 'submit' }}
-                    width={'70vw'}
+                    calssName={styles.modal}
                     maskStyle={{ background: 'transparent' }}
                     bodyStyle={{ display: 'flex', margin: '30px', justifyContent: 'center' }}
                 >
                     <FOTAform form={form} id={'category-add-form'} validateMessages={validateMessages} onFinish={onFinishA} name={'nest-messagesA'} />
                 </Modal>
-                <Table columns={columns} dataSource={xmlData} pagination={false} scroll={{ y: 800 }} width='800' className={styles.table}  loading={loading}/> 
-                <Upload {...props2}>
-                    <Button icon={<UploadOutlined />}>Select File</Button>
-                </Upload>
-                <Button
-                    type="primary"
-                    onClick={handleUpload}
-                    disabled={fileList.length === 0}
-                    loading={uploading}
-                    style={{ marginTop: 16 }}
-                >
-                    {uploading ? 'Uploading' : 'Start Upload'}
-                </Button>
+                <Table columns={columns} dataSource={xmlData} pagination={false} scroll={{ y: 800 }}  className={styles.table}  loading={loading}/> 
             </Card>
         </Fragment>
     )

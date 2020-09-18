@@ -1,40 +1,65 @@
 {
-    "CurrentFile":[
-        {
-            "FileName" : "FOTA_XLM",
-            "FileType" : "xml",
-            "UploadDate": "2020-09-08",
-            "Size": 20
-        },
-        {
-            "FileName" : "015E110000000001",
-            "FileType" : "txt",
-            "UploadDate": "2020-08-08",
-            "Size": 40
-        },
-        {
-            "FileName" : "m300_20181121102749",
-            "FileType" : "img",
-            "UploadDate": "2020-09-08",
-            "Size": 25
-        },
-        {
-            "FileName" : "m350_201811AF102749",
-            "FileType" : "img",
-            "UploadDate": "2020-09-10",
-            "Size": 33
-        },
-        {
-            "FileName" : "015FcKWzx7sMqVGtN_HqAAAU",
-            "FileType" : "txt",
-            "UploadDate": "2020-09-01",
-            "Size": 56
-        },
-        {
-            "FileName" : "015FFAovVz31BgmpYH3eAAAd",
-            "FileType" : "txt",
-            "UploadDate": "2020-09-02",
-            "Size": 126
-        }
-    ]
+    "response": {
+        "repository": [
+            {
+                "cid": "proscend",
+                "list": [
+                    {
+                        "name": "015FsqEZA_q7iIwMvEzPAAB7CFG",
+                        "size": 49,
+                        "date": "2020-09-15 17:28:50",
+                        "type": "cfg",
+                        "inf": {
+                            "model": "M351"
+                        }
+                    },
+                    {
+                        "name": "015F8TKB4RdKjftPf_OWAACwFW",
+                        "size": 32348165,
+                        "date": "2020-09-15 17:28:53",
+                        "type": "fw",
+                        "inf": {
+                            "model": "M300"
+                        }
+                    },
+                    {
+                        "name": "015Fix7k80dXixGBbHnpAACMCFG",
+                        "size": 1234,
+                        "date": "2020-09-15 17:28:53",
+                        "type": "cfg",
+                        "inf": {
+                            "model": "M350"
+                        }
+                    },
+                    {
+                        "name": "015FlTz8zb256ak8NnX4AACkCFG",
+                        "size": 3134,
+                        "date": "2020-09-15 17:28:53",
+                        "type": "cfg",
+                        "inf": {
+                            "model": "M351"
+                        }
+                    },
+                    {
+                        "name": "015FlTz8zb256ak8NnX4AACkFW",
+                        "size": 1179,
+                        "date": "2020-09-15 17:28:53",
+                        "type": "fw",
+                        "inf": {
+                            "model": "M351"
+                        }
+                    },
+                    {
+                        "name": "015FYap2PVio3qH08mcQAADPCFG",
+                        "size": 1222,
+                        "date": "2020-09-15 17:28:53",
+                        "type": "cfg",
+                        "inf": {
+                            "model": "M330"
+                        }
+                    }
+                ]
+            }
+        ]
+    }
 }

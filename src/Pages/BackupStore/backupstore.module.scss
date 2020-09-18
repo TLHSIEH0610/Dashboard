@@ -1,4 +1,5 @@
 .container{
+    max-width: 100%;
     margin: 0 30px;
     display: flex;
     flex-direction: column;
@@ -10,9 +11,26 @@
     margin: 10px;
 }
 .wrap{
-    width: 87vw;
+    width: 100%;
     padding: 0 15px;
-    display: flex;
+    // display: flex;
+    margin: 0 auto;
     // justify-content: center;
 }
+@media(max-width: 1000px){
+    .wrap{
+        flex-direction: column;
+    }
+}
+@media(max-width: 768px){
+    .TabPane{
+        font-size: 22px !important;
+    }
+}
 
+.tabs{
+    width: 100%;
+}
+// .TabPane{
+//     width:100%
+// }

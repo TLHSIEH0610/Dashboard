@@ -1,8 +1,6 @@
-
-import React, { Fragment, useEffect, useState } from 'react'
-import { Form, Input, Button, Card, Tabs, Upload, message, Modal } from 'antd';
+import React  from 'react'
+import { Form, Input } from 'antd';
 import styles from './fota_input.module.scss'
-import { UploadOutlined } from '@ant-design/icons'
 
 
 const layout = {
@@ -42,7 +40,7 @@ const FOTAform = (props) => {
                 >
                     <Input id={`${name}_${id}`}/>
                 </Form.Item>
-                <Form.Item
+                {/* <Form.Item
                     name={'force'}
                     label="force"
                     rules={[
@@ -52,8 +50,9 @@ const FOTAform = (props) => {
                     ]}
                 >
                     <Input  id={`${name}_${id}`}/>
-                </Form.Item>
+                </Form.Item> */}
                 <Form.Item
+                   
                     id={`${name}_${id}`}
                     name={'MD5'}
                     label="MD5"
@@ -64,7 +63,7 @@ const FOTAform = (props) => {
                         },
                     ]}
                 >
-                    <Input />
+                    <Input  disabled={true}/>
                 </Form.Item>
                 <Form.Item
                     name={'SoftwareMCSV'}
@@ -96,7 +95,7 @@ const FOTAform = (props) => {
                     </Upload>
                 </Form.Item> */}
             </div>
-            <div>
+            {/* <div>
                 <Form.Item
                     name={'LoginName'}
                     label="LoginName"
@@ -207,7 +206,7 @@ const FOTAform = (props) => {
                         </Form.Item>
                     </Input.Group>
                 </Form.Item>
-            </div>
+            </div> */}
         </Form>
     )
 }

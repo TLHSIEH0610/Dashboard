@@ -47,7 +47,7 @@ export const NavRoutes = [
         path: '/backuprestore',
         icon: <FiSettings/>,
         cName: 'NavText',
-        auth: false,
+        auth: true,
         component: Backup
     }
     // {

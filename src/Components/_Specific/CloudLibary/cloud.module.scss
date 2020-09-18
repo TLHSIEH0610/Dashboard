@@ -1,5 +1,5 @@
 .table{
-    max-width: 1000px !important;
+    width: 90%;
     text-align: center;
     th{
         text-align: center !important;
@@ -10,7 +10,31 @@
         text-align: center;
     }
 }
+@media(max-width:786px){
+    .table{
+        th,td{
+            font-size: 20px;
+        }
+    }
+    .clickBtn span{
+        font-size: 20px;
+    }
+}
 
 .clickBtn{
-    margin-right: 15px;
+    margin-right: 20px;
+    display: flex;
+    align-items: center;
+    height:auto !important;
+}
+
+
+.card{
+    width: 100%;
+}
+
+.actionCol{
+    display: flex;
+    // min-width: 200px;
+    text-align: center;
 }
