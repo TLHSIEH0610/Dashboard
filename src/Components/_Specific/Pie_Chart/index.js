@@ -1,63 +1,60 @@
-import React, { Fragment, useState, useEffect, useRef } from 'react'
-import { Doughnut } from 'react-chartjs-2';
-// import styles from './Pie.module.scss'
-import { Container, Row, Col, Card } from 'react-bootstrap'
-import useURLloader from '../../../hook/useURLloader'
-
-
+import React, { Fragment, useState, useEffect, useContext } from "react";
+import styles from "./Pie.module.scss";
+import { Card } from "antd";
+import useURLloader from "../../../hook/useURLloader";
+import PieChartC from "./PieChart";
+import Context from '../../../Utility/Reduxx'
 const PieChart = () => {
-    // const url = '/api/statistic.json'
-    const url = '/cmd?get={"statistic":{}}'
-    const [healthPie, setHealthPie] = useState({})
-    const [strengthPie, setStrengthPie] = useState({})
-    const isFirstRun = useRef(true);
-    const [loading, res] = useURLloader(url)
-    useEffect(()=>{
-        if (isFirstRun.current) {
-            isFirstRun.current = false;
-            return;
-        }
-        let data = res.response.statistic.obj
-        setHealthPie({
-            datasets: [{
-                data: [data.health.up, data.health.warning, data.health.critical, data.health.offline],
-                backgroundColor: ["#28a745", "#ffc107", "#dc3545", "#343a40"]
-            }],
-            labels: ['up', 'warning', 'critical', 'offline']
-        })
-        setStrengthPie({
-            datasets: [{
-                data: [data.sim.excellent, data.sim.good, data.sim.fair, data.sim.poor],
-                backgroundColor: ["#28a745", "#ffc107", "#dc3545", "#343a40"]
-            }],
-            labels: ['excellent', 'good', 'fair', 'poor']
-        })
-    }, [res])
-    
-    return(
-        <Fragment>
-        <Container>
-            <Row>
-                <Col>
-                <Card>
-                    <Card.Header>Featured</Card.Header>
-                    <Card.Body>
-                        <Doughnut data={strengthPie} option={'responsive: true, maintainAspectRatio: false'} />
-                    </Card.Body>
-                    </Card>
-                </Col>
-                <Col>
-                <Card>
-                    <Card.Header>Featured</Card.Header>
-                    <Card.Body>
-                        <Doughnut data={healthPie} option={'responsive: true, maintainAspectRatio: false'} />   
-                    </Card.Body>
-                    </Card>
-                </Col>
-            </Row>
-        </Container>
-    </Fragment>
-    )
-}
+  const { state } = useContext(Context) 
+  const cid = localStorage.getItem('authUser.cid')
+  const url =cid==='proscend' ? `/cmd?get={"statistic":{"filter":{${state.Login.Cid}}}}`:`/cmd?get={"statistic":{"filter":{"cid":"${cid}"}}}` ;
+  const [loading, response] = useURLloader(url, url);
+  const [PieData, setPieData] = useState([]);
+  //   console.log(response)
+  // console.log(state)
+  useEffect(() => {
+    if (response) {
+      let data = response.response.statistic.obj;
+      setPieData(data);
+      // console.log(url);
+      // console.log(response)
+    }
+  }, [response]);
 
-export default PieChart
+  return (
+    <Fragment>
+      <div className={styles.PieWrapper}>
+        <Card className={styles.PieCard} loading={loading}>
+          <PieChartC
+            dataSource={
+              PieData.health && [
+                PieData.health.up,
+                PieData.health.warning,
+                PieData.health.critical,
+                PieData.health.offline,
+              ]
+            }
+            data={["up", "warning", "critical", "offline"]}
+            name={"Devices Health"}
+          />
+        </Card>
+        <Card className={styles.PieCard} loading={loading}>
+          <PieChartC
+            dataSource={
+              PieData.sim && [
+                PieData.sim.excellent,
+                PieData.sim.good,
+                PieData.sim.failr,
+                PieData.sim.poor,
+              ]
+            }
+            data={["excellent", "good", "failr", "poor"]}
+            name={"Devices Strength"}
+          />
+        </Card>
+      </div>
+    </Fragment>
+  );
+};
+
+export default PieChart;

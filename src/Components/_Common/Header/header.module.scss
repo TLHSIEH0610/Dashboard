@@ -1,5 +1,37 @@
 .head{
-    background: gray;
+    background: white;
     height: 52.4px;
     width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    box-shadow: 3px 3px 5px black;
+    padding: 0 20px;
+}
+.menu{
+    font-size: 20px;
+
+    .inform{
+        background: #F8F8FF;
+        // padding:10px;
+        color:#6495ED;
+        border-radius: 50%;
+        font-size: 25px;
+        &:hover{
+            background:#007bff;
+            color:white;
+        }
+    }
+    .user{
+        font-size: 25px;
+    }
+    .language{
+        font-size: 40px;
+        color: #8FBC8F;
+    }
+}
+.superSelect{
+    // li{
+        margin: 0 3px 0 -15px !important;
+    // }
+
 }

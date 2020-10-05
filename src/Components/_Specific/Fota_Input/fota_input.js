@@ -1,6 +1,6 @@
 import React, { Fragment, useEffect, useState, useRef } from 'react'
 import axios from 'axios'
-import { Form, Input, Button, Card, Upload, message, Modal, Table, Space } from 'antd';
+import { Form, Input, Button, Card, Modal, Table, Space } from 'antd';
 import styles from './fota_input.module.scss'
 import {  SearchOutlined } from '@ant-design/icons'
 import FOTAform from './form'
@@ -88,8 +88,8 @@ const Fota_Input = () => {
         DataToXMLString(newXml)
         // console.log(str)
     };
-    const [fileList, setFileList] = useState([])
-    const [uploading, setUploading] = useState(false)
+    // const [fileList, setFileList] = useState([])
+    // const [uploading, setUploading] = useState(false)
 
     const DataToXMLString = (newXml) => {
         let str = ''

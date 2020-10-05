@@ -1,8 +1,8 @@
 
 import { Redirect } from "react-router-dom"
-import React from 'react'
-
-
+import React, {useContext} from 'react'
+import context from './Reduxx'
+import axios from 'axios'
 
 
 
@@ -30,11 +30,13 @@ export async function UserLogin(Account) {
 
 export async function UserLogOut() {
     const url = "/logout"
+    // const {state} = useContext(context)
     let response
-
     try{
         response = await fetch(url, { credentials: 'include' })
         console.log(response)
+        localStorage.clear()
+        // dispatch({type:'setUser', payload:{Cid: ''}})
         return response
     }
     catch(error){

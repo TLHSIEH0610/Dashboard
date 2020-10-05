@@ -1,0 +1,104 @@
+.up{
+    color:green;
+    font-size: 1.4rem;
+    p{
+        padding-bottom: 0px;
+    }
+}
+
+.critical{
+    color:gold;
+    font-size: 1.4rem;
+} 
+
+.warning{
+    color:red;
+    font-size: 1.4rem;
+}
+
+.offline{
+    color:black;
+    font-size: 1.4rem;
+}
+// .modal{
+//     height: 100%;
+// }
+.iconwrapper{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    p{
+        margin: 0px 0px  0px 6px;
+    }
+}
+
+.desc{
+
+    th{
+        width:150px;
+        vertical-align: middle;
+    }
+
+}
+
+.tabpane{
+    overflow-y: scroll;
+    max-height: 450px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.alarmlog{
+    color: red;
+    margin-right: 7px;
+    font-size: 1.4rem;
+    cursor: pointer;
+    &.disabled{
+        color:gray;
+        cursor: not-allowed;
+    }
+}
+
+.IoT{
+    margin-right: 7px;
+    font-size: 1.4rem;
+    cursor: pointer;
+    &.disabled{
+        color:gray;
+        cursor: not-allowed;
+    }
+}
+.Status, .Map, .Setting{
+    margin-right: 7px;
+    font-size: 1.4rem;
+    cursor: pointer;
+}
+.Map{
+    color:red;
+}
+.alarmtable{
+    width: 90%;
+    margin: 0 auto;
+    // overflow-y: scroll;
+    // height:450px;
+}
+.echartBar{
+    margin: auto 0;
+}
+.IoTinput{
+    width:80%;
+}
+.rename{
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    p{
+        margin-bottom:0;
+    }
+    .renameIcon{
+        color:#1890ff;
+        margin-left:3px;
+        cursor: pointer;
+    }
+}

@@ -1,0 +1,15 @@
+.Card{
+    width: 100%;
+    // display: flex;
+
+}
+.subCard{
+    width: 30%;
+    display: inline-block;
+    margin:1% 1% 0 0!important;
+    height:40%;
+    .Icon{
+        font-size: 2rem;
+        color: #6495ED;
+    }
+}

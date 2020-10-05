@@ -1,10 +1,10 @@
-import React, { useContext, useEffect, useState } from 'react'
-import { Form, Input, Button } from 'antd';
+import React, {  useState, useContext } from 'react'
+import { Form, Input, Button, Card } from 'antd';
 import Swal from 'sweetalert2'
 import { useHistory } from "react-router-dom";
 import { UserLogin } from '../../../Utility/Fetch'
 import Context from '../../../Utility/Reduxx'
-
+import styles from './login.module.scss'
 
 const layout = {
   labelCol: {
@@ -23,17 +23,17 @@ const tailLayout = {
 }
 
 const LoginInput = () => {
-  const { dispatch } = useContext(Context)  
+  const { state, dispatch } = useContext(Context)  
   const history = useHistory();
-  const [Auth, setAuth] = useState (localStorage.getItem('auth.isAuthed'))
+  // const [Auth, setAuth] = useState (localStorage.getItem('auth.isAuthed'))
 
-  useEffect(()=>{
-    dispatch({type:'setLogin', payload:{IsLogin: Auth}})
-},[Auth])
+//   useEffect(()=>{
+//     dispatch({type:'setLogin', payload:{IsLogin: Auth}})
+// },[Auth])
 
   const OnFinish = async (values) => {
     const [response , data] = await UserLogin(values)
-    console.log(response, data)
+    // console.log(response, data)
     // if(response.status === 200){
     //    dispatch({type:'setLogin', payload:{IsLogin: true}})
     // }
@@ -50,12 +50,19 @@ const LoginInput = () => {
             localStorage.setItem('authUser.cid', data.cid);
             localStorage.setItem('authUser.level', data.level);
             localStorage.setItem('auth.isAuthed', true);
-            // dispatch({type:'setLogin', payload:{IsLogin: true}})
-            setAuth(true)
+            localStorage.setItem('super.cid', '');
+            dispatch({type:'setUser', payload:{User: data.cid}})
+            // setAuth(true)
         })
         .then(() => {
-            console.log(Auth)
-            history.push('/dashboard')
+            // console.log(Auth)
+            // history.push('/backuprestore')
+            console.log(state)
+            if(state.Login.LogPath){
+              history.push(state.Login.LogPath)
+            }else{
+              history.push('/dashboard')
+            }
           })
 
       default:
@@ -69,8 +76,10 @@ const LoginInput = () => {
   };
 
   return (
+    <Card bodyStyle={{ width: '100%'}} className={styles.card}>
     <Form
       {...layout}
+      className={styles.form}
       name="basic"
       initialValues={{
         remember: true,
@@ -79,6 +88,7 @@ const LoginInput = () => {
       onFinishFailed={onFinishFailed}
     >
       <Form.Item
+        className={styles.item}
         label="name"
         name="name"
         rules={[
@@ -88,10 +98,11 @@ const LoginInput = () => {
           },
         ]}
       >
-        <Input />
+        <Input className={styles.input}/>
       </Form.Item>
 
       <Form.Item
+        className={styles.item}
         label="password"
         name="password"
         rules={[
@@ -101,7 +112,7 @@ const LoginInput = () => {
           },
         ]}
       >
-        <Input.Password />
+        <Input.Password className={styles.input}/>
       </Form.Item>
       <Form.Item {...tailLayout}>
         <Button type="primary" htmlType="submit">
@@ -110,6 +121,7 @@ const LoginInput = () => {
         </Button>
       </Form.Item>
     </Form>
+    </Card>
   );
 };
 

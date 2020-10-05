@@ -8,7 +8,7 @@ import { UserLogOut } from '../../../Utility/Fetch'
 import { useHistory } from "react-router-dom";
 import Swal from 'sweetalert2'
 import Context from '../../../Utility/Reduxx'
-
+import {Button} from 'antd'
 
 
 const Nav = () => {
@@ -18,8 +18,8 @@ const Nav = () => {
   const [Auth, setAuth] = useState(localStorage.getItem('auth.isAuthed'))
   const ShowBar = ()=>{setShow(!show)}
   useEffect(()=>{
-    dispatch({type:'setLogin', payload:{IsLogin: Auth}})
-  }, [Auth])
+    setAuth(localStorage.getItem('auth.isAuthed'))
+  }, [localStorage.getItem('auth.isAuthed')])
 
   const logout = async () => {
     localStorage.clear();
@@ -32,6 +32,7 @@ const Nav = () => {
       timer: 1200,
     })
     .then(()=>{
+      dispatch({type:'setUser', payload:{User: ''}})
       history.push('/login')
     })
   }
@@ -51,7 +52,7 @@ const Nav = () => {
             }) }
           </ul>
           {/* <button className={styles.LogoutBtn} onClick={logout} >Sign Out</button>     */}
-          {Auth ? <button className={styles.LogoutBtn} onClick={logout} >Sign Out</button> : <button className={styles.LogoutBtn} onClick={()=>{history.push('/login')}} >Sign In</button> }           
+          {Auth ? <Button className={styles.LogoutBtn} onClick={logout} >Sign Out</Button> : <button className={styles.LogoutBtn} onClick={()=>{history.push('/login')}} >Sign In</button> }           
       </div>
     </Fragment>
   )

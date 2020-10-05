@@ -1,6 +1,5 @@
 import React, { Fragment } from 'react'
 import AllinOne from '../../Components/_Specific/DeviceBackup/AllinOne'
-import AllinOne_test from '../../Components/_Specific/DeviceBackup/AllinOne_test'
 import ActionStatus from '../../Components/_Specific/DeviceBackup/ActionStatus'
 import styles from './backupstore.module.scss'
 import { Tabs } from 'antd';
@@ -17,7 +16,7 @@ const Backup = () => {
   return (
     <Fragment>
       <div className={styles.container}>
-        <Tabs defaultActiveKey="4" className={styles.tabs}>
+        <Tabs defaultActiveKey="1" className={styles.tabs}>
           <TabPane
             tab={
               <span className={styles.TabPane}>
@@ -56,20 +55,6 @@ const Backup = () => {
           >
             <div className={styles.wrap}>
               <Fota_Input />
-            </div>
-          </TabPane>
-          <TabPane
-            tab={
-              <span className={styles.TabPane}>
-                <GrDocumentImage className={styles.icon} />
-          Req test
-        </span>
-            }
-            key="4"
-          >
-            <div className={styles.wrap}>
-              <AllinOne_test />
-              <ActionStatus/>
             </div>
           </TabPane>
         </Tabs>

@@ -1,13 +1,15 @@
 table{
+    width: 100%;
     th{
         padding: 0.4%;
         transform: translate(-2%, 0);
         font-weight: 700;
-        font-size: 1.3rem;
+        font-size: 1.1rem;
     }
     th, td{
         text-align: center !important;
-        min-width:15vw !important;
+        // min-width:15vw !important;
+        // width: 100%;
         padding-right: 2% ;
     }
 }
@@ -18,20 +20,57 @@ table{
 .Form{
     display: flex;
 }
-@media(max-width: 1300px){
+.step{
+    display: flex !important;
+    width:80% !important;
+    padding:20px !important;
+    margin: auto;
+}
+@media(max-width: 1380px){
     .Form{
         display: block;
     }
 }
-.formitem{
-    // margin-bottom: 0 !important;
-    margin-right: 2% !important;
-    width:100%;
-}
+// .formitem{
+//     // margin-bottom: 0 !important;
+//     margin-right: 2% !important;
+//     width:100%;
+// }
 .outerspace{
     width:100%;
 }
 .clickBtn{
     display: flex;
     align-items: center;
+}
+.fileinput{
+    width: 230px !important; 
+}
+.actioninput{
+    width: 150px !important; 
+}
+.deviceinput{
+    width: 230px !important; 
+}
+.modelinput{
+    width: 150px !important; 
+}
+
+.formwrap{
+    display: flex;
+    width: 100%;
+    // justify-content: space-around;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    .formDiv{
+        margin-right:2%;
+    }
+    .submitBtn{
+        margin-top: auto;
+    }
+}
+.formDiv p{
+    font-size: 1.1rem;
+    font-weight: 600;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }

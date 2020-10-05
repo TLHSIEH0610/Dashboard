@@ -1,6 +1,6 @@
 .container{
     max-width: 100%;
-    margin: 0 30px;
+    margin: 0 10px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -11,8 +11,8 @@
     margin: 10px;
 }
 .wrap{
-    width: 100%;
-    padding: 0 15px;
+    width: 100% !important;
+    // padding: 0 15px;
     // display: flex;
     margin: 0 auto;
     // justify-content: center;

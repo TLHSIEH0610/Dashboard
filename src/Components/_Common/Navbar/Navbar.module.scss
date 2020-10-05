@@ -1,12 +1,13 @@
 .bar{
-    background: gray;
+    // background: gray;
     display:none;
+    height:52.4px;
     &:hover{
         background: #DCDCDC;
     }
     &.active{display:inline-block ;}
     a{
-        color: white;
+        color: #001529;
         font-size: 25px;
         padding: 12.7px;
         line-height: 26px;
@@ -21,7 +22,9 @@
     height:100vh;
     justify-content: flex-start;
     align-items: center;
-    background: #F8F8FF;
+    // background: #F8F8FF;
+    background: #001529;
+    // color: white;
     &.active{
         transform:translateX(-200px);
         display: none;
@@ -38,37 +41,48 @@
             display: block;
         }
         li.title{
-            background: white;
-            padding:15px;
+            background: #001529;
+            padding:25px 15px;
             line-height: 23px;
             display: flex;
             justify-content: center;
             align-items: center;
             font-size: 28px;
             position: relative;
+            h2{
+                margin-bottom: 0px;
+                line-height: 23px;
+                color:white;
+            }
             .cross{
                 padding-left: 10;
+                margin-right: 3px;
                 width: auto;
-                font-size: 20px;
+                font-size: 10px;
                 position: absolute;
                 right: 0%;
+                padding: 10px;
             }
         }
         li a{
             display: inline-block;
             padding:18px;
             line-height: 18px;
-            color: black;
+            color: hsla(0,0%,100%,.65);
             width: 100%;
             &:hover{
-                background:#DCDCDC;
+                // background:#DCDCDC;
+                color:white;
             }
         }
     }
     .LogoutBtn{
         background: #6c757d;
-        padding: 10px;
+        padding: 7px;
         border-radius: 5px;
         color: white;
+        display: flex;
+        align-items: center;
+        color: lightgray
     }
 }

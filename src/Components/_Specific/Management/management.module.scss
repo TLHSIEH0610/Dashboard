@@ -1,0 +1,43 @@
+.subHeader{
+    table{
+      max-width: 80%;
+      margin: 5px auto;
+    }
+    thead th{
+        background: #FFF8DC !important;
+        font-size:0.85rem;
+    }
+}
+
+.stepsContent {
+    margin-top: 16px;
+    border: 1px dashed #e9e9e9;
+    border-radius: 2px;
+    background-color: #fafafa;
+    min-height: 200px;
+    text-align: center;
+    padding-top: 80px;
+  }
+  
+  .stepsAction {
+    margin-top: 24px;
+  }
+
+  .formwrap{
+    display: flex;
+    width: 100%;
+    // justify-content: space-around;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    .formDiv{
+        margin-right:2%;
+    }
+    .submitBtn{
+        margin-top: auto;
+    }
+}
+.formDiv p{
+    font-size: 1.1rem;
+    font-weight: 600;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}

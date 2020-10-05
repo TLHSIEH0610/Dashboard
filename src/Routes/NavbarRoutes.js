@@ -1,12 +1,15 @@
 import React from 'react';
 import {GoDashboard} from 'react-icons/go'
-import {GrTree} from 'react-icons/gr'
 import {FaMapMarkerAlt} from 'react-icons/fa'
 import {FiSettings} from 'react-icons/fi'
+import { MdSettingsBackupRestore, MdCastConnected } from 'react-icons/md'
 import Dashboard from '../Pages/Dashboard'
 import Track from '../Pages/Track'
 import Topology from '../Pages/Topology'
 import Backup from '../Pages/BackupStore'
+import {ApartmentOutlined} from '@ant-design/icons'
+import Management from '../Pages/Management'
+import IoT from '../Pages/IoT'
 
 
 export const NavRoutes = [
@@ -21,7 +24,7 @@ export const NavRoutes = [
     {
         title: 'Topology',
         path: '/topology',
-        icon: <GrTree/>,
+        icon: <ApartmentOutlined />,
         cName: 'NavText',
         auth: true,
         component: Topology
@@ -35,21 +38,30 @@ export const NavRoutes = [
         component: Track
     },
     {
-        title: 'Setting',
-        path: '/setting',
-        icon: <FiSettings/>,
+        title: 'IoT',
+        path: '/iot',
+        icon: <MdCastConnected/>,
         cName: 'NavText',
         auth: true,
-        component: 'Setting'
+        component: IoT
     },
     {
         title: 'Device Backup',
         path: '/backuprestore',
-        icon: <FiSettings/>,
+        icon: <MdSettingsBackupRestore/>,
         cName: 'NavText',
         auth: true,
         component: Backup
-    }
+    },
+    {
+        title: 'Management',
+        path: '/management',
+        icon: <FiSettings/>,
+        cName: 'NavText',
+        auth: true,
+        component: Management
+    },
+
     // {
     //     title: 'Login',
     //     path: '/login',

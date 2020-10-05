@@ -1,0 +1,129 @@
+
+// *{
+//     margin: 0;
+//     padding: 0;
+//     box-sizing: border-box;
+//     -o-box-sizing: border-box;
+//     -ms-box-sizing: border-box;
+//     -moz-box-sizing: border-box;
+//     -webkit-box-sizing: border-box;
+// }
+
+// .section{
+    
+//     position: relative;
+//     width: 100PX;
+//     height: 300px;
+//     border: 1px solid black;
+//     background-color: rgb(221, 221, 221);
+//     top: calc(50vh - 50px);
+//     left: calc(50% - 150px);
+//     border-radius: 10px;  
+// }
+
+
+
+// .battery{
+    
+//     width: 60px;
+//     height: 10px;
+//     border: 1px solid black;
+//     border-radius: 5px 5px 0 0;
+//     position: absolute;
+//     bottom: calc(100%);
+//     left: calc(50% - 30px);
+//     background-color: rgb(221, 221, 221);
+// }
+
+
+// .section::after{
+    
+//     content: '';
+//     width: 94px;
+//     height: 5%;
+//     background-color: orange;
+//     position: absolute;
+//     display: block;
+//     bottom: 1px;
+//     left: 2px;
+//     border-radius: 0 0 10px 10px ;
+//     transition: 2s;
+// }
+
+// .section::before{
+    
+//     content: '';
+//     position: absolute;
+//     width: 96px;
+//     height: 2px;
+//     left: 0;
+//     bottom: 25%;
+//     z-index: 1;
+//     background-color: rgb(221, 221, 221);
+// }
+
+// .battery::after{
+    
+//     content: '';
+//     width: 96px;
+//     height: 2px;
+//     position: absolute;
+//     left: -20px;
+//     bottom: -150px;
+//     z-index: 1;
+//     background-color: rgb(221, 221, 221);
+// }
+
+
+// .battery::before{
+    
+//     content: '';
+//     width: 96px;
+//     height: 2px;
+//     position: absolute;
+//     left: -20px;
+//     bottom: -75px;
+//     z-index: 1;
+//     background-color: rgb(221, 221, 221);
+// }
+
+// .section:hover::after{
+    
+//     height: 99%;
+//     border-radius: 10px;
+//     background-color:  rgb(21, 201, 21);
+// }
+.solarIoTWrapper{
+    display: flex;
+    justify-content: space-around;
+    .Itemcontainer{
+        width: 100%;
+    }
+    .battery{
+        font-size: 15rem;
+    }
+    .sunGrid{
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        .sun{
+            font-size: 10rem;
+            color:gold;
+            transform: rotateX(180deg);
+            position: absolute;
+            top: 0;
+            z-index: 2;
+        }
+        .grid{
+            font-size: 15rem;
+            transform: skewX(30deg);
+            // margin-top: -10px;
+            top: 30%;
+            // position: absolute;
+        }
+    }
+
+    .lamp{
+        font-size: 15rem;
+    }
+}

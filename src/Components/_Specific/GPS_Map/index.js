@@ -3,6 +3,7 @@ import axios from "axios";
 import styles from "./Map.module.scss";
 import GoogleMapReact from "google-map-react";
 import MarkerClusterer from "@google/markerclusterer";
+import { Card } from "antd";
 
 const Map = () => {
   let center = {
@@ -52,21 +53,20 @@ const Map = () => {
 
   return (
     <Fragment>
-      <div className={styles.GMAP}>
-        <div style={{ height: "50vh", width: "50%" }}>
-          <GoogleMapReact
-            bootstrapURLKeys={{
-              key: `https://maps.google.com/maps/api/js?key=AIzaSyAM0qzn6FVfsv0hvMOEn6ciTMK8at2n9fw`,
-              libraries: ["Polyline", "Marker"],
-            }}
-            defaultCenter={center}
-            defaultZoom={zoom}
-            yesIWantToUseGoogleMapApiInternals
-            onGoogleApiLoaded={({ map, maps }) => setGoogleMapRef(map, maps)}
-            options={{ gestureHandling: "greedy", streetViewControl: true }}
-          ></GoogleMapReact>
-        </div>
-      </div>
+      <Card className={styles.Card}>
+        <GoogleMapReact
+          style={{ height: "50vh", width: "50%" }}
+          bootstrapURLKeys={{
+            key: `https://maps.google.com/maps/api/js?key=AIzaSyAM0qzn6FVfsv0hvMOEn6ciTMK8at2n9fw`,
+            libraries: ["Polyline", "Marker"],
+          }}
+          defaultCenter={center}
+          defaultZoom={zoom}
+          yesIWantToUseGoogleMapApiInternals
+          onGoogleApiLoaded={({ map, maps }) => setGoogleMapRef(map, maps)}
+          options={{ gestureHandling: "greedy", streetViewControl: true }}
+        ></GoogleMapReact>
+      </Card>
     </Fragment>
   );
 };

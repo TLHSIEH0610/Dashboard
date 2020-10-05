@@ -1,5 +1,5 @@
 .table{
-    width: 90%;
+    width: 100%;
     text-align: center;
     th{
         text-align: center !important;
@@ -22,7 +22,7 @@
 }
 
 .clickBtn{
-    margin-right: 20px;
+    margin: 0 20px 20px 0;
     display: flex;
     align-items: center;
     height:auto !important;
@@ -30,7 +30,7 @@
 
 
 .card{
-    width: 100%;
+    max-width: 100% !important;
 }
 
 .actionCol{
@@ -38,3 +38,4 @@
     // min-width: 200px;
     text-align: center;
 }
+

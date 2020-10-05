@@ -1,120 +1,303 @@
-import React, { useState, useEffect, useRef, Fragment, useContext } from 'react'
-import styles from './cloud.module.scss'
-import { Button, Card, Table, Input, Space, Modal, Upload, Select, Form, message } from 'antd'
-import axios from 'axios'
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  Fragment,
+  useContext,
+} from "react";
+import styles from "./cloud.module.scss";
+import {
+  Button,
+  Card,
+  Table,
+  Input,
+  Space,
+  Modal,
+  Upload,
+  Select,
+  Form,
+  message,
+  Popconfirm,
+} from "antd";
+import axios from "axios";
 // import useURLloader from '../../../hook/useURLloader'
-import { DownloadOutlined, SearchOutlined, UploadOutlined } from '@ant-design/icons'
-import Highlighter from 'react-highlight-words'
-import { RiDeleteBin2Line } from 'react-icons/ri'
-import { FcDeleteDatabase, FcDownload } from 'react-icons/fc'
+import { SearchOutlined, UploadOutlined } from "@ant-design/icons";
+import Highlighter from "react-highlight-words";
+import { FcDeleteDatabase, FcDownload } from "react-icons/fc";
 import Context from '../../../Utility/Reduxx'
-import reqwest from 'reqwest';
-import MD5 from 'crypto-js/md5'
-import md5 from 'blueimp-md5'
+import md5 from "blueimp-md5";
+import { useHistory } from "react-router-dom";
+import { UserLogOut } from "../../../Utility/Fetch";
+import Swal from "sweetalert2";
 
 const CloudList = () => {
-  const [form] = Form.useForm()
-  const [data, setData] = useState([{ key:'', name: '', type: '', date: '', model:'', size:'' }])
-  const { state, dispatch } = useContext(Context)  
-  const [loading, setLoading] = useState(false)
-  const [selectedRowKeys, setSelectedRowKeys] = useState([])
-  const [selectedRows, setSelectedRows] = useState([])
-  const [visible, setVisible] = useState(false)
-  const [cMD5, setCMD5] = useState('')
-  // const onSelectChange = selectedRowKeys => {
-  //   console.log('selectedRowKeys changed: ', selectedRowKeys);
-  //   setSelectedRowKeys(selectedRowKeys)
-  // }
+  const [form] = Form.useForm();
+  const CompanyPD = [
+    "M300",
+    "M301",
+    "M302",
+    "M330",
+    "M350",
+    "M351",
+    "M352",
+    "M360",
+  ];
+  const history = useHistory();
+  const [data, setData] = useState([
+    { key: "", name: "", type: "", date: "", model: "", size: "" },
+  ]);
+  const { state } = useContext(Context)
+  const [loading, setLoading] = useState(false);
+  const [fileList, setFileList] = useState([]);
+  const [uploading, setUploading] = useState(false);
+  const [visible, setVisible] = useState(false);
+  const [cMD5, setCMD5] = useState("");
+  const IsActionUpdated = state.BackupRestore.IsActionUpdated
+  const EditableContext = React.createContext();
+  const EditableRow = ({ index, ...props }) => {
+    const [form] = Form.useForm();
+    return (
+      <Form form={form} component={false}>
+        <EditableContext.Provider value={form}>
+          <tr {...props} />
+        </EditableContext.Provider>
+      </Form>
+    );
+  };
 
-  const rowSelection = {
-    selectedRowKeys,
-    // onChange: onSelectChange,
-    onChange: (selectedRowKeys, selectedRows) => {
-      console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
-      setSelectedRowKeys(selectedRowKeys)
-      setSelectedRows(selectedRows)
+  const EditableCell = ({
+    title,
+    editable,
+    children,
+    dataIndex,
+    record,
+    // handleSave,
+    ...restProps
+  }) => {
+    const [editing, setEditing] = useState(false);
+    const inputRef = useRef();
+    const form = useContext(EditableContext);
+    useEffect(() => {
+      if (editing) {
+        inputRef.current.focus();
+      }
+    }, [editing]);
+
+    const toggleEdit = () => {
+      setEditing(!editing);
+      form.setFieldsValue({
+        [dataIndex]: record[dataIndex],
+      });
+    };
+
+    const save = async (e) => {
+      try {
+        const values = await form.validateFields();
+        // console.log(values, record);
+        
+        toggleEdit();
+        if(record.name===values.name){return}
+        const cid = localStorage.getItem('authUser.cid')
+        const url = localStorage.getItem('authUser.cid') ==='proscend' ? `/repository?rename_file={${state.Login.Cid},"old_name":"${record.name}","new_name":"${values.name}","type":"${record.type}"}`  : `/repository?rename_file={"cid":"${cid}","old_name":"${record.name}","new_name":"${values.name}","type":"${record.type}"}`
+        console.log(url)
+        setUploading(true)
+        axios.get(url).then((res)=>{
+          setUploading(false)
+          console.log(res)
+          message.success('rename successfully.')
+        })
+        .catch((erro)=>{
+          console.log(erro)
+          message.error('rename failed.')
+          setUploading(false)
+        })
+        // handleSave({ ...record, ...values });
+      } catch (errInfo) {
+        console.log("Save failed:", errInfo);
+      }
+    };
+
+    let childNode = children;
+    if (editable) {
+      childNode = editing ? (
+        <Form.Item
+          style={{
+            margin: 0,
+          }}
+          name={dataIndex}
+          rules={[
+            {
+              required: true,
+              message: `${title} is required.`,
+            },
+          ]}
+        >
+          <Input ref={inputRef} onPressEnter={save} onBlur={save} />
+        </Form.Item>
+      ) : (
+        <Popconfirm title="Edit fileName?" onConfirm={() => toggleEdit()}>
+        <div
+          className="editable-cell-value-wrap"
+          style={{
+            paddingRight: 24,
+          }}
+          // onClick={
+          //   toggleEdit
+          // }
+        >
+          {children}
+        </div>
+        </Popconfirm>
+      );
+    }
+
+    return <td {...restProps}>{childNode}</td>;
+  };
+
+  // const handleSave = (row) => {
+  //   const newData = [...data];
+  //   const index = newData.findIndex((item) => row.key === item.key);
+  //   const item = newData[index];
+  //   newData.splice(index, 1, { ...item, ...row });
+  //   setData(newData);
+  // };
+
+  const components = {
+    body: {
+      row: EditableRow,
+      cell: EditableCell,
     },
   };
-  const hasSelected = selectedRowKeys.length > 0;
 
+  const [allFileList, setAllFileList] = useState([])
   useEffect(() => {
-    const FileRepostoryUrl = "api/CloudLibary.json";
+    const cid = localStorage.getItem("authUser.cid");
+    const FileRepostoryUrl = cid ==='proscend' ? `repository?list_file={ ${state.Login.Cid}}`: `repository?list_file={ "cid":"${cid}"}`;
     setLoading(true);
-    axios.get(FileRepostoryUrl).then((res) => {
-      const response = res.data.response.repository[0].list
-      let Resdata = []
-      response.forEach((item, index)=>{
-        Resdata.push({ key: index, name: item.name, type: item.type, date: item.date, size: item.size, model: item.inf.model  })
+    axios
+      .get(FileRepostoryUrl)
+      .then((res) => {
+        console.log(res.data);
+        const response = res.data.response.repository[0].list;
+        let Resdata = [];
+        let allFileList = []
+        response.forEach((item, index) => {
+          allFileList.push(item.name)
+          Resdata.push({
+            key: index,
+            name: item.name,
+            type: item.type,
+            date: item.date,
+            size: item.size,
+            model: item.inf.model,
+          });
+        });
+        setData(Resdata);
+        setAllFileList(allFileList)
+        setLoading(false);
+        console.log("刷新");
       })
-      setData(Resdata);
-      setLoading(false);
-    });
-  },[])
-// http://192.168.0.95:8000/repository?delete_file={"cid":"12345678901234567890123456789011","name":"abc","type":"cfg"}
+      .catch((error) => {
+        if (error.response.status === 401) {
+          // dispatch({type:'setLogin', payload:{IsLogin: false}})
+          UserLogOut();
+          history.push("/login");
+        }
+      });
+  }, [uploading, IsActionUpdated]);
+
   const deleteItem = (key) => {
-    setLoading(true)
-    const cid = localStorage.getItem('authUser.cid')
-    let url = `/repository?delete_file={"cid":"${cid}","name":"${key.name}","type":"${key.type}"}`
-    console.log(url)
-    axios.get(url).then((res)=>{
-      console.log(res)
-      setLoading(false)
-    })
-    .catch((error)=>{
-      console.log(error)
-      setLoading(false)
-    })
-  }
+    setUploading(true);
+    const cid = localStorage.getItem("authUser.cid");
+    let url = cid==='proscend'?  `/repository?delete_file={${state.Login.Cid},"name":"${key.name}","type":"${key.type}"}` :`/repository?delete_file={"cid":"${cid}","name":"${key.name}","type":"${key.type}"}` ;
+    console.log(url);
+    axios
+      .get(url)
+      .then((res) => {
+        console.log(res);
 
-// http://192.168.0.95:8000/repository?download_file={"cid":"12345678901234567890123456789011","name":"abc","type":"cfg"}
+        Swal.fire({
+          title: `Delete ${key.name} complete!`,
+          icon: "success",
+          showConfirmButton: true,
+          // timer: 1000
+        });
+      })
+      .then(() => {
+        setUploading(false);
+      })
+      .catch((error) => {
+        console.log(error);
+        setUploading(false);
+        Swal.fire({
+          title: `Delete ${key.name} fail!`,
+          icon: "error",
+          showConfirmButton: true,
+          // timer: 1000
+        });
+      });
+  };
+
   const DownloadConfig = (key) => {
-    setLoading(true)
-    const cid = localStorage.getItem('authUser.cid')
-    let url = `/repository?download_file={"cid":"${cid}","name":"${key.name}","type":"${key.type}"}`
-    console.log(url)
-    axios({
-      url: url,
-      // url: 'api/fota.xml',
-      method: 'GET',
-      responseType: 'blob', // important
-    }).then((response) => {
-      setLoading(false)
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', 'config.txt');
-      document.body.appendChild(link);
-      link.click()
-    })
-  }
+    setUploading(true);
+    const cid = localStorage.getItem("authUser.cid");
+    console.log(key)
+    let url = cid ==='proscend' ? `/repository?download_file={${state.Login.Cid},"name":"${key.name}","type":"${key.type}"}` : `/repository?download_file={"cid":"${cid}","name":"${key.name}","type":"${key.type}"}`;
+    console.log(url);
+    const opt = {
+      responseType: "blob",
+    };
+    axios
+      .get(url, opt)
+      .then((response) => {
+        setUploading(false);
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", `${key.name}`);
+        document.body.appendChild(link);
+        link.click();
+      })
+      .catch((err) => {
+        console.log(err);
+        setUploading(false);
+      });
+  };
 
-  const [searchText, setSearchText] = useState('')
-  const [searchedColumn, setSearchedColumn] = useState('')
+  const [searchText, setSearchText] = useState("");
+  const [searchedColumn, setSearchedColumn] = useState("");
 
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
-    setSearchText(selectedKeys[0])
-    setSearchedColumn(dataIndex)
-  }
+    setSearchText(selectedKeys[0]);
+    setSearchedColumn(dataIndex);
+  };
 
-  const handleReset = clearFilters => {
+  const handleReset = (clearFilters) => {
     clearFilters();
-    setSearchText('')
-  }
+    setSearchText("");
+  };
 
-  const searchInput = useRef('');
-  const getColumnSearchProps = dataIndex => ({
-    filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+  const searchInput = useRef("");
+  const getColumnSearchProps = (dataIndex) => ({
+    filterDropdown: ({
+      setSelectedKeys,
+      selectedKeys,
+      confirm,
+      clearFilters,
+    }) => (
       <div style={{ padding: 8 }}>
         <Input
-          ref={node => {
+          ref={(node) => {
             searchInput.current = node;
           }}
           placeholder={`Search ${dataIndex}`}
           value={selectedKeys[0]}
-          onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+          onChange={(e) =>
+            setSelectedKeys(e.target.value ? [e.target.value] : [])
+          }
           onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
-          style={{ width: 188, marginBottom: 8, display: 'block' }}
+          style={{ width: 188, marginBottom: 8, display: "block" }}
         />
         <Space>
           <Button
@@ -125,290 +308,340 @@ const CloudList = () => {
             style={{ width: 90 }}
           >
             Search
-              </Button>
-          <Button onClick={() => handleReset(clearFilters)} size="small" style={{ width: 90 }}>
+          </Button>
+          <Button
+            onClick={() => handleReset(clearFilters)}
+            size="small"
+            style={{ width: 90 }}
+          >
             Reset
-              </Button>
+          </Button>
         </Space>
       </div>
     ),
-    filterIcon: filtered => <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
+    filterIcon: (filtered) => (
+      <SearchOutlined style={{ color: filtered ? "#1890ff" : undefined }} />
+    ),
     onFilter: (value, record) =>
       record[dataIndex]
-        ? record[dataIndex].toString().toLowerCase().includes(value.toLowerCase())
-        : '',
-    onFilterDropdownVisibleChange: visible => {
+        ? record[dataIndex]
+            .toString()
+            .toLowerCase()
+            .includes(value.toLowerCase())
+        : "",
+    onFilterDropdownVisibleChange: (visible) => {
       if (visible) {
-        setTimeout(() => searchInput.current.select(), 100)
+        setTimeout(() => searchInput.current.select(), 100);
       }
     },
-    render: text =>
+    render: (text) =>
       searchedColumn === dataIndex ? (
         <Highlighter
-          highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+          highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
           searchWords={[searchText]}
           autoEscape
-          textToHighlight={text ? text.toString() : ''}
+          textToHighlight={text ? text.toString() : ""}
         />
       ) : (
-          text
-        ),
-  })
-  //Upload function
-  // const [fileList, setFileList] = useState([
-    // {
-    //   uid: '-1',
-    //   name: 'xxx.png',
-    //   status: 'done',
-    //   url: 'http://www.baidu.com/xxx.png',
-    // },
-  // ])
+        text
+      ),
+  });
 
-  const handleChange = info => {
+  const handleChange = (info) => {
     let fileList = [...info.fileList];
-    // 1. Limit the number of uploaded files
-    // Only to show two recent uploaded files, and old ones will be replaced by the new
     fileList = fileList.slice(-1);
     // 2. Read from response and show file link
-    fileList = fileList.map(file => {
+    fileList = fileList.map((file) => {
       if (file.response) {
         // Component will show file.url as link
         file.url = file.response.url;
       }
       return file;
     });
-    setFileList(fileList)
-    form.resetFields(['type', 'MD5'])
-    setUploadFileType('')
-    console.log(fileList)
-    const fileReader = new FileReader()
-    fileReader.readAsBinaryString(fileList[0].originFileObj)
-    fileReader.onload = (e)=>{
-      console.log(fileList, md5(e.target.result))
-      setCMD5(md5(e.target.result)) 
-    }
-    
-      
-    // form.resetFields(['MD5'])
-    // form.setFieldsValue({MD5:md5(fileList[0])})  
+    setFileList(fileList);
+    form.resetFields(["type", "MD5"]);
+    setUploadFileType("");
+    console.log(fileList);
+    const fileReader = new FileReader();
+    fileReader.readAsBinaryString(fileList[0].originFileObj);
+    fileReader.onload = (e) => {
+      console.log(fileList, md5(e.target.result));
+      setCMD5(md5(e.target.result));
+    };
   };
 
-  // const props = {
-  //   action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
-  //   onChange: handleChange,
-  //   multiple: false,
-  // };
-  const [fileList, setFileList] = useState([])
-  const [file, setFile] = useState({})
-  const [uploading, setUploading]= useState(false)
+  const onFinish = (values) => {
+    setUploading(true);
+    console.log("Received values of form:", values);
+    const formData = new FormData();
+    formData.append("file", values.upload.fileList[0].originFileObj);
+    const cid = localStorage.getItem("authUser.cid");
+    
+    const url = cid ==='proscend' ? `/repository?upload_file={${state.Login.Cid},"name":"${values.filename || values.upload.file.name}","type":"${values.type}","inf": {"MD5":"${values.MD5 == undefined ? "123" : values.MD5}","model": "${values.model}"}}` : `/repository?upload_file={"cid":"${cid}","name":"${values.filename || values.upload.file.name}","type":"${values.type}","inf": {"MD5":"${values.MD5 == undefined ? "123" : values.MD5}","model": "${values.model}"}}`;
+    console.log(url);
+    console.log(allFileList, values.filename, values.upload.file.name)
+    if(values.filename? allFileList.includes(values.filename) : allFileList.includes(values.upload.file.name) ){
+      Swal.fire({
+        title: `FileName Duplicated! Please try again`,
+        icon: "error",
+        showConfirmButton: true,
+        // timer: 1000
+      })
+      setUploading(false)
+      return
+    }
 
- const onFinish = (values) => {
-  setUploading(true)
-  console.log("Received values of form:", values);
-  // console.log(fileList)
-  const formData = new FormData();
-  fileList.forEach(file => {
-    formData.append('files[]', file);
-  });
-  
-  // console.log(formData)
-  const cid = localStorage.getItem('authUser.cid')
-// http://192.168.0.95:8000/repository?upload_file={"cid":"12345678901234567890123456789011","name":"abc","type":"cfg","inf":inf}
-  const url = `/repository?upload_file={"cid":${JSON.stringify(cid)},"name":${JSON.stringify(values.upload.file.name)},"type":${JSON.stringify(values.type)},"inf":${values.MD5 == undefined ? "{}" : JSON.stringify(values.MD5)}}`
-  console.log(url)
-  axios.post(url, formData).then((res)=>{
-    console.log(res)
-    setFileList([])
-    setUploading(false)
-    message.success('upload successfully.');
-  })
-  .catch((err)=>{
-    console.log(err)
-    setUploading(false)
-    message.error('upload failed.');
-  })
-  // let hash = md5(values.upload.file)
-  // console.log(hash)
-  // You can use any AJAX library you like
-  // reqwest({
-  //   url: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
-  //   method: 'post',
-  //   processData: false,
-  //   data: formData,
-  //   success: () => {
-  //     setFileList([])
-  //     setUploading(false)
-  //     message.success('upload successfully.');
-  //   },
-  //   error: () => {
-      // setUploading(false)
-      // message.error('upload failed.');
-  //   },
-  // });
-};
+    axios.post(url, formData)
+      .then((res) => {
+        console.log(res);
+        setFileList([]);
+        Swal.fire({
+          title: `Upload complete!`,
+          icon: "success",
+          showConfirmButton: true,
+          // timer: 1000
+        });
+      })
+      .then(() => {
+        setUploading(false);
+        form.resetFields()
+        setUploadFileType("")
+      })
+      .catch((err) => {
+        console.log(err);
+        setUploading(false);
+        Swal.fire({
+          title: `Fail, plaese try again!`,
+          icon: "error",
+          showConfirmButton: true,
+          // timer: 1000
+        });
+        form.resetFields()
+        setUploadFileType("")
+      });
+  };
+
   const props = {
-    onRemove: file => {
-      const index = fileList.indexOf(file)
-      const newFileList = fileList.slice()
-      newFileList.splice(index, 1)
-      setFileList(newFileList)  
+    onRemove: (file) => {
+      const index = fileList.indexOf(file);
+      const newFileList = fileList.slice();
+      newFileList.splice(index, 1);
+      setFileList(newFileList);
     },
     onChange: handleChange,
-    beforeUpload: file => {
-      // console.log(fileList, file)
-      setFileList([...fileList, file])
-      // setFile(file)
-      // setMD5(md5(file))    
-      // form.setFieldsValue({MD5:md5(file)})  
+    beforeUpload: (file) => {
+      setFileList([...fileList, file]);
       return false;
     },
     fileList,
   };
 
   const { Option, OptGroup } = Select;
-  const [uploadFileType, setUploadFileType] = useState(null) 
+  const [uploadFileType, setUploadFileType] = useState(null);
 
   function FileSelecthandleChange(value) {
     console.log(`selected ${value}`);
   }
 
-  const columns = [
-    { 
-      title: 'FileName',
-      dataIndex: 'name',
-      width: '30%',
-      ...getColumnSearchProps('name')
-    },
-    { 
-      title: 'Model',
-      dataIndex: 'model',
-      width: '15%',
-      ...getColumnSearchProps('model')
+  let columns = [
+    {
+      title: "FileName",
+      dataIndex: "name",
+      width: "30%",
+      editable: true,
+      ...getColumnSearchProps("name"),
     },
     {
-      title: 'FileType',
-      dataIndex: 'type',
-      width: '15%',
-      ...getColumnSearchProps('type')
-    },
-  {
-      title: 'CtratedDate',
-      dataIndex: 'date',
-      width: '25%',
-      responsive: ['md'],
-      ...getColumnSearchProps('date')
+      title: "Model",
+      dataIndex: "model",
+      width: "15%",
+      ...getColumnSearchProps("model"),
     },
     {
-      title: 'Size(KB)',
-      dataIndex: 'size',
-      width: '15%',
-      responsive: ['md']
+      title: "FileType",
+      dataIndex: "type",
+      width: "15%",
+      ...getColumnSearchProps("type"),
     },
     {
-      title: 'Action',
-      dataIndex: 'action',
-      width: '20%',
-      className:`${styles.actionCol}`,
+      title: "CreatedDate",
+      dataIndex: "date",
+      width: "25%",
+      responsive: ["md"],
+      ...getColumnSearchProps("date"),
+    },
+    {
+      title: "Size(KB)",
+      dataIndex: "size",
+      width: "15%",
+      responsive: ["md"],
+    },
+    {
+      title: "Action",
+      dataIndex: "action",
+      width: "20%",
+      className: `${styles.actionCol}`,
       render: (text, record, index) => (
         <Fragment key={index}>
-          <Button onClick={()=>DownloadConfig(record)} icon={<FcDownload />}></Button>
-          <Button onClick={()=>deleteItem(record)} icon={<FcDeleteDatabase />}></Button>
+          <Button
+            onClick={() => DownloadConfig(record)}
+            icon={<FcDownload />}
+          ></Button>
+          <Popconfirm title="Sure to delete?" onConfirm={() => deleteItem(record)}>
+          <Button
+            icon={<FcDeleteDatabase />}
+          ></Button>
+          </Popconfirm>
         </Fragment>
-      )
+      ),
+    },
+  ];
+
+  columns = columns.map((col) => {
+    if (!col.editable) {
+      return col;
     }
-  ]
+
+    return {
+      ...col,
+      onCell: (record) => ({
+        record,
+        editable: col.editable,
+        dataIndex: col.dataIndex,
+        title: col.title,
+        // handleSave: handleSave,
+      }),
+    };
+  });
 
   return (
-    <Card title="Data on Clould Libary" className={styles.card} headStyle={{ display: 'none' }} >
-        <Button type="primary"  loading={loading}  onClick={()=>setVisible(true)} className={styles.clickBtn} size={'large'} icon={<UploadOutlined />} >
-          Upload
-        </Button>
-        <Modal
-          title="Upload"
-          visible={visible}
-          onOk={()=>setVisible(false)}
-          onCancel={()=>setVisible(false)}
-          okButtonProps={{ form: 'FileUpload', key: 'submit', htmlType: 'submit', disabled:(fileList.length === 0), loading:uploading }}
-          okText={uploading ? 'Uploading' : 'Start Upload'}
-          cancelText="Cancel"
-        >
+    <Card
+      title="Data on Clould Libary"
+      className={styles.card}
+      headStyle={{ display: "none" }}
+    >
+      <Button
+        type="primary"
+        loading={loading}
+        onClick={() => setVisible(true)}
+        className={styles.clickBtn}
+        size={"large"}
+        icon={<UploadOutlined />}
+      >
+        Upload
+      </Button>
+      <Modal
+        title="Upload"
+        visible={visible}
+        onOk={() => setVisible(false)}
+        onCancel={() => setVisible(false)}
+        okButtonProps={{
+          form: "FileUpload",
+          key: "submit",
+          htmlType: "submit",
+          disabled: fileList.length === 0,
+          loading: uploading,
+        }}
+        okText={uploading ? "Uploading" : "Start Upload"}
+        cancelText="Cancel"
+      >
         <Form
-          id={'FileUpload'}
+          id={"FileUpload"}
           name="dynamic_form_nest_item"
           onFinish={onFinish}
           autoComplete="off"
-          form = {form}
+          form={form}
         >
           <Form.Item
-            label={'File'}
-            name={'upload'}
-            rules={[
-              { required: true, message: "Please select a file" },
-            ]}
+            label={"File"}
+            name={"upload"}
+            rules={[{ required: true, message: "Please select a file" }]}
           >
             <Upload {...props}>
               <Button icon={<UploadOutlined />}>Select File</Button>
             </Upload>
           </Form.Item>
           <Form.Item
-            label={'File Type'}
-            name={'type'}
-            rules={[
-              { required: true, message: "Please select a type" },
-            ]}
+            label={"Model"}
+            name={"model"}
+            rules={[{ required: true, message: "Please select a model" }]}
           >
-              <Select style={{ width: 200 }} onChange={(value)=>{
-                FileSelecthandleChange(value) 
-                setUploadFileType(value)
-                form.setFieldsValue({MD5:cMD5}) 
-                // console.log(fileList)
-                // let hash = md5(file) 
-                // setMD5(hash)    
-                // form.setFieldsValue({MD5:MD5})                   
-                // console.log(hash)
-                }}>
-                <OptGroup label="Restore">
-                  <Option value="cfg">cfg</Option>
-                </OptGroup>
-                <OptGroup label="Upgrade">
-                  <Option value="fw">fw</Option>
-                </OptGroup>
-              </Select>
-          </Form.Item>
-          {
-            (uploadFileType==='fw' && 
-            <Form.Item
-            label={'MD5'}
-            name={'MD5'}
-            rules={[
-              { required: true, message: "Please input the MD5 number!" },
-            ]}
+            <Select
+              style={{ width: 200 }}
+              onChange={(value) => {
+                console.log(value);
+              }}
             >
-              <Input placeholder="Please input a specific series of MD5"  disabled={true}/>
-          </Form.Item>)
-          }
-      </Form>
+              {CompanyPD.map((item, index) => {
+                return (
+                  <Option key={index} value={item}>
+                    {item}
+                  </Option>
+                );
+              })}
+            </Select>
+          </Form.Item>
+          <Form.Item
+            label={"File Name"}
+            name={"filename"}
+            rules={[{ required: false, message: "Input a file name" }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label={"File Type"}
+            name={"type"}
+            rules={[{ required: true, message: "Please select a type" }]}
+          >
+            <Select
+              style={{ width: 200 }}
+              onChange={(value) => {
+                FileSelecthandleChange(value);
+                setUploadFileType(value);
+                form.setFieldsValue({ MD5: cMD5 });
+              }}
+            >
+              <OptGroup label="Restore">
+                <Option value="cfg">cfg</Option>
+              </OptGroup>
+              <OptGroup label="Upgrade">
+                <Option value="fw">fw</Option>
+              </OptGroup>
+            </Select>
+          </Form.Item>
+          {uploadFileType === "fw" && (
+            <Form.Item
+              label={"MD5"}
+              name={"MD5"}
+              rules={[
+                { required: true, message: "Please input the MD5 number!" },
+              ]}
+            >
+              <Input
+                placeholder="Please input a specific series of MD5"
+                disabled={true}
+              />
+            </Form.Item>
+          )}
+        </Form>
       </Modal>
-      {/* <Button type="primary" loading={loading} onClick={BatchDownload} icon={<DownloadOutlined />} size={'large'} className={styles.clickBtn} htmlType="submit">
-        Download
-      </Button>
-      <Button type="primary" danger loading={loading} onClick={BatchDelete} icon={<RiDeleteBin2Line />} size={'large'} className={styles.clickBtn} >
-        Delete
-      </Button> */}
       <div>
-        <div>
-          <span style={{ marginLeft: 8 }}>
-            {hasSelected ? `Selected ${selectedRowKeys.length} items` : ''}
-          </span>
-        </div>
-        <Table columns={columns} dataSource={data} pagination={false}  className={styles.table} loading={loading} />
+        <Table
+          components={components}
+          rowClassName={() => "editable-row"}
+          columns={columns}
+          dataSource={data}
+          pagination={false}
+          className={styles.table}
+          // loading={loading}
+          loading={uploading}
+        />
       </div>
     </Card>
-  )
-}
+  );
+};
 
-export default CloudList 
-
+export default CloudList;
 
 // http://192.168.0.95:8000/repository?upload_file={"cid":"12345678901234567890123456789011","name":"abc","type":"cfg","inf":inf}
 // http://192.168.0.95:8000/repository?download_file={"cid":"12345678901234567890123456789011","name":"abc","type":"cfg"}
@@ -417,3 +650,4 @@ export default CloudList
 // http://192.168.0.95:8000/repository?list_file={}
 // http://192.168.0.95:8000/repository?list_file={"cid":"12345678901234567890123456789011"}
 
+// https://ba6e036d2d9a.ngrok.io/repository?download_file={"cid":"proscend","name":"test123","type":"cfg"}

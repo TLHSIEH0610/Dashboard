@@ -1,30 +1,66 @@
-import React, { useState, useEffect, useRef, Fragment } from "react";
+import React, { useState, useEffect, useRef, Fragment,useContext } from "react";
 import styles from "./devicebackup.module.scss";
-import { Button, Card, Space, Form, Input, Table, Steps } from "antd";
+import { Button, Card, Space, Input, Table, Steps, Popconfirm, message } from "antd";
 import axios from "axios";
-import { SearchOutlined, UserOutlined, SolutionOutlined, LoadingOutlined, SmileOutlined } from "@ant-design/icons";
-import Highlighter from 'react-highlight-words';
+import {
+  SearchOutlined,
+  UserOutlined,
+  SolutionOutlined,
+  LoadingOutlined,
+  SmileOutlined,
+} from "@ant-design/icons";
+import Highlighter from "react-highlight-words";
+import { useHistory } from "react-router-dom";
+import Context from '../../../Utility/Reduxx'
+// import { UserLogOut } from "../../../Utility/Fetch";
 
 const { Step } = Steps;
 
 const ActionStatus = () => {
-  const [loading, setLoading] = useState(false)
+  const { state, dispatch } = useContext(Context)  
+  const history = useHistory();
+  const [loading, setLoading] = useState(false);
   const [event, setEvent] = useState([
-    { name: "", action: "", key:'', model:'', state:'' },
+    { name: "", action: "", key: "", model: "", state: "" },
   ]);
-
-
+  const [count, setCount] = useState(0);
+  const IsActionUpdated = state.BackupRestore.IsActionUpdated
   useEffect(() => {
-    setLoading(true)
-    axios.get("api/BkUpReSr.json").then((res) => {
-      let responseData = []
-      res.data.response.bck_rst_upg.forEach((item, index)=>{
-        responseData.push({name:item.name, action:item.action, key:index, model:item.model, state:item.state, id:item.id })
-      })
+    console.log("執行區間功能", state);
+    const cid = localStorage.getItem("authUser.cid");
+    const url = `/cmd?set={"bck_rst_upg_list":{"list":{ ${state.Login.Cid}}}}`;
+    console.log(url)
+    // setLoading(true)
+    axios.get(url).then((res) => {
+      let responseData = [];
+      // console.log(res)
+      res.data.response &&(
+        res.data.response.bck_rst_upg.forEach((item, index) => {
+          responseData.push({
+            name: item.name,
+            action: item.action,
+            key: index,
+            model: item.model,
+            state: item.state,
+            id: item.id,
+          })
+        }))
+      
+      if (JSON.stringify(responseData) === JSON.stringify(event)) {
+        setLoading(false)
+        return;
+      }
+      // console.log ( JSON.stringify(responseData)  === JSON.stringify(event))
       setEvent(responseData);
+      dispatch({type:'ActionStatusList', payload:{ActionStatusList: responseData}})
+      dispatch({type:'IsActionUpdated', payload:{IsActionUpdated: false}})
       setLoading(false)
     });
-  },[]);
+    const stateInterval = setInterval(() => {
+      setCount((prevState) => prevState + 1);
+    }, 10000);
+    return () => clearInterval(stateInterval);
+  }, [count, IsActionUpdated]);
 
   const getColumnSearchProps = (dataIndex) => ({
     filterDropdown: ({
@@ -94,34 +130,39 @@ const ActionStatus = () => {
       ),
   });
 
-  const[searchText, setSearchText] = useState('')
-  const[searchedColumn, setSearchedColumn] = useState('')
+  const [searchText, setSearchText] = useState("");
+  const [searchedColumn, setSearchedColumn] = useState("");
 
- const handleSearch = (selectedKeys, confirm, dataIndex) => {
-      confirm();
-      setSearchText( selectedKeys[0])
-      setSearchedColumn( dataIndex)
-    }
-  
-  const  handleReset = clearFilters => {
-      clearFilters();
-      setSearchText('')
-    }
+  const handleSearch = (selectedKeys, confirm, dataIndex) => {
+    confirm();
+    setSearchText(selectedKeys[0]);
+    setSearchedColumn(dataIndex);
+  };
 
-  const searchInput = useRef('');
+  const handleReset = (clearFilters) => {
+    clearFilters();
+    setSearchText("");
+  };
 
-  // "response": {
-  //   "bck_rst_upg": [
-  //     {
-  //       "id": "015E350099100001",
-  //       "cid": "12345678901234567890123456789011",
-  //       "model": "M350",
-  //       "name": "2222",
-  //       "type": "cfg",
-  //       "inf": "123",
-  //       "action": "UPGRADE",
-  //       "state": "START_REBOOT"
-  //     },
+  const searchInput = useRef("");
+///cmd?set={"bck_rst_upg_list":{"delete":{"id":id}}}
+  function clearHistory(id) {
+    setLoading(true)
+    let url = `/cmd?set={"bck_rst_upg_list":{"delete":{"id":"${id}"}}}`;
+    axios.get(url).then((res) => {
+      console.log(res)
+      setCount((prevState) => prevState + 1)
+      setLoading(false)
+      message.success('clear successfully.')
+    }).then(()=>{
+      setLoading(true)
+    })
+    .catch((error)=>{
+      console.log(error)
+      setLoading(false)
+      message.error('operation failed.')
+    })
+  }
 
   const columns = [
     {
@@ -149,41 +190,81 @@ const ActionStatus = () => {
       ...getColumnSearchProps("state"),
     },
     {
-      title: 'History',
-      dataIndex: 'History',
-      width: '20%',
-      render: ( text, record, index) => (
-          <Fragment>
-            {<a href='#' key={index}> clear </a>}
-          </Fragment>
-      )
-  }
+      title: "History",
+      dataIndex: "History",
+      width: "20%",
+      render: (text, record, index) => (
+        <Fragment>
+          {
+            <Popconfirm
+              title="Sure to delete?"
+              onConfirm={() => clearHistory(record.id)}
+            >
+              <Button key={index}>clear</Button>
+            </Popconfirm>
+          }
+        </Fragment>
+      ),
+    },
   ];
 
-
-  // record.state ==='START_REBOOT'? 'wait' : ( record.state ==='FILE_UPLOADING'? 'process' : 'finish')
   return (
     <Fragment>
-     <Card title="Request Status" >
-     <Table
-        columns={columns}
-        dataSource={event}
-        pagination={false}
-        className={styles.table}
-        loading={loading}
-        expandable={{
-          // expandedRowRender: record => <p style={{ margin: 0 }}>{record.id}</p>,  
-          expandedRowRender: record => <Steps>
-            {/* {record.state} */}
-          <Step status={(record.state ==='RECEIVE_COMMAND' ? 'process' : 'wait')} title="RECEIVE_COMMAND" icon={record.state ==='RECEIVE_COMMAND' ?<LoadingOutlined /> :<UserOutlined />} />
-          <Step status={(record.state ===('FILE_UPLOADING' || 'FILE_UPLOAD')) ? 'process' : 'finish'} title="(UP)DOWNLOADING" icon={record.state ===('FILE_UPLOADING' || 'FILE_UPLOAD') ?<LoadingOutlined /> :<SolutionOutlined />} />
-          <Step status={'finish'} title="START_REBOOT" icon={<SmileOutlined />} />
-        </Steps>,
-          rowExpandable: record => record.state !== 'START_REBOOT',
-        }}
-      />
-     </Card>
-     </Fragment>
+      <Card
+        title="Action Status"
+        // headStyle={{ background: "rgba(0,0,0,.03)" }}
+        bordered = {true}
+      >
+        <Table
+          columns={columns}
+          dataSource={event}
+          pagination={false}
+          className={styles.table}
+          loading={loading}
+          expandable={{
+            expandedRowRender: (record) => (
+              <div className={styles.step}>
+                <Steps>
+                  <Step
+                    status={
+                      record.state === "RECEIVE_COMMAND" ? "process" : "finish"
+                    }
+                    title="RECEIVE_COMMAND"
+                    icon={
+                      record.state === "RECEIVE_COMMAND" ? (
+                        <LoadingOutlined />
+                      ) : (
+                        <UserOutlined />
+                      )
+                    }
+                  />
+                  <Step
+                    status={
+                      record.state === "FILE_UPLOADING" ? "process" : "wait"
+                    }
+                    title="Processing"
+                    icon={
+                      record.state === "FILE_UPLOADING" ? (
+                        <LoadingOutlined />
+                      ) : (
+                        <SolutionOutlined />
+                      )
+                    }
+                  />
+                  <Step
+                    status={"wait"}
+                    title="Complete"
+                    icon={<SmileOutlined />}
+                  />
+                </Steps>
+              </div>
+            ),
+            rowExpandable: (record) =>
+              record.state !== "START_REBOOT" && record.state !== "FILE_UPLOAD",
+          }}
+        />
+      </Card>
+    </Fragment>
   );
 };
 
