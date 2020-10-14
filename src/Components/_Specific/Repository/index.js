@@ -377,7 +377,7 @@ const CloudList = () => {
     formData.append("file", values.upload.fileList[0].originFileObj);
     const cid = localStorage.getItem("authUser.cid");
     
-    const url = cid ==='proscend' ? `/repository?upload_file={${state.Login.Cid},"name":"${values.filename || values.upload.file.name}","type":"${values.type}","inf": {"MD5":"${values.MD5 == undefined ? "123" : values.MD5}","model": "${values.model}"}}` : `/repository?upload_file={"cid":"${cid}","name":"${values.filename || values.upload.file.name}","type":"${values.type}","inf": {"MD5":"${values.MD5 == undefined ? "123" : values.MD5}","model": "${values.model}"}}`;
+    const url = cid ==='proscend' ? `/repository?upload_file={${state.Login.Cid},"name":"${values.filename || values.upload.file.name}","type":"${values.type}","inf": {"MD5":"${values.MD5 === undefined ? "123" : values.MD5}","model": "${values.model}"}}` : `/repository?upload_file={"cid":"${cid}","name":"${values.filename || values.upload.file.name}","type":"${values.type}","inf": {"MD5":"${values.MD5 === undefined ? "123" : values.MD5}","model": "${values.model}"}}`;
     console.log(url);
     console.log(allFileList, values.filename, values.upload.file.name)
     if(values.filename? allFileList.includes(values.filename) : allFileList.includes(values.upload.file.name) ){

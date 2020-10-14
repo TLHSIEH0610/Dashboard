@@ -6,7 +6,9 @@
     {"lat": 24.774161651838146, "lng": 121.00975314343036,  "alt": 119, "time": "014:00", "health": "up", "strength": "excellent"  }, 
     {"lat": 24.77428646377295,  "lng": 121.00985016395957,  "alt": 120, "time": "017:00", "health": "up", "strength": "excellent"  }, 
     {"lat": 24.77445064021258,  "lng": 121.00997937099696,  "alt": 120, "time": "20:00", "health": "up", "strength": "excellent"  }, 
-    {"lat": 24.774631464846667, "lng": 121.01011394245238,  "alt": 117, "time": "23:00", "health": "up", "strength": "excellent"  } 
+    {"lat": 24.774631464846667, "lng": 121.01011394245238,  "alt": 117, "time": "23:00", "health": "up", "strength": "excellent"  },
+    {"lat": 24.247014, "lng": 120.675671,  "alt": 117, "time": "23:40", "health": "up", "strength": "excellent"  },
+    {"lat": 24.147783, "lng": 120.674625,  "alt": 117, "time": "23:70", "health": "up", "strength": "excellent"  }  
   ] },
   "Day02" :{ "position" : [
     {"lat": 24.774631464846667, "lng": 121.01011394245238,  "alt": 117, "time": "07:00", "health": "up", "strength": "excellent"  }, 

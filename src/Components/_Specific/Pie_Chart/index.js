@@ -4,20 +4,18 @@ import { Card } from "antd";
 import useURLloader from "../../../hook/useURLloader";
 import PieChartC from "./PieChart";
 import Context from '../../../Utility/Reduxx'
+
 const PieChart = () => {
   const { state } = useContext(Context) 
   const cid = localStorage.getItem('authUser.cid')
   const url =cid==='proscend' ? `/cmd?get={"statistic":{"filter":{${state.Login.Cid}}}}`:`/cmd?get={"statistic":{"filter":{"cid":"${cid}"}}}` ;
   const [loading, response] = useURLloader(url, url);
   const [PieData, setPieData] = useState([]);
-  //   console.log(response)
-  // console.log(state)
+
   useEffect(() => {
     if (response) {
-      let data = response.response.statistic.obj;
-      setPieData(data);
-      // console.log(url);
-      // console.log(response)
+      setPieData(response.response.statistic.obj);
+
     }
   }, [response]);
 

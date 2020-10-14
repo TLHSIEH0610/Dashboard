@@ -4,6 +4,7 @@ import { BrowserRouter, Route, Redirect, Switch } from "react-router-dom";
 import Nav from "./Components/_Common/Navbar";
 import "./App.scss";
 import Login from "./Pages/login";
+import Register from './Pages/Register'
 import Header from "./Components/_Common/Header";
 import { Provider } from "./Utility/Reduxx";
 import { NavRoutes } from "./Routes/NavbarRoutes";
@@ -23,6 +24,7 @@ const App = () => {
             <div className="content">
               <Switch>
                 <Route path="/login" exact component={Login}></Route>
+                <Route path="/register" exact component={Register}></Route>
                 {NavRoutes.map((item, index) => {
                   return (
                     <Route

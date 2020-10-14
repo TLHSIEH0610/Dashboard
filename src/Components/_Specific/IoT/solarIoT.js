@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Card, Table } from "antd";
 import useURLloader from "../../../hook/useURLloader";
-import styles from "./solarIoT.module.scss";
+
 
 const SolarIoTC = () => {
   const SolarUrl = "/api/IoT_solar2.json";
@@ -307,6 +307,7 @@ const SolarIoTC = () => {
   return (
     <Card>
       <Table
+      loading={loading}
         columns={columns}
         dataSource={IoTData}
         bordered

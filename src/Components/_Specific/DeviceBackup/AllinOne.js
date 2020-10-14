@@ -297,80 +297,6 @@ const AllinOne_test = () => {
           </div>    
           <div className={styles.formDiv}>
           <p>File</p>
-          {/* {action === "backup" ?
-                    <Fragment>
-                    <p>FileName</p>
-                    <Form.Item
-                    className={styles.formitem}
-                    name="filename"
-                    rules={[
-                      {
-                        required: true,
-                        message: "File is required!",
-                      },
-                    ]}
-                  >
-                    <Input />
-                  </Form.Item>
-                  </Fragment> 
-          :
-          <Fragment>
-          <p>SelectFile</p> 
-          <Form.Item
-            // label='File'
-            className={styles.formitem}
-            name="Repostiry"
-            rules={[
-              {
-                required: true,
-                message: "File is required!",
-              },
-            ]}
-          >
-            <Select
-              // disabled={action === "backup" ? true : false}
-              showSearch
-              // style={{ width: 230 }}
-              className={styles.fileinput}
-              placeholder="Select a file"
-              optionFilterProp="children"
-              notFoundContent={"Not available"}
-              onChange={(value) => {}}
-              onFocus={() => {
-                onFocus();
-              }}
-              onBlur={onBlur}
-              onSearch={onSearch}
-              filterOption={(input, option) =>
-                option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-              }
-            >
-                {action !== null &&
-                (action === "backup"
-                  ? ""
-                  : action === "restore"
-                  ? FR.map((item, index) => {
-                    if(item.type==='cfg' && item.inf.model===selectedModel){
-                      return (
-                        <Option key={index} value={item.name}>
-                          {item.name}
-                        </Option>
-                      );
-                    }
-                    })
-                  : FR.map((item, index) => {
-                    if(item.type==='fw' && item.inf.model===selectedModel){
-                      return (
-                        <Option key={index} value={item.name}>
-                          {item.name}
-                        </Option>
-                      );
-                    }
-                    }))}
-            </Select>
-          </Form.Item>
-          </Fragment> 
-          } */}
           <Form.Item
             // label='File'
             className={styles.formitem}
@@ -444,8 +370,7 @@ const AllinOne_test = () => {
 export default AllinOne_test;
 
 // Backup/Restore/Upgrade
-              //actual  /cmd?set={"backup":[{"cid":"proscend","id":"015E350099100001","name":"015E350099100001","type":"cfg","inf":{"model":"M350"}},{"cid":"proscend","id":"015E350099200001","name":"015E350099200001","type":"cfg","inf":{"model":"M350"}},{"cid":"proscend","id":"015E350099300001","name":"015E350099300001","type":"cfg","inf":{"model":"M350"}}]}
-                      // cmd?set={"backup":[{"cid":"proscend","id":"015E350099100001","name":"111","type":"cfg","inf":{}},{"cid":"proscend","id":"015E350099200001","name":"222","type":"cfg","inf":{}},{"cid":"proscend","id":"015E350099300001","name":"333","type":"cfg","inf":{}}]}
+// cmd?set={"backup":[{"cid":"proscend","id":"015E350099100001","name":"111","type":"cfg","inf":{}},{"cid":"proscend","id":"015E350099200001","name":"222","type":"cfg","inf":{}},{"cid":"proscend","id":"015E350099300001","name":"333","type":"cfg","inf":{}}]}
 // http://127.0.0.1:8000/cmd?set={"backup":[{"cid":"12345678901234567890123456789011","id":"015E350099100001","name":"1234","type":"cfg","inf":{}}]}
 // http://127.0.0.1:8000/cmd?set={"restore":[{"cid":"12345678901234567890123456789011","id":"015E350099100001","name":"1234","type":"cfg","inf":{}}]}
 // http://127.0.0.1:8000/cmd?set={"upgrade":[{"cid":"12345678901234567890123456789011","id":"015E350099100001","name":"1234","type":"cfg","inf":{}}]}

@@ -1,13 +1,17 @@
 .Card{
-    width: 100%;
-    // display: flex;
-
+    width: 50%;
+    height: 438.24px;
+}
+@media(max-width:1100px){
+    .Card{
+        flex-wrap: wrap;
+    }
 }
 .subCard{
     width: 30%;
     display: inline-block;
     margin:1% 1% 0 0!important;
-    height:40%;
+    height:100%;
     .Icon{
         font-size: 2rem;
         color: #6495ED;

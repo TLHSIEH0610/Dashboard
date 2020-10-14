@@ -1,49 +1,17 @@
 import React from "react";
-import { Descriptions } from "antd";
-import styles from "../topology.module.scss";
+// import styles from "../topology.module.scss";
 import {
   Form,
   Input,
-  Button,
-  Card,
-  Table,
-  Space,
-  Modal,
   Switch,
   Radio,
   Select
 } from "antd";
 
-// export const ChangePage = (props) => {
-//     const { key } = props
-//     const [form] = Form.useForm();
-//     // function callback(key) {
-//         console.log(key);
-//         const url = `/cmd?get={"device_cfg":{"filter":{"id":"${record.id}"},"nodeInf":{},"obj":{"${key}":{}}}}`;
-//         axios.get(url).then((res) => {
-//           // console.log(res.data);
-//           if (key === "lan") {
-//             let result = res.data.response.device_cfg[0].obj.lan;
-//             setLan(result);
-//             form.setFieldsValue({
-//               ip4_address: result.ipv4.address,
-//               ip4_netmask: result.ipv4.netmask,
-//               ip4_dhcpmodel: result.ipv4.dhcp.model,
-//               ip4_dhcp_start: result.ipv4.dhcp.pool[0].start,
-//               ip4_dhcp_end: result.ipv4.dhcp.pool[0].end,
-//               ip6_type: result.ipv6.type,
-//               ip6_assignment: result.ipv6.dhcp.assignment,
-//             });
-//           }
-//           key === "wan" && setWan(res.data.response.device_cfg[0].obj.wan);
-//           key === "lte" && setLte(res.data.response.device_cfg[0].obj.lte);
-//         });
-//     //   }
 
-// }
 const { Option } = Select;
-export const LanSetting = (props) => {
-  const { layout, form, onFinish } = props;
+
+export const LanSetting = ({ layout, form, onFinish }) => {
 
   return (
     <Form {...layout} onFinish={onFinish} form={form}>
@@ -128,8 +96,7 @@ export const LanSetting = (props) => {
   );
 };
 
-export const WanSetting = (props) => {
-  const { layout, form, onFinish } = props;
+export const WanSetting = ({ layout, form, onFinish }) => {
 
   return (
     <Form {...layout} onFinish={onFinish} form={form}>
@@ -243,8 +210,8 @@ export const WanSetting = (props) => {
   );
 };
 
-export const LteSetting = (props) => {
-  const { layout, form, onFinish } = props;
+export const LteSetting = ({ layout, form, onFinish }) => {
+
   function pinonChange(checked) {
     console.log(`switch to ${checked}`);
   }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import axios from 'axios'
 import Context from '../Utility/Reduxx'
 import { useHistory,useLocation } from "react-router-dom";
@@ -14,25 +14,21 @@ const useURLloader = (url, dep) => {
     useEffect(()=>{
         setLoading(true)
         axios.get(url).then((res)=>{
-            // console.log(res)
+            console.log( '執行了',url)
             setData(res.data)
             setLoading(false)
-            console.log(loading, data)
-
         })
         .catch((error)=>{
             console.log(error)
+            setLoading(false)
             if(error.response.status === 401){
-                // dispatch({type:'setLogin', payload:{IsLogin: false}})
-                // console.log(location)
                 dispatch({type:'LogPath', payload:{LogPath: location.pathname}})
                 UserLogOut()
                 history.push('/login')    
             }
-
-        })  
-        // console.log(dep)
+        }) 
     }, [dep, url])
+    
     return [loading, data]
 }
 

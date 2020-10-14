@@ -15,7 +15,7 @@ import IoT from '../Pages/IoT'
 export const NavRoutes = [
     {
         title: 'Dashboard',
-        path: '/dashboard',
+        path: '/',
         icon: <GoDashboard/>,
         cName: 'NavText',
         auth: true,

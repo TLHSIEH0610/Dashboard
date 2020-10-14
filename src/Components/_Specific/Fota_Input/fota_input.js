@@ -7,14 +7,12 @@ import FOTAform from './form'
 import Highlighter from 'react-highlight-words';
 
 
-const validateMessages = {
-    required: '${label} is required!',
-};
 
 const Fota_Input = () => {
     const [xmlData, setXmlData] = useState([{ key: '', ModelName: '', Version: '', force: '', MD5: '', name: '', SoftwareMCSV: '', Transport: [{ Protocol: '', Host: '', Port: '', Path: '', LoginName: '', PassWord: '' }] }])
     const [form] = Form.useForm()
     const [loading, setLoading] = useState(false)
+
     useEffect(() => {
         setLoading(true)
         axios.get('/api/fota2.xml').then((res) => {
@@ -286,7 +284,7 @@ const Fota_Input = () => {
                     maskStyle={{ background: 'transparent' }}
                     bodyStyle={{ display: 'flex', margin: '30px', justifyContent: 'center' }}
                     >
-                    <FOTAform form={form} id={'category-editor-form'} validateMessages={validateMessages} onFinish={onFinish} name={'nest-messagesE'} />
+                    <FOTAform form={form} id={'category-editor-form'} onFinish={onFinish} name={'nest-messagesE'} />
                     </Modal>
                     <Button size={'large'}  danger onClick={() => {
                         deleteData(index)
@@ -348,7 +346,7 @@ const Fota_Input = () => {
                     maskStyle={{ background: 'transparent' }}
                     bodyStyle={{ display: 'flex', margin: '30px', justifyContent: 'center' }}
                 >
-                    <FOTAform form={form} id={'category-add-form'} validateMessages={validateMessages} onFinish={onFinishA} name={'nest-messagesA'} />
+                    <FOTAform form={form} id={'category-add-form'}  onFinish={onFinishA} name={'nest-messagesA'} />
                 </Modal>
                 <Table columns={columns} dataSource={xmlData} pagination={false} scroll={{ y: 800 }}  className={styles.table}  loading={loading}/> 
             </Card>

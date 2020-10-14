@@ -9,9 +9,10 @@ import "echarts/lib/component/title";
 import "echarts/lib/component/legend";
 
 
-export const StatusStrength = (props) => {
-  const { dataSource } = props;
+export const StatusStrength = ({ dataSource }) => {
+
   const statistic = dataSource.sim[0];
+  
   return (
     <div>
       <Descriptions
@@ -48,8 +49,8 @@ export const StatusStrength = (props) => {
   );
 };
 
-export const StatusGPS = (props) => {
-  const { dataSource } = props;
+export const StatusGPS = ({ dataSource }) => {
+
   const gps = dataSource.gps;
   return (
     <div>
@@ -78,9 +79,10 @@ export const StatusGPS = (props) => {
   );
 };
 
-export const StatusDNS = (props) => {
-  const { dataSource } = props;
+export const StatusDNS = ({ dataSource }) => {
+
   const dns = dataSource.dns;
+
   return (
     <div>
       <Descriptions
@@ -108,9 +110,10 @@ export const StatusDNS = (props) => {
 };
 
 
-export const StatusConnection = (props) => {
-  const { dataSource } = props
+export const StatusConnection = ({ dataSource }) => {
+
   const connection = dataSource.connection
+
 return (
   <div>
   <Descriptions
@@ -198,9 +201,8 @@ return (
 }  
 
 
-export const TxRxStatistic = (props) => {
+export const TxRxStatistic = ({ dataSource }) => {
 
-  const { dataSource } = props
   const statistic = dataSource.statistic
   const getOption = () => {
 

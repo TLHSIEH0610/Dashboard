@@ -1,20 +1,20 @@
-import React, { Component, Fragment } from "react";
+import React from "react";
 import PieChart from "../../Components/_Specific/Pie_Chart";
-import Map from "../../Components/_Specific/GPS_Map";
-import IoTC from "../../Components/_Specific/IoT/Iot";
-import styles from "./index.module.scss";
-import SolarIoTC from "../../Components/_Specific/IoT/solarIoT";
+import OpenStreetMapC from "../../Components/_Specific/Track_Map/OpenStreetMap";
+import IoTDashboard from "../../Components/_Specific/IoT/IoTDashboard";
+import styles from './index.module.scss'
 
 const Dashboard = () => {
   return (
-    <div >
+    <div>
       <PieChart />
-      {/* <div className={styles.MapIoCWrapper}> */}
-        {/* <IoTC /> */}
-        {/* <Map /> */}
-        
-      {/* </div> */}
-      {/* <SolarIoTC /> */}
+      <div className={styles.IoTOPSWrapper}>
+        <IoTDashboard />
+        <OpenStreetMapC
+          centerPosition={[24.763963, 121.000095]}
+          currentZoom={12}
+        />
+      </div>
     </div>
   );
 };

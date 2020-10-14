@@ -1,21 +1,26 @@
-.card{
-    height:80vh;
-    // margin-top: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+.card {
+  height: 80vh;
+  // margin-top: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
-.form{
-    // display: flex;
-    // flex-direction: column;
-    // align-items: center;
-    // justify-content: center;
-    // margin-top: 50%;
-    width:100%;
-}
-// .item{
-//     margin: 0 auto;
-    .input{
-        width:  70%!important;
+
+.registerBtn {
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 0.9rem;
+    color: blue;
+    width: 380px;
+    text-align: center;
+    margin:0 auto;
+    background: #FFFAF0;
+    font-weight: 600;
+    &:hover{
+        color: gray;
     }
-// }
+    span{
+        cursor: default;
+        color:black;
+    }
+}

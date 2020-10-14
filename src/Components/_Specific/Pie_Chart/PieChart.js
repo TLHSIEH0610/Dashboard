@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from "react";
-import { GroupedColumn } from "@ant-design/charts";
+import React from "react";
 import "echarts/lib/chart/pie";
 import ReactEchartsCore from "echarts-for-react/lib/core";
 import echarts from "echarts/lib/echarts";
@@ -7,17 +6,16 @@ import "echarts/lib/component/tooltip";
 import "echarts/lib/component/title";
 import "echarts/lib/component/legend";
 
-const PieChartC = (props) => {
-  const { dataSource, data, name } = props;
-  // console.log(dataSource, data, name);
-  //   const statistic = dataSource.statistic
+const PieChartC = ({ dataSource, data, name }) => {
+
+
   const getOption = () => {
     const option = {
       title: {
         text: name,
         // subtext: "123",
         left: "center",
-        padding: [5, 0]
+        padding: [0, 0]
       },
       color: ["#28a745", "#ffc107", "#dc3545", "#343a40"],
       tooltip: {
@@ -25,10 +23,11 @@ const PieChartC = (props) => {
         formatter: "{a} <br/>{b}: {c} ({d}%)",
       },
       legend: {
-        orient: "vertical",
-        left: 10,
+        orient: "horizontal",
+        left: '20%',
         data: data,
         align: "auto",
+        padding: [30, 0]
       },
       series: [
         {
@@ -36,6 +35,7 @@ const PieChartC = (props) => {
           type: "pie",
           radius: ["50%", "70%"],
           avoidLabelOverlap: true,
+          top: 50,
           label: {
             show: true,
             position: "outer",

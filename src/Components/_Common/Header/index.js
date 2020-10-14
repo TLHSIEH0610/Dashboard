@@ -1,6 +1,6 @@
 import React, { Fragment, useState, useEffect, useContext } from "react";
 import styles from "./header.module.scss";
-import { Menu, Divider, Badge, Select } from "antd";
+import { Menu, Badge, Select } from "antd";
 import { FcManager } from "react-icons/fc";
 import { AiTwotoneBell } from "react-icons/ai";
 import { FaLanguage } from "react-icons/fa";

@@ -1,23 +1,23 @@
-import React, {  useState, useContext } from 'react'
+import React, { useContext } from 'react'
 import { Form, Input, Button, Card } from 'antd';
 import Swal from 'sweetalert2'
 import { useHistory } from "react-router-dom";
 import { UserLogin } from '../../../Utility/Fetch'
 import Context from '../../../Utility/Reduxx'
 import styles from './login.module.scss'
+import { UserOutlined, LockOutlined } from '@ant-design/icons';
 
 const layout = {
-  labelCol: {
-    span: 8,
-  },
+
   wrapperCol: {
-    span: 16,
+    span: 10,
+    offset: 6,
   },
 }
 
 const tailLayout = {
   wrapperCol: {
-    offset: 8,
+    offset: 6,
     span: 16,
   },
 }
@@ -25,18 +25,10 @@ const tailLayout = {
 const LoginInput = () => {
   const { state, dispatch } = useContext(Context)  
   const history = useHistory();
-  // const [Auth, setAuth] = useState (localStorage.getItem('auth.isAuthed'))
 
-//   useEffect(()=>{
-//     dispatch({type:'setLogin', payload:{IsLogin: Auth}})
-// },[Auth])
 
   const OnFinish = async (values) => {
     const [response , data] = await UserLogin(values)
-    // console.log(response, data)
-    // if(response.status === 200){
-    //    dispatch({type:'setLogin', payload:{IsLogin: true}})
-    // }
     switch (response.status) {
       case 200:
         return Swal.fire({
@@ -52,16 +44,13 @@ const LoginInput = () => {
             localStorage.setItem('auth.isAuthed', true);
             localStorage.setItem('super.cid', '');
             dispatch({type:'setUser', payload:{User: data.cid}})
-            // setAuth(true)
         })
         .then(() => {
-            // console.log(Auth)
-            // history.push('/backuprestore')
-            console.log(state)
+            // console.log(state)
             if(state.Login.LogPath){
               history.push(state.Login.LogPath)
             }else{
-              history.push('/dashboard')
+              history.push('/')
             }
           })
 
@@ -89,7 +78,6 @@ const LoginInput = () => {
     >
       <Form.Item
         className={styles.item}
-        label="name"
         name="name"
         rules={[
           {
@@ -98,12 +86,11 @@ const LoginInput = () => {
           },
         ]}
       >
-        <Input className={styles.input}/>
+        <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Username"/>
       </Form.Item>
 
       <Form.Item
         className={styles.item}
-        label="password"
         name="password"
         rules={[
           {
@@ -112,15 +99,16 @@ const LoginInput = () => {
           },
         ]}
       >
-        <Input.Password className={styles.input}/>
+        <Input.Password prefix={<LockOutlined className="site-form-item-icon" />}/>
       </Form.Item>
       <Form.Item {...tailLayout}>
         <Button type="primary" htmlType="submit">
-        {/* <Button type="primary" htmlType="submit" onClick={()=>dispatch({type:'setLogin', payload:{IsLogin: true}})}> */}
-          Submit
+          Log-in
         </Button>
       </Form.Item>
+     
     </Form>
+    <div className={styles.registerBtn} onClick={()=>{history.push('/register')}}> <span>Don't have an account?</span> Register and enjoy free trail </div>
     </Card>
   );
 };

@@ -5,9 +5,9 @@ const Context = createContext();
 export default Context;
 
 //建立全局Reducer
-// const iniState = {IsLogin:false, id: 'id'}
 const iniState = {
-  Login: { IsLogin: false, LogPath: "/dashboard", User: null, Cid: "" },
+  Global: { innerWidth:'', innerHeight:'' },
+  Login: { IsLogin: false, LogPath: "/", User: null, Cid: "" },
   Topology: { id: "id", deviceStatusByID: "" },
   BackupRestore: {
     BackupReq: "",
@@ -19,6 +19,11 @@ const iniState = {
 const reducer = (state = iniState, action) => {
   let newState;
   switch (action.type) {
+    case "setWindow":
+      newState = { ...state };
+      newState.Global.innerWidth = action.payload.innerWidth;
+      newState.Global.innerHeight = action.payload.innerHeight;
+      return newState;
     case "setLogin":
       newState = { ...state };
       newState.Login.IsLogin = action.payload.IsLogin;
@@ -64,8 +69,7 @@ export const Provider = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, iniState);
   return (
     <Context.Provider value={{ state, dispatch }}>
-      {" "}
-      {children}{" "}
+      {children}
     </Context.Provider>
   );
 };

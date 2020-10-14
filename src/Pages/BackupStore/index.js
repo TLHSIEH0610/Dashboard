@@ -6,7 +6,7 @@ import { Tabs } from 'antd';
 import { MdBackup, MdSettingsBackupRestore } from 'react-icons/md'
 import { GrDocumentImage } from 'react-icons/gr'
 import Fota_Input from '../../Components/_Specific/Fota_Input/fota_input'
-import CloudList from '../../Components/_Specific/CloudLibary/cloud'
+import Repository from '../../Components/_Specific/Repository'
 
 
 const { TabPane } = Tabs;
@@ -41,7 +41,7 @@ const Backup = () => {
             key="2"
           >
             <div className={styles.wrap}>
-              <CloudList />
+              <Repository />
             </div>
           </TabPane>
           <TabPane

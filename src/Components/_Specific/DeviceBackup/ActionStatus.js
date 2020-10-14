@@ -10,7 +10,6 @@ import {
   SmileOutlined,
 } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
-import { useHistory } from "react-router-dom";
 import Context from '../../../Utility/Reduxx'
 // import { UserLogOut } from "../../../Utility/Fetch";
 
@@ -18,22 +17,20 @@ const { Step } = Steps;
 
 const ActionStatus = () => {
   const { state, dispatch } = useContext(Context)  
-  const history = useHistory();
   const [loading, setLoading] = useState(false);
   const [event, setEvent] = useState([
     { name: "", action: "", key: "", model: "", state: "" },
   ]);
   const [count, setCount] = useState(0);
   const IsActionUpdated = state.BackupRestore.IsActionUpdated
+
   useEffect(() => {
-    console.log("執行區間功能", state);
+
     const cid = localStorage.getItem("authUser.cid");
-    const url = `/cmd?set={"bck_rst_upg_list":{"list":{ ${state.Login.Cid}}}}`;
-    console.log(url)
-    // setLoading(true)
+    const url = cid==='proscend?' ? `/cmd?set={"bck_rst_upg_list":{"list":{ ${state.Login.Cid}}}}`: `/cmd?set={"bck_rst_upg_list":{"list":{ "cid":${cid}}}}`;
+
     axios.get(url).then((res) => {
       let responseData = [];
-      // console.log(res)
       res.data.response &&(
         res.data.response.bck_rst_upg.forEach((item, index) => {
           responseData.push({
@@ -45,21 +42,23 @@ const ActionStatus = () => {
             id: item.id,
           })
         }))
-      
       if (JSON.stringify(responseData) === JSON.stringify(event)) {
         setLoading(false)
         return;
       }
-      // console.log ( JSON.stringify(responseData)  === JSON.stringify(event))
+
       setEvent(responseData);
       dispatch({type:'ActionStatusList', payload:{ActionStatusList: responseData}})
       dispatch({type:'IsActionUpdated', payload:{IsActionUpdated: false}})
       setLoading(false)
     });
+
     const stateInterval = setInterval(() => {
       setCount((prevState) => prevState + 1);
     }, 10000);
+
     return () => clearInterval(stateInterval);
+
   }, [count, IsActionUpdated]);
 
   const getColumnSearchProps = (dataIndex) => ({
@@ -145,7 +144,7 @@ const ActionStatus = () => {
   };
 
   const searchInput = useRef("");
-///cmd?set={"bck_rst_upg_list":{"delete":{"id":id}}}
+
   function clearHistory(id) {
     setLoading(true)
     let url = `/cmd?set={"bck_rst_upg_list":{"delete":{"id":"${id}"}}}`;

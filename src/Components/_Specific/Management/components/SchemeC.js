@@ -4,40 +4,29 @@
 // http://192.168.0.95:8000/scheme_mgnt?list_scheme={}  # {"response": [{"cid": "proscend_2", "user": 10, "group": 10, "device": 1024, "expiry": 1640966399, "tracking": 100, "tracking_pool": 10000000, "iot": 10, "iot_poor": 10000000, "users": 10, "groups": 10, "devices": 1024, "expires": 467, "trackings": 100, "tracking_pools": 10000000, "iots": 10, "iot_poors": 10000000}]}
 
 import React, { useContext, useEffect, useState } from "react";
-import { Table, Card, Form, Input, Modal, Button } from "antd";
-
-// import Swal from 'sweetalert2'
-// import { useHistory } from "react-router-dom";
-// import { UserLogin } from '../../../Utility/Fetch'
-import Context from "../../../Utility/Reduxx";
-import styles from "./management.module.scss";
-import useURLloader from "../../../hook/useURLloader";
+import { Table, Card, Form, Descriptions, Modal, Button } from "antd";
+import Context from "../../../../Utility/Reduxx";
+import styles from "../management.module.scss";
+import useURLloader from "../../../../hook/useURLloader";
 
 const CreateSchemeForm = () => {
+  return 123;
+};
 
-    return(
-        123
-    )
-}
-
-
-
-
-
-const SchemeManageC = () => {
+export const SchemeManageC = () => {
   const { state } = useContext(Context);
-  const [form] = Form.useForm()
+  const [form] = Form.useForm();
   const cid = localStorage.getItem("authUser.cid");
   const SchemeUrl =
     cid === "proscend"
       ? `/scheme_mgnt?list_scheme={${state.Login.Cid}}`
       : `/scheme_mgnt?list_scheme={"cid":"${cid}"}`;
   const [loading, response] = useURLloader(SchemeUrl);
-  const [SchemeData, setSchemeData] = useState([])
-  const [CreateSchemevisible, setCreateSchemevisible] = useState(false)
-  
+  const [SchemeData, setSchemeData] = useState([]);
+  const [CreateSchemevisible, setCreateSchemevisible] = useState(false);
+
   useEffect(() => {
-    console.log(response)
+    console.log(response);
     if (response) {
       let SchemeData = [];
       response.response.forEach((item, index) => {
@@ -60,7 +49,7 @@ const SchemeManageC = () => {
           user: item.scheme_list.user,
           users: item.scheme_list.users,
         });
-        setSchemeData(SchemeData)
+        setSchemeData(SchemeData);
       });
       console.log(SchemeData);
     }
@@ -170,35 +159,35 @@ const SchemeManageC = () => {
       width: 110,
     },
     {
-        title: "Expires",
-        key: "expires",
-        width: 100,
+      title: "Expires",
+      key: "expires",
+      width: 100,
     },
     {
       title: "Expire",
-      dataIndex: 'expire',
+      dataIndex: "expire",
       key: "expire",
       width: 100,
     },
     {
-        title: "Action",
-        key: "action",
-        width: 160,
-        fixed: "right",
-        render: (text, record, index) =>{
-            return (
-                <div>
-                    <Button>Edit</Button>
-                    <Button>Delete</Button>
-                </div>
-            )
-        }
+      title: "Action",
+      key: "action",
+      width: 160,
+      fixed: "right",
+      render: (text, record, index) => {
+        return (
+          <div>
+            <Button>Edit</Button>
+            <Button>Delete</Button>
+          </div>
+        );
+      },
     },
   ];
 
   return (
     <Card loading={loading}>
-              <div>
+      <div>
         <Button
           type="primary"
           onClick={() => {
@@ -230,9 +219,86 @@ const SchemeManageC = () => {
         </Modal>
       </div>
 
-      <Table columns={columns} dataSource={SchemeData} scroll={{ x: 1500, y: 600 }} />
+      <Table
+        columns={columns}
+        dataSource={SchemeData}
+        scroll={{ x: 1500, y: 600 }}
+      />
     </Card>
   );
 };
 
-export default SchemeManageC;
+export const SchemeModalC = ({
+  SchemeModalvisible,
+  setSchemeModalvisible,
+  record,
+}) => {
+  const SchemeUrl = `/scheme_mgnt?list_scheme={"cid":"${record.cid}"}`;
+  const [Schemeloading, Schemeresponse] = useURLloader(SchemeUrl);
+  const [SchemeData, setSchemeData] = useState({})
+
+  useEffect(() => {
+    if(Schemeresponse){
+      setSchemeData(Schemeresponse.response[0].scheme_list)
+    }
+    
+    
+  }, [Schemeresponse]);
+
+  return (
+    <Modal
+      visible={SchemeModalvisible}
+      onOk={() => setSchemeModalvisible(false)}
+      onCancel={() => setSchemeModalvisible(false)}
+      okText="confirm"
+      cancelText="cancel"
+      centered={true}
+      width={"50%"}
+      className={styles.modal}
+      title='Scheme'
+      destroyOnClose={true}
+    >
+      <Card loading={Schemeloading} bordered={false}>
+      <Descriptions
+        bordered
+        // column={{ xxl: 4, xl: 3, lg: 3, md: 3, sm: 2, xs: 1 }}
+      >
+        {SchemeData && <Descriptions.Item label="Current Scheme">
+          device: {SchemeData.device}
+          <br />
+          devices: {SchemeData.devices}
+          <br />
+          expire: {SchemeData.expire}
+          <br />
+          expires: {SchemeData.expires}
+          <br />
+          group: {SchemeData.group}
+          <br />
+          groups: {SchemeData.groups}
+          <br />
+          iot: {SchemeData.iot}
+          <br />
+          iots: {SchemeData.iots}
+          <br />
+          iot_poor: {SchemeData.iot_poor}
+          <br />
+          iot_poors: {SchemeData.iot_poors}
+          <br />
+          tracking: {SchemeData.tracking}
+          <br />
+          trackings: {SchemeData.trackings}
+          <br />
+          tracking_pool: {SchemeData.tracking_pool}
+          <br />
+          tracking_pools: {SchemeData.tracking_pools}
+          <br />
+          user: {SchemeData.user}
+          <br />
+          users: {SchemeData.users}
+          <br />
+        </Descriptions.Item>}
+      </Descriptions>
+      </Card>
+    </Modal>
+  );
+};
