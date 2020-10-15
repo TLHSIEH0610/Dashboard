@@ -10,6 +10,7 @@ const useURLloader = (url, dep) => {
     const history = useHistory()
     const { dispatch } = useContext(Context) 
     const location = useLocation();
+    
 
     useEffect(()=>{
         setLoading(true)
@@ -22,6 +23,10 @@ const useURLloader = (url, dep) => {
             console.log(error)
             setLoading(false)
             if(error.response.status === 401){
+                const isAuthed = localStorage.getItem('auth.isAuthed')
+                if(!isAuthed){
+                    return
+                }
                 dispatch({type:'LogPath', payload:{LogPath: location.pathname}})
                 UserLogOut()
                 history.push('/login')    

@@ -12,9 +12,6 @@ import {
   message
 } from "antd";
 import axios from "axios";
-// import Swal from 'sweetalert2'
-// import { useHistory } from "react-router-dom";
-// import { UserLogin } from '../../../Utility/Fetch'
 import Context from "../../../../Utility/Reduxx";
 import styles from "../management.module.scss";
 import useURLloader from "../../../../hook/useURLloader";
@@ -428,7 +425,7 @@ export const NotifiManageC = () => {
   );
 };
 
-export const NotifiModalC = ({
+const NotifiModalC = ({
   record,
   NotifiModalvisible,
   setNotifiModalvisible,
@@ -467,11 +464,9 @@ export const NotifiModalC = ({
 
   useEffect(() => {
     if (Notiresponse) {
-      console.log(Notiresponse);
-
       const NotifiData = Notiresponse.response.notification[0];
       // setNotifiData(NotifiData);
-      console.log(NotifiData);
+      console.log('執行了 NotifiData');
       form.setFieldsValue({
         timezone: NotifiData.timezone,
         mail_active: NotifiData.mail.active,
@@ -734,6 +729,9 @@ export const NotifiModalC = ({
     </Modal>
   );
 };
+
+export const NotifiModalMC = React.memo(NotifiModalC)
+
 // http://192.168.0.95:8000/cmd?get={"notification":{}}
 // http://192.168.0.95:8000/cmd?get={"notification":{"filter":{"cid":"12345678901234567890123456789011"}}}
 // http://192.168.0.95:8000/cmd?set={"notification":[{"cid":"12345678901234567890123456789011", "timezone":"Asia/Taipei", "conditions":{"level":"ERROR"}, "mail":{"active":"True", "mail_from":"from_1@gmail.com","mail_to":["to_1@gmail.com", "to_2@gmail.com", "to_3@gmail.com"], "token":"ajsrkwvfzgpwbyba"},"line":{"active":"False","token":"kdLz7PCTSKlWuUhMC4vFIwLm3t2YKGajBPY5VjXG7oL"}},{"cid":"12345678901234567890123456789011", "timezone":"America/New_York", "conditions":{"level":"WARM"}, "mail":{"active":"False", "mail_from":"from_2@gmail.com","mail_to":["to_4@gmail.com", "to_5@gmail.com", "to_6@gmail.com"], "token":"trsrkwvfzgpwbyba"},"line":{"active":"True","token":"abLz7PCTSKlWuUhMC4vFIwLm3t2YKGajBPY5VjXG7oL"}}]}

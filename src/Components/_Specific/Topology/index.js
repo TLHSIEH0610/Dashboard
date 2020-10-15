@@ -33,7 +33,7 @@ import styles from "./topology.module.scss";
 import { SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 import axios from "axios";
-import TopoIoTC from "./components/TopoIoTC";
+import { TopoIoTMC } from "./components/TopoIoTC";
 import { RiAlarmWarningFill, RiEdit2Fill } from "react-icons/ri";
 import { FcDocument, FcSettings } from "react-icons/fc";
 import { FaMapMarkerAlt } from "react-icons/fa";
@@ -273,7 +273,7 @@ const TopologyC = () => {
     if (DeviceStateResponse) {
       let responseData = DeviceStateResponse.response.device_status;
       let dataSource = [];
-      console.log(responseData);
+      // console.log(responseData);
       responseData.forEach((item, index) => {
         dataSource.push({
           key: index,
@@ -646,7 +646,7 @@ const TopologyC = () => {
       />
 
       {IoTresponse && (
-        <TopoIoTC
+        <TopoIoTMC
           IoTvisible={IoTvisible}
           setIoTvisible={setIoTvisible}
           IoTresponse={IoTresponse}

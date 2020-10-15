@@ -399,4 +399,5 @@ const TopoIoTC = ({ IoTvisible, setIoTvisible, IoTresponse, deviceindex, handleD
     </Modal>
   );
 };
-export default TopoIoTC;
+
+export const TopoIoTMC = React.memo(TopoIoTC);

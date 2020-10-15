@@ -9,7 +9,7 @@ const PieChart = () => {
   const { state } = useContext(Context) 
   const cid = localStorage.getItem('authUser.cid')
   const url =cid==='proscend' ? `/cmd?get={"statistic":{"filter":{${state.Login.Cid}}}}`:`/cmd?get={"statistic":{"filter":{"cid":"${cid}"}}}` ;
-  const [loading, response] = useURLloader(url, url);
+  const [loading, response] = useURLloader(url);
   const [PieData, setPieData] = useState([]);
 
   useEffect(() => {

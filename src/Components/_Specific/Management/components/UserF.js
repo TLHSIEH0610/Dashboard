@@ -1,12 +1,12 @@
-import React, { useEffect, useContext } from "react";
+import React, { useEffect, useContext, useState } from "react";
 import {
   Input,
   Form,
   Button,
-  InputNumber,
   Space,
   Select,
-  message
+  message,
+  Modal
 } from "antd";
 import {
   MinusCircleOutlined,
@@ -18,29 +18,80 @@ import axios from 'axios'
 const { Option } = Select;
 
 const layout = {
-  labelCol: { span: 8 },
+  labelCol: { span: 6 },
   wrapperCol: { span: 16 },
 };
 
-export const CreateUserForm = ({ onFinish, GroupList, record }) => {
+const CreateUserForm = ({ setUploading ,GroupList, record, CreateUservisible, setCreateUservisible }) => {
   const [form] = Form.useForm();
   const { state } = useContext(Context);
-
-  function handleChange(value) {
-    console.log(`selected ${value}`);
-  }
+  const [btnloading, setBtnloading] = useState(false)
 
   useEffect(()=>{
+    console.log('執行了 createUserForm')
     form.setFieldsValue({
       cid: record.cid
     });
+  },[])
+
+  useEffect(()=>{
+    console.log(form.getFieldsValue(), form.isFieldTouched())
   })
 
+  const onFinish = (values) => {
+    console.log("Received values of form:", values);
+    
+
+      setUploading(true);
+      setBtnloading(true)
+      const userlist = JSON.stringify(values.users);
+      console.log(userlist);
+      const url = `/user_mgnt?create_user={"cid":"${values.cid}", "user_list":${userlist}}`;
+      console.log(url);
+      axios
+        .get(url)
+        .then((res) => {
+          setUploading(false);
+          setBtnloading(false)
+          message.success("Create successfully.");
+          console.log(res);
+          setCreateUservisible(false)
+        })
+        .catch((error) => {
+          console.log(error);
+          setUploading(false);
+          setBtnloading(false)
+          message.error("Create fail.");
+        });
+    
+
+  };
+
   return (
+    <Modal
+    title="Create User Account"
+    visible={CreateUservisible}
+    // onOk={() => setCreateUservisible(false)}
+    onCancel={() => setCreateUservisible(false)}
+    width='60%'
+    destroyOnClose={true}
+    footer={[
+      <Button
+        key="submit"
+        type="primary"
+        loading={btnloading}
+        onClick={() => {
+          form.submit();
+        }}
+      >
+        Submit
+      </Button>,
+    ]}
+  >
     <Form name="CreateUser" autoComplete="off" form={form} onFinish={onFinish}>
       {state.Login.Cid === "" ? (
         <Form.Item name="cid" rules={[{ required: true, message: "" }]} label={'Customer'}>
-          <Input disabled={true} />
+          <Input disabled={true} onChange={()=>{console.log(form.getFieldsValue(), form.getFieldValue(), form.isFieldTouched())}}/>
         </Form.Item>
       ) : (
         <Form.Item
@@ -98,7 +149,7 @@ export const CreateUserForm = ({ onFinish, GroupList, record }) => {
                   >
                     <Select 
                     // style={{ width: 120 }}
-                     onChange={handleChange}
+                    //  onChange={handleChange}
                      placeholder='Level  '
                     >
                       <Option value="super">super</Option>
@@ -115,7 +166,7 @@ export const CreateUserForm = ({ onFinish, GroupList, record }) => {
                   >
                     <Select 
                       style={{ width: 120 }}
-                      onChange={handleChange}
+                      // onChange={handleChange}
                       mode={"multiple"}
                       placeholder='Group'
                     >
@@ -160,15 +211,19 @@ export const CreateUserForm = ({ onFinish, GroupList, record }) => {
         }}
       </Form.List>
     </Form>
+    </Modal>
   );
 };
 
-export const EditUserForm = ({ GroupList, UserEditRecord, onEditcid, setUploading }) => {
+export const CreateUserModalMC = React.memo(CreateUserForm)
+
+
+const EditUserForm = ({ GroupList, UserEditRecord, onEditcid, setUploading, setEditVisible, EditVisible }) => {
   const [form] = Form.useForm();
-  console.log(GroupList,UserEditRecord, onEditcid)
+  // console.log(GroupList,UserEditRecord, onEditcid)
 
   const EditUseronFinish = (values) => {
-    console.log(values, UserEditRecord);
+    // console.log(values, UserEditRecord);
     setUploading(true);
     const EditUserUrl = values.password ===undefined? `/user_mgnt?modify_user={"cid":"${onEditcid}", "user_list":[{"name":"${
       values.name
@@ -195,6 +250,7 @@ export const EditUserForm = ({ GroupList, UserEditRecord, onEditcid, setUploadin
   };
 
   useEffect(() => {
+    console.log( '執行了 EditUserForm')
     form.setFieldsValue({
       name: UserEditRecord.name,
       level: UserEditRecord.level,
@@ -207,7 +263,17 @@ export const EditUserForm = ({ GroupList, UserEditRecord, onEditcid, setUploadin
   }
 
   return (
-    <Form name="EditUser" autoComplete="off" form={form} onFinish={EditUseronFinish}>
+    <Modal
+    title="EditUser"
+    visible={EditVisible}
+    onOk={() => setEditVisible(false)}
+    okButtonProps={{ form: "EditUser", key: "submit", htmlType: "submit" }}
+    onCancel={() => setEditVisible(false)}
+    okText="Submit"
+    cancelText="Cancel"
+    destroyOnClose={true}
+  >
+    <Form name="EditUser" autoComplete="off" form={form} onFinish={EditUseronFinish} {...layout}>
       <Form.Item
        label='name'
         name="name"
@@ -233,7 +299,10 @@ export const EditUserForm = ({ GroupList, UserEditRecord, onEditcid, setUploadin
         name="level"
         rules={[{ required: true, message: "Missing level" }]}
       >
-        <Select style={{ width: 120 }} onChange={handleChange}>
+        <Select 
+        // style={{ width: 120 }} 
+        onChange={handleChange}
+        >
           <Option value="super">super</Option>
           <Option value="admin">admin</Option>
           <Option value="get">get</Option>
@@ -246,7 +315,7 @@ export const EditUserForm = ({ GroupList, UserEditRecord, onEditcid, setUploadin
         // rules={[{ required: true, message: "Missing gid" }]}
       >
         <Select
-          style={{ width: 120 }}
+          // style={{ width: 120 }}
           onChange={handleChange}
           mode={"multiple"}
         >
@@ -264,23 +333,61 @@ export const EditUserForm = ({ GroupList, UserEditRecord, onEditcid, setUploadin
         </Select>
       </Form.Item>
     </Form>
+    </Modal>
   );
 };
 
-export const CreateInfoForm = ({ onFinish }) => {
+export const EditUserModalMC = React.memo(EditUserForm)
+
+const CreateInfoForm = ({ CreateVisible, setCreateVisible, setUploading }) => {
+  console.log('執行了 CreateInfoForm')
   const [form] = Form.useForm();
+  const CreateInfoonFinish = (values) => {
+    console.log("Received values of form:", values);
+    setUploading(true);
+    const url = ` /inf_mgnt?create_inf={"cid":"${values.cid}", "inf_list":{"company":"${values.company}", "contact":"${values.contact}", "mail":"${values.mail}", "phone":"${values.phone}"}}`;
+    console.log(url);
+    axios
+      .get(url)
+      .then((res) => {
+        setUploading(false);
+        message.success("update successfully.");
+        setCreateVisible(false)
+        console.log(url);
+        console.log(res);
+      })
+      .catch((error) => {
+        console.log(error);
+        setUploading(false);
+        message.error("update fail.");
+      });
+  };
+
   return (
+    <Modal
+    title="Create User Infomation"
+    visible={CreateVisible}
+    // onOk={() => setCreateVisible(false)}
+    onCancel={() => setCreateVisible(false)}
+    okButtonProps={{
+      form: "CreateInfo",
+      key: "submit",
+      htmlType: "submit",
+    }}
+    okText="Create"
+    cancelText="Cancel"
+  >
     <Form
       {...layout}
       name="CreateInfo"
-      onFinish={onFinish}
+      onFinish={CreateInfoonFinish}
       form={form}
     >
       <Form.Item name={"cid"} label="CustomerID" rules={[{ required: true }]}>
         <Input />
       </Form.Item>
       <Form.Item name={"company"} label="Company" rules={[{ required: true }]}>
-        <Input.TextArea />
+        <Input />
       </Form.Item>
       <Form.Item
         name={"contact"}
@@ -301,8 +408,11 @@ export const CreateInfoForm = ({ onFinish }) => {
         label="Phone"
         rules={[{ type: "number", required: true }]}
       >
-        <InputNumber />
+        <Input />
       </Form.Item>
     </Form>
+    </Modal>
   );
 };
+
+export const CreateInfoModalMC = React.memo(CreateInfoForm)

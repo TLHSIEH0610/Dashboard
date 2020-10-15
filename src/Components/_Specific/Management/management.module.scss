@@ -53,13 +53,10 @@
   justify-content: center;
 }
 
-.NewUserBtnWrapper{
-  display: flex;
-  margin:16px 10px;
   .NewUserInfoBtn{
-    margin-left: 10px;
+    margin: 16px 10px;
   }
-}
+
 
 .EditIcon, .TokenIcon, .NotificationIcon, .CreateUserIcon, .DeleteIcon, .ViewSchemeIcon, .EditGroupIcon{
   font-size: 1.2rem;

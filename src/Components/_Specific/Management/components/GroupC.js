@@ -127,8 +127,9 @@ export const GroupManagementC = () => {
   ]);
   const [EditGroupVisible, setEditGroupVisible] = useState(false);
   const [record, setRecord] = useState([]);
-
+  console.log('渲染了 GroupManagementC')
   useEffect(() => {
+    
     if (Noderesponse) {
       console.log(Noderesponse);
       let NodeList = [];
@@ -410,12 +411,7 @@ export const GroupManagementC = () => {
 
 export default GroupManagementC;
 
-// /device_mgnt/group?create_group={"cid":"12345678901234567890123456789011", "group_list":[{"name":"g1","node_list":["012C100000000001","012C100000000002"]}, {"name":"g2","node_list":["012C100000000001"]}]}
-// /device_mgnt/group?modify_group={"cid":"12345678901234567890123456789011", "group_list":[{"name":"g1","node_list":["012C100000000003","012C100000000004"]}]}
-// /device_mgnt/group?delete_group={"cid":"12345678901234567890123456789011", "group_list":[{"name":"g1"}, {"name":"g2"}]}
-// /device_mgnt/group?list_group={} # {"response": {"cid":"12345678901234567890123456789011", "group_list":[{"name":"g1","node_list":["012C100000000003","012C100000000004"]}, {"name":"g2","node_list":[]}]}}
-
-export const GroupModalC = ({
+const GroupModalC = ({
   GroupModalvisible,
   setGroupModalvisible,
   record,
@@ -434,6 +430,7 @@ export const GroupModalC = ({
   const [Nodeloading, Noderesponse] = useURLloader(NodeUrl);
   const [NodeList, setNodeList] = useState([]);
   const [currentPage, setCurrentPage] = useState("");
+  console.log('渲染了 GroupModalC')
 
   function callback(key) {
     setCurrentPage(key);
@@ -760,3 +757,6 @@ export const GroupModalC = ({
     </Modal>
   );
 };
+
+
+export const GroupModalMC = React.memo(GroupModalC)
