@@ -1,0 +1,59 @@
+{
+    "response": {
+      "bck_rst_upg": [
+        {
+          "id": "015E350099100001",
+          "cid": "12345678901234567890123456789011",
+          "model": "M350",
+          "name": "2222",
+          "type": "cfg",
+          "inf": "123",
+          "action": "UPGRADE",
+          "state": "FILE_UPLOADING"
+        },
+        {
+          "id": "015E35009920013124",
+          "cid": "12345678901234567890123456789011",
+          "model": "M350",
+          "name": "2222",
+          "type": "cfg",
+          "inf": "123",
+          "action": "RESTORE",
+          "state": "START_REBOOT"
+        },
+        {
+            "id": "015E3500992022320003",
+            "cid": "12345678901234567890123456789011",
+            "model": "M350",
+            "name": "2222",
+            "type": "cfg",
+            "inf": "123",
+            "action": "RESTORE",
+            "state": "START_REBOOT"
+        },
+        {
+            "id": "015E350099200022",
+            "cid": "12345678901234567890123456789011",
+            "model": "M350",
+            "name": "2222",
+            "type": "cfg",
+            "inf": "123",
+            "action": "BACKUP",
+            "state": "RECEIVE_COMMAND"
+        },
+        {
+          "id": "015E350099300055",
+          "cid": "12345678901234567890123456789011",
+          "model": "M350",
+          "name": "2222",
+          "type": "cfg",
+          "inf": {
+            
+          },
+          "action": "BACKUP",
+          "state": "FILE_UPLOAD"
+        }
+      ]
+    }
+  }
+  

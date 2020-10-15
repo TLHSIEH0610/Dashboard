@@ -1,0 +1,81 @@
+{"Day01" :{ "position" : [
+    {"lat": 24.773979,          "lng": 121.00911000000000,  "alt": 112, "time": "07:00", "health": "up", "strength": "excellent"  },
+    {"lat": 24.774222535724427, "lng": 121.00916565583707,  "alt": 115, "time": "08:00", "health": "up", "strength": "excellent"  },
+    {"lat": 24.774126339170373, "lng": 121.00938878209949,  "alt": 117, "time": "09:00", "health": "up", "strength": "excellent"  }, 
+    {"lat": 24.774014921549416, "lng": 121.00964002964706,  "alt": 118, "time": "011:00", "health": "critical", "strength": "excellent"  }, 
+    {"lat": 24.774161651838146, "lng": 121.00975314343036,  "alt": 119, "time": "014:00", "health": "up", "strength": "excellent"  }, 
+    {"lat": 24.77428646377295,  "lng": 121.00985016395957,  "alt": 120, "time": "017:00", "health": "up", "strength": "excellent"  }, 
+    {"lat": 24.77445064021258,  "lng": 121.00997937099696,  "alt": 120, "time": "20:00", "health": "up", "strength": "excellent"  }, 
+    {"lat": 24.774631464846667, "lng": 121.01011394245238,  "alt": 117, "time": "23:00", "health": "up", "strength": "excellent"  },
+    {"lat": 24.247014, "lng": 120.675671,  "alt": 117, "time": "23:40", "health": "up", "strength": "excellent"  },
+    {"lat": 24.147783, "lng": 120.674625,  "alt": 117, "time": "23:70", "health": "up", "strength": "excellent"  }  
+  ] },
+  "Day02" :{ "position" : [
+    {"lat": 24.774631464846667, "lng": 121.01011394245238,  "alt": 117, "time": "07:00", "health": "up", "strength": "excellent"  }, 
+    {"lat": 24.774767837681622, "lng": 121.01022541522980,  "alt": 118, "time": "08:00", "health": "up", "strength": "excellent"  }, 
+    {"lat": 24.77497849477258,  "lng": 121.01039263419807,  "alt": 118, "time": "09:00", "health": "up", "strength": "excellent"  }, 
+    {"lat": 24.77521350486264,  "lng": 121.01058131083846,  "alt": 117, "time": "011:00", "health": "critical", "strength": "excellent"  }, 
+    {"lat": 24.775424161197364, "lng": 121.01074316538870,  "alt": 116, "time": "014:00", "health": "up", "strength": "excellent"  }, 
+    {"lat": 24.77561776988337,  "lng": 121.01087551563978,  "alt": 116, "time": "017:00", "health": "up", "strength": "excellent"  }, 
+    {"lat": 24.775811378267427, "lng": 121.01100786589086,  "alt": 116, "time": "20:00", "health": "up", "strength": "excellent"  }, 
+    {"lat": 24.776029339546028, "lng": 121.01115362718701,  "alt": 116, "time": "23:00", "health": "up", "strength": "excellent"  }, 
+    {"lat": 24.77611092271947,  "lng": 121.01120551116765,  "alt": 115, "time": "07:00", "health": "up", "strength": "excellent"  } 
+  ] },
+  "Day03" :{ "position" : [
+    {"lat": 24.77611092271947,  "lng": 121.01120551116765,  "alt": 115, "time": "07:00", "health": "up", "strength": "excellent"  }, 
+    {"lat": 24.776053692737737, "lng": 121.01154975593090,  "alt": 113, "time": "08:00", "health": "up", "strength": "excellent"  }, 
+    {"lat": 24.7759915920894,   "lng": 121.01195569150150,  "alt": 112, "time": "09:00", "health": "up", "strength": "excellent"  }, 
+    {"lat": 24.77594410333737,  "lng": 121.01238308474422,  "alt": 111, "time": "011:00", "health": "critical", "strength": "excellent"  }, 
+    {"lat": 24.775916097141742, "lng": 121.01272196508944,  "alt": 110, "time": "014:00", "health": "up", "strength": "excellent"  }, 
+    {"lat": 24.775875914328314, "lng": 121.01307693868876,  "alt": 108, "time": "017:00", "health": "up", "strength": "excellent"  }, 
+    {"lat": 24.775855214086018, "lng": 121.01349628530443,  "alt": 106, "time": "20:00", "health": "up", "strength": "excellent"  }, 
+    {"lat": 24.77582720787034,  "lng": 121.01389149203897,  "alt": 104, "time": "23:00", "health": "up", "strength": "excellent"  }, 
+    {"lat": 24.775787025028137, "lng": 121.01428938098252,  "alt": 102, "time": "07:00", "health": "up", "strength": "excellent"  } 
+  ] },
+  "Day04" :{ "position" : [
+    {"lat": 24.775787025028137, "lng": 121.01428938098252,  "alt": 102, "time": "07:00", "health": "up", "strength": "excellent"   }, 
+    {"lat": 24.775768760095566, "lng": 121.01466044783592,  "alt": 100, "time": "08:00", "health": "up", "strength": "excellent"   }, 
+    {"lat": 24.775733447884985, "lng": 121.01506638340652,  "alt": 98 , "time": "09:00", "health": "up", "strength": "excellent"  }, 
+    {"lat": 24.77568352370804,  "lng": 121.01546427235007,  "alt": 96 , "time": "011:00", "health": "critical", "strength": "excellent"  }, 
+    {"lat": 24.775628728856574, "lng": 121.01587020792067,  "alt": 95 , "time": "014:00", "health": "up", "strength": "excellent"  }, 
+    {"lat": 24.775595851934085, "lng": 121.01628419011831,  "alt": 92 , "time": "017:00", "health": "up", "strength": "excellent"  }, 
+    {"lat": 24.775582457629856, "lng": 121.01660161279142,  "alt": 89 , "time": "20:00", "health": "up", "strength": "excellent"  }, 
+    {"lat": 24.775569063324152, "lng": 121.01677687838674,  "alt": 86 , "time": "23:00", "health": "up", "strength": "excellent"  }, 
+    {"lat": 24.77576023645952,  "lng": 121.01681266911328,  "alt": 84 , "time": "07:00", "health": "up", "strength": "excellent"  } 
+  ] },
+  "Day05" :{ "position" : [
+    {"lat": 24.77576023645952,  "lng": 121.01681266911328,  "alt": 84 , "time": "07:00", "health": "up", "strength": "excellent"  }, 
+    {"lat": 24.776012292308998, "lng": 121.01686991751194,  "alt": 83 , "time": "08:00", "health": "up", "strength": "excellent"  }, 
+    {"lat": 24.776242429811546, "lng": 121.01694057695568,  "alt": 82 , "time": "09:00", "health": "up", "strength": "excellent"  }, 
+    {"lat": 24.776409248792717, "lng": 121.01712925359607,  "alt": 81 , "time": "011:00", "health": "critical", "strength": "excellent"  }, 
+    {"lat": 24.776593114709325, "lng": 121.01735011674464,  "alt": 80 , "time": "014:00", "health": "up", "strength": "excellent"  }, 
+    {"lat": 24.776825686438887, "lng": 121.01761657744646,  "alt": 80 , "time": "017:00", "health": "up", "strength": "excellent"  }, 
+    {"lat": 24.777085046021288, "lng": 121.01792058907449,  "alt": 80 , "time": "20:00", "health": "up", "strength": "excellent"  }, 
+    {"lat": 24.777346840355342, "lng": 121.01825142279267,  "alt": 81 , "time": "23:00", "health": "up", "strength": "excellent"  }, 
+    {"lat": 24.77765733989627,  "lng": 121.01857152767480,  "alt": 82 , "time": "07:00", "health": "up", "strength": "excellent"  } 
+  ] },
+  "Day06" :{ "position" : [
+    {"lat": 24.77765733989627,  "lng": 121.01857152767480,  "alt": 82 , "time": "07:00", "health": "up", "strength": "excellent"  }, 
+    {"lat": 24.778001932595117, "lng": 121.01885139942169,  "alt": 86 , "time": "08:00", "health": "up", "strength": "excellent"  }, 
+    {"lat": 24.778358700706455, "lng": 121.01911249570549,  "alt": 90 , "time": "09:00", "health": "up", "strength": "excellent"  }, 
+    {"lat": 24.778564481164423, "lng": 121.01925289258361,  "alt": 95 , "time": "011:00", "health": "critical", "strength": "excellent"  }, 
+    {"lat": 24.778741038090164, "lng": 121.01936378516257,  "alt": 100, "time": "014:00", "health": "up", "strength": "excellent"   }, 
+    {"lat": 24.77914894450991,  "lng": 121.01959805935621,  "alt": 105, "time": "017:00", "health": "up", "strength": "excellent"   }, 
+    {"lat": 24.77956659058954,  "lng": 121.01982696913183,  "alt": 111, "time": "20:00", "health": "up", "strength": "excellent"   }, 
+    {"lat": 24.779979364780083, "lng": 121.02005587890744,  "alt": 117, "time": "23:00", "health": "up", "strength": "excellent"   }, 
+    {"lat": 24.78039213759785,  "lng": 121.02029015310109,  "alt": 123, "time": "07:00", "health": "up", "strength": "excellent"   }
+  ] },
+  "Day07" :{ "position" : [
+    {"lat": 24.78039213759785,  "lng": 121.02029015310109,  "alt": 123, "time": "07:00", "health": "up", "strength": "excellent"   }, 
+    {"lat": 24.78080977949411,  "lng": 121.02049760520458,  "alt": 129, "time": "08:00", "health": "up", "strength": "excellent"   }, 
+    {"lat": 24.78123716085428,  "lng": 121.02070773951709,  "alt": 136, "time": "09:00", "health": "up", "strength": "excellent"   }, 
+    {"lat": 24.7815866145135, "lng": 121.02088836953044,  "alt": 144, "time": "011:00", "health": "up", "strength": "excellent"   }, 
+    {"lat": 24.781804565172347, "lng": 121.02099389769137,  "alt": 153, "time": "014:00", "health": "up", "strength": "excellent"   }, 
+    {"lat": 24.781878838936137, "lng": 121.02099750190973,  "alt": 163, "time": "017:00", "health": "up", "strength": "excellent"   }, 
+    {"lat": 24.781994511102702, "lng": 121.02066314779222,  "alt": 174, "time": "20:00", "health": "up", "strength": "excellent"   }
+  ] }
+}
+  
+  
+  
+  

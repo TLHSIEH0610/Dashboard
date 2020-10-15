@@ -494,9 +494,10 @@ const TopologyC = () => {
       sortOrder: sortedInfo
         ? sortedInfo.columnKey === "strength" && sortedInfo.order
         : null,
-      // ellipsis: true,
+      ellipsis: true,
       render: (_, record) => strengthIcon(record),
     },
+
     {
       title: "Action",
       dataIndex: "alarm",
