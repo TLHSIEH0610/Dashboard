@@ -1,6 +1,7 @@
 .up{
     color:green;
     font-size: 1.4rem;
+    margin-right: 4%;
     p{
         padding-bottom: 0px;
     }
@@ -8,50 +9,74 @@
 
 .critical{
     color:gold;
+    margin-right: 4%;
     font-size: 1.4rem;
 } 
 
 .warning{
     color:red;
+    margin-right: 4%;
     font-size: 1.4rem;
 }
 
 .offline{
     color:black;
+    margin-right: 4%;
     font-size: 1.4rem;
 }
 // .modal{
 //     height: 100%;
 // }
-.iconwrapper{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    p{
-        margin: 0px 0px  0px 6px;
-    }
-}
+
 
 .desc{
-
+    // vertical-align: middle;
     th{
-        width:150px;
+        // width:50% !important;
         vertical-align: middle;
     }
+    td{
+        // width:50% !important;
+        vertical-align: middle;
+    }
+    
+    // .item{
+    //     width: 50%;
+    //     // &th{
+    //     //     width:30% !important;
+    //     //     vertical-align: middle;
+    //     // }
+    //     // &td{
+    //     //     width:70% !important;
+    //     //     vertical-align: middle;
+    //     // }
+    // }
+
 
 }
 
-.tabpane{
-    overflow-y: scroll;
-    max-height: 450px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+
+.Tabs{
+    margin:20px;
+    
+    // overflow-y: scroll;
+    .tabpane{
+        overflow-y: scroll;
+        // max-height: 450px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        .connection{
+            // padding-top:20px !important;
+            overflow-y: scroll; 
+            max-height: 450px;
+        }
+    }
 }
 
 .alarmlog{
     color: red;
-    margin-right: 7px;
+    margin-right: 4%;
     font-size: 1.4rem;
     cursor: pointer;
     &.disabled{
@@ -61,7 +86,7 @@
 }
 
 .IoT{
-    margin-right: 7px;
+    margin-right: 4%;
     font-size: 1.4rem;
     cursor: pointer;
     &.disabled{
@@ -70,7 +95,7 @@
     }
 }
 .Status, .Map, .Setting{
-    margin-right: 7px;
+    margin-right: 4%;
     font-size: 1.4rem;
     cursor: pointer;
 }
@@ -78,8 +103,8 @@
     color:red;
 }
 .alarmtable{
-    width: 90%;
-    margin: 0 auto;
+    // width: 90%;
+    margin: 20px;
     // overflow-y: scroll;
     // height:450px;
 }

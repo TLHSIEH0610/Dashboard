@@ -1,6 +1,5 @@
-import React, { useState, Fragment, useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import styles from "./Navbar.module.scss";
-import { BsReverseLayoutTextSidebarReverse } from "react-icons/bs";
 import { NavRoutes } from "../../../Routes/NavbarRoutes";
 import { ImCross } from "react-icons/im";
 import { UserLogOut } from "../../../Utility/Fetch";
@@ -8,27 +7,64 @@ import { useHistory, Link } from "react-router-dom";
 import Swal from "sweetalert2";
 import Context from "../../../Utility/Reduxx";
 import { Button, Tooltip } from "antd";
+import { FcExternal, FcInternal } from 'react-icons/fc'
+import { FcList } from 'react-icons/fc'
 
 const Nav = () => {
   const history = useHistory();
   const { state, dispatch } = useContext(Context);
-  
-  const [show, setShow] = useState(false);
+  const showNav = state.Global.showNav
+  const IsMD = state.Global.IsMD
+  console.log(IsMD)
+  // const [showNav, setShowNav] = useState(true);
+  // const [showMD, setShowMD] = useState(false);
   const [Auth, setAuth] = useState(localStorage.getItem("auth.isAuthed"));
   const ShowBar = () => {
-    setShow(!show);
+    // setShowNav(!showNav);
+    dispatch({
+      type: "setShowNav",
+      payload: {
+        showNav: !showNav,
+      },
+    });
+    
   };
-  useEffect(()=>{
-    if(state.Global.innerWidth<1200){
-      setShow(true)
-    }else{
-      setShow(false)
+  useEffect(() => {
+    if (state.Global.innerWidth < 1200) {
+      // setShowNav(false);
+      dispatch({
+        type: "setShowNav",
+        payload: {
+          showNav: false,
+        },
+      });
+    } else {
+      // setShowNav(true);
+      dispatch({
+        type: "setShowNav",
+        payload: {
+          showNav: true,
+        },
+      });
     }
-  }, [state.Global.innerWidth])
+    if (state.Global.innerWidth < 768) {
+      dispatch({
+        type: "setIsMD",
+        payload: {
+          IsMD: true,
+        },
+      });
+    } else {
+      dispatch({
+        type: "setIsMD",
+        payload: {
+          IsMD: false,
+        },
+      });
+    }
+  }, [state.Global.innerWidth]);
 
   const updateWidthAndHeight = () => {
-    // setWidth(window.innerWidth);
-    // setHeight(window.innerHeight);
     dispatch({
       type: "setWindow",
       payload: {
@@ -37,6 +73,10 @@ const Nav = () => {
       },
     });
   };
+
+  useEffect(() => {
+    console.log(showNav, state.Global.MDMenue);
+  }, [showNav]);
 
   useEffect(() => {
     window.addEventListener("resize", updateWidthAndHeight);
@@ -68,55 +108,44 @@ const Nav = () => {
       history.push("/login");
     });
   };
-
+  // state.Global.MDMenue
+  // state.Global.IsMD
   return (
-    <Fragment>
+    <div className={styles.container}>
       <div
-        className={show ? `${styles.bar} ${styles.active}` : `${styles.bar}`}
-      >
-        <Link to="#" onClick={ShowBar}>
-          <BsReverseLayoutTextSidebarReverse />
-        </Link>
-        <div className={styles.NavIconWrapper}>
-        {NavRoutes.map((item, index) => {
-            return (
-              <Tooltip title={item.title} placement="right" key={index}>
-                <Link to={item.path} >
-                  {item.icon} 
-                </Link>
-              </Tooltip> 
-            );
-          })}
-        </div>
-      </div>
-      <div
-        className={
-          show ? `${styles.navwrap} ${styles.active}` : `${styles.navwrap}`
-        }
+        className={ showNav ? ( IsMD ? `${styles.navwrap} ${styles.MDshowNav}` : `${styles.navwrap}`) : ( IsMD ? `${styles.MDhideNav} `: `${styles.navwrap} ${styles.ChangeBGforHide}`)}
+        // style={IsMD ? {display:'none'}: null}
       >
         <ul className={styles.navitems}>
-          <li className={styles.title}>
-            {" "}
-            <h2>ISMS</h2>{" "}
+          <li className={styles.title} style={showNav ? null: {background:'white'}}>
+            {showNav ? <h2>ISMS</h2> : null}
             <Link to="#" className={styles.cross} onClick={ShowBar}>
-              <ImCross />
-            </Link>{" "}
+              { showNav ? <ImCross /> : <FcList style={{fontSize:'1.5rem'}}/> }
+            </Link>
           </li>
           {NavRoutes.map((item, index) => {
             return (
+              <Tooltip title={item.title} placement="right" key={index}>
               <li className={item.navitem} key={index}>
                 <Link to={item.path}>
-                  {item.icon} <span>{item.title}</span>
+                  {item.icon} {showNav ? <span>{item.title}</span> : null}
                 </Link>
               </li>
+              </Tooltip>
             );
           })}
         </ul>
         {Auth ? (
+         showNav ? 
           <Button className={styles.LogoutBtn} onClick={logout}>
             Sign Out
           </Button>
+          :
+          <Tooltip title={'Sign-out'} placement="right">
+          <FcExternal style={{fontSize:'1.5rem', cursor:'pointer'}} onClick={logout}/>
+          </Tooltip>
         ) : (
+          showNav ? 
           <button
             className={styles.LogoutBtn}
             onClick={() => {
@@ -125,9 +154,15 @@ const Nav = () => {
           >
             Sign In
           </button>
+          :
+          <Tooltip title={'Sign-in'} placement="right">
+          <FcInternal style={{fontSize:'1.5rem', cursor:'pointer'}} onClick={() => {
+            history.push("/login");
+          }}/>
+          </Tooltip>
         )}
       </div>
-    </Fragment>
+    </div>
   );
 };
 

@@ -1,18 +1,42 @@
 import React from "react";
-// import styles from "../topology.module.scss";
-import {
-  Form,
-  Input,
-  Switch,
-  Radio,
-  Select
-} from "antd";
-
+import styles from "../topology.module.scss";
+import { Form, Input, Switch, Radio, Select, Descriptions } from "antd";
 
 const { Option } = Select;
 
-export const LanSetting = ({ layout, form, onFinish }) => {
+export const IdentityTable = ({ identity }) => {
+  return(
+    <Descriptions
+    bordered
+    column={{ xxl: 4, xl: 3, lg: 3, md: 3, sm: 2, xs: 1 }}
+    className={styles.desc}
+  >
+    <Descriptions.Item label="Identity">
+      IMEI: {identity.IMEI}
+      <br />
+      bootloader_version: {identity.bootloader_version}
+      <br />
+      hardware_mcsv: {identity.hardware_mcsv}
+      <br />
+      hostname: {identity.hostname}
+      <br />
+      lan_eth_mac: {identity.lan_eth_mac}
+      <br />
+      modem_firmware_version: {identity.modem_firmware_version}
+      <br />
+      serial_number: {identity.serial_number}
+      <br />
+      wan_eth_mac: {identity.wan_eth_mac}
+      <br />
+      wifi_ap_mac: {identity.wifi_ap_mac}
+      <br />
+    </Descriptions.Item>
+  </Descriptions>
+  )
+};
 
+export const LanSetting = ({ layout, onFinish }) => {
+  const [form] = Form.useForm()
   return (
     <Form {...layout} onFinish={onFinish} form={form}>
       <Form.Item
@@ -96,36 +120,33 @@ export const LanSetting = ({ layout, form, onFinish }) => {
   );
 };
 
-export const WanSetting = ({ layout, form, onFinish }) => {
-
+export const WanSetting = ({ layout, onFinish }) => {
+  const [form] = Form.useForm()
   return (
     <Form {...layout} onFinish={onFinish} form={form}>
       <Form.Item label="Ethernet dhcp dns(1)">
         <Input.Group compact>
-       <Form.Item name="ipv4_type">
-        <Radio.Group>
-          <Radio value="ISP">ISP</Radio>
-          <Radio value="manual">Manual</Radio>
-          <Radio value="nonec">none</Radio>
-        </Radio.Group>
-      </Form.Item>
-          <Form.Item
-            name={["ip4", "adress"]}
-            noStyle
-          >
+          <Form.Item name="ipv4_type">
+            <Radio.Group>
+              <Radio value="ISP">ISP</Radio>
+              <Radio value="manual">Manual</Radio>
+              <Radio value="nonec">none</Radio>
+            </Radio.Group>
+          </Form.Item>
+          <Form.Item name={["ip4", "adress"]} noStyle>
             <Input style={{ width: "50%" }} placeholder="Input adress" />
           </Form.Item>
         </Input.Group>
       </Form.Item>
       <Form.Item label="ethernet_dhcp_dns_2">
         <Input.Group compact>
-        <Form.Item name="ipv4_type">
-        <Radio.Group>
-          <Radio value="ISP">ISP</Radio>
-          <Radio value="manual">Manual</Radio>
-          <Radio value="nonec">none</Radio>
-        </Radio.Group>
-        </Form.Item>
+          <Form.Item name="ipv4_type">
+            <Radio.Group>
+              <Radio value="ISP">ISP</Radio>
+              <Radio value="manual">Manual</Radio>
+              <Radio value="nonec">none</Radio>
+            </Radio.Group>
+          </Form.Item>
           <Form.Item
             name={["ip4", "adress"]}
             noStyle
@@ -137,13 +158,13 @@ export const WanSetting = ({ layout, form, onFinish }) => {
       </Form.Item>
       <Form.Item label="ethernet_dhcp_dns_3">
         <Input.Group compact>
-        <Form.Item name="ipv4_type">
-        <Radio.Group>
-          <Radio value="ISP">ISP</Radio>
-          <Radio value="manual">Manual</Radio>
-          <Radio value="nonec">none</Radio>
-        </Radio.Group>
-        </Form.Item>
+          <Form.Item name="ipv4_type">
+            <Radio.Group>
+              <Radio value="ISP">ISP</Radio>
+              <Radio value="manual">Manual</Radio>
+              <Radio value="nonec">none</Radio>
+            </Radio.Group>
+          </Form.Item>
           <Form.Item
             name={["ip4", "adress"]}
             noStyle
@@ -156,9 +177,9 @@ export const WanSetting = ({ layout, form, onFinish }) => {
       <Form.Item label="Priority Order">
         <Input.Group compact>
           <Form.Item
-            name='1'
+            name="1"
             noStyle
-            label='1'
+            label="1"
             // rules={[{ required: true, message: "adress is required" }]}
           >
             <Select placeholder="Please select">
@@ -168,9 +189,9 @@ export const WanSetting = ({ layout, form, onFinish }) => {
             </Select>
           </Form.Item>
           <Form.Item
-            name='2'
+            name="2"
             noStyle
-            label='2'
+            label="2"
             // rules={[{ required: true, message: "adress is required" }]}
           >
             <Select placeholder="Please select">
@@ -180,9 +201,9 @@ export const WanSetting = ({ layout, form, onFinish }) => {
             </Select>
           </Form.Item>
           <Form.Item
-            name='3'
+            name="3"
             noStyle
-            label='3'
+            label="3"
             // rules={[{ required: true, message: "adress is required" }]}
           >
             <Select placeholder="Please select">
@@ -210,8 +231,8 @@ export const WanSetting = ({ layout, form, onFinish }) => {
   );
 };
 
-export const LteSetting = ({ layout, form, onFinish }) => {
-
+export const LteSetting = ({ layout, onFinish }) => {
+  const [form] = Form.useForm()
   function pinonChange(checked) {
     console.log(`switch to ${checked}`);
   }
@@ -227,7 +248,7 @@ export const LteSetting = ({ layout, form, onFinish }) => {
 
   return (
     <Form {...layout} onFinish={onFinish} form={form}>
-        <Form.Item name="mode" label='Model'>
+      <Form.Item name="mode" label="Model">
         <Radio.Group>
           <Radio value="auto">Auto</Radio>
           <Radio value="2G-only">2G-only</Radio>
@@ -235,121 +256,77 @@ export const LteSetting = ({ layout, form, onFinish }) => {
           <Radio value="4G-only">4G-only</Radio>
         </Radio.Group>
       </Form.Item>
-      <Form.Item
-        name={"mtu"}
-        label="mtu"
-      >
+      <Form.Item name={"mtu"} label="mtu">
+        <Input />
+      </Form.Item>
+      <Form.Item name={"pin"} label="pin">
+        <Input />
+      </Form.Item>
+      <Form.Item name={"puk"} label="puk">
         <Input />
       </Form.Item>
       <Form.Item
-        name={"pin"}
-        label="pin"
-      >
-        <Input />
-      </Form.Item>
-      <Form.Item
-        name={"puk"}
-        label="puk"
-      >
-        <Input />
-      </Form.Item>
-      <Form.Item
-      valuePropName="checked"
+        valuePropName="checked"
         name={"pin_enabled"}
         label="pin enabled"
       >
         <Switch defaultChecked onChange={pinonChange} />
       </Form.Item>
-      <Form.Item
-        name={"apn"}
-        label="apn"
-      >
+      <Form.Item name={"apn"} label="apn">
         <Input />
       </Form.Item>
       <Form.Item
-      valuePropName="checked"
+        valuePropName="checked"
         name={"ipv6_enabled"}
         label="ipv6 enabled"
       >
         <Switch defaultChecked onChange={ipv6onChange} />
       </Form.Item>
-      <Form.Item name="auth" label='Auth Type'>
+      <Form.Item name="auth" label="Auth Type">
         <Radio.Group>
           <Radio value="none">none</Radio>
           <Radio value="pap">pap</Radio>
           <Radio value="chap">chap</Radio>
         </Radio.Group>
       </Form.Item>
-      <Form.Item
-        name={"username"}
-        label="Auth_UserName"
-      >
+      <Form.Item name={"username"} label="Auth_UserName">
+        <Input />
+      </Form.Item>
+      <Form.Item name={"password"} label="Auth_Password">
         <Input />
       </Form.Item>
       <Form.Item
-        name={"password"}
-        label="Auth_Password"
-      >
-        <Input />
-      </Form.Item>
-      <Form.Item
-      valuePropName="checked"
+        valuePropName="checked"
         name={"limit_enabled"}
         label="limit enabled"
       >
         <Switch onChange={ipv6onChange} />
       </Form.Item>
-      <Form.Item
-        name={"limit_mbyte"}
-        label="Mbyte"
-      >
+      <Form.Item name={"limit_mbyte"} label="Mbyte">
         <Input />
       </Form.Item>
-      <Form.Item
-        name={"limit_mbyte"}
-        label="Reset Day"
-      >
+      <Form.Item name={"limit_mbyte"} label="Reset Day">
         <Input />
       </Form.Item>
-      <Form.Item
-        name={"limit_mbyte"}
-        label="Reset Hour"
-      >
+      <Form.Item name={"limit_mbyte"} label="Reset Hour">
         <Input />
       </Form.Item>
-      <Form.Item
-        name={"limit_mbyte"}
-        label="Reset Minute"
-      >
+      <Form.Item name={"limit_mbyte"} label="Reset Minute">
         <Input />
       </Form.Item>
-      <Form.Item
-        name={"limit_mbyte"}
-        label="Reset Second"
-      >
+      <Form.Item name={"limit_mbyte"} label="Reset Second">
         <Input />
       </Form.Item>
-      <Form.Item
-      valuePropName="checked"
-        name={"roaming"}
-        label="Roaming"
-      >
+      <Form.Item valuePropName="checked" name={"roaming"} label="Roaming">
         <Switch onChange={roamingonChange} />
       </Form.Item>
-      <Form.Item
-        name={"limit_mbyte"}
-        label="Recovery DownTimes"
-      >
+      <Form.Item name={"limit_mbyte"} label="Recovery DownTimes">
         <Input />
       </Form.Item>
-      <Form.Item
-      valuePropName="checked"
-        name={"roaming"}
-        label="Recovery apn"
-      >
+      <Form.Item valuePropName="checked" name={"roaming"} label="Recovery apn">
         <Switch onChange={apnonChange} />
       </Form.Item>
-      <Form.Item name="action" label='Recovery apn action'>
+      <Form.Item name="action" label="Recovery apn action">
         <Radio.Group>
           <Radio value="reboot">reboot</Radio>
           <Radio value="default-apn">default-apn</Radio>

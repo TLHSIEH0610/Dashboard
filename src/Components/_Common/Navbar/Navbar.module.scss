@@ -1,92 +1,124 @@
-.bar{
-    // background: gray;
-    display:none;
-    height:52.4px;
-    &:hover{
-        background: #DCDCDC;
-    }
-    &.active{display:inline-block ;}
-    a{
-        color: #001529;
-        font-size: 25px;
-        padding: 12.7px;
-        line-height: 26px;
-        display: inline-block;
-    }
+
+.MD {
+  display: none;
 }
-.NavIconWrapper{
-    display: flex;
-    flex-direction: column;
+.MDhideNav{
+    display: none;
 }
-.navwrap{
-    display: flex;
-    flex-direction: column;
+.bar {
+  &.showbar {
+    display: inline-block;
+  }
+  &.hidebar {
+    display: none;
+  }
+  height: 52.4px;
+  &:hover {
+    background: #dcdcdc;
+  }
+
+  a {
+    color: #001529;
+    font-size: 25px;
+    line-height: 26px;
+    display: inline-block;
+  }
+}
+.NavIconWrapper {
+  display: flex;
+  flex-direction: column;
+}
+.container{
+    position:relative
+}
+.navwrap {
+  display: flex;
+  flex-direction: column;
+  top: 0;
+  max-width: 200px;
+  height: 100vh;
+  padding:0 10px;
+  justify-content: flex-start;
+  align-items: center;
+  background: #001529;
+  position: relative;
+  &.MDshowNav{
+    min-width: 230px;
+    position: absolute;
     top:0;
-    width: 200px;
-    height:100vh;
-    justify-content: flex-start;
+    left:0;
+    z-index:99;
+  }
+  &.ChangeBGforHide{
+      background: white ;
+  }
+  &.MDmenue {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 99;
+  }
+  &.hideNavbar {
+    display: none;
+  }
+  .navitems {
+    display: flex;
+    flex-direction: column;
     align-items: center;
-    // background: #F8F8FF;
-    background: #001529;
-    // color: white;
-    &.active{
-        transform:translateX(-200px);
-        display: none;
-        
+    width: 100%;
+    li {
+      text-align: center;
+      width: 100%;
+      display: block;
+      
     }
-    .navitems{
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        width: 100%;
-        li{
-            text-align: center;
-            width: 100%;
-            display: block;
-        }
-        li.title{
-            background: #001529;
-            padding:25px 15px;
-            line-height: 23px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 28px;
-            position: relative;
-            h2{
-                margin-bottom: 0px;
-                line-height: 23px;
-                color:white;
-            }
-            .cross{
-                padding-left: 10;
-                margin-right: 3px;
-                width: auto;
-                font-size: 10px;
-                position: absolute;
-                right: 0%;
-                padding: 10px;
-            }
-        }
-        li a{
-            display: inline-block;
-            padding:18px;
-            line-height: 18px;
-            color: hsla(0,0%,100%,.65);
-            width: 100%;
-            &:hover{
-                // background:#DCDCDC;
-                color:white;
-            }
-        }
-    }
-    .LogoutBtn{
-        background: #6c757d;
-        padding: 7px;
-        border-radius: 5px;
+    li.title {
+      background: #001529;
+      padding: 25px 15px;
+      line-height: 23px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 28px;
+      position: relative;
+      h2 {
+        margin-bottom: 0px;
+        line-height: 23px;
         color: white;
-        display: flex;
-        align-items: center;
-        color: lightgray;
+        margin-right:10px;
+      }
+      .cross {
+        width: auto;
+        font-size: 10px;
+        position: absolute;
+        right: 0%;
+      }
     }
+    li a {
+      display: flex;
+      align-items: center;
+      padding: 18px 10px;
+      margin-right:5px;
+      line-height: 18px;
+      color: hsla(0, 0%, 100%, 0.65);
+      width: 130%;
+      span{
+        display: inline-block;
+        width: 100px;
+        margin-left: 10px;
+      }
+      &:hover {
+        color: white;
+      }
+    }
+  }
+  .LogoutBtn {
+    background: #6c757d;
+    padding: 7px;
+    border-radius: 5px;
+    color: white;
+    display: flex;
+    align-items: center;
+    color: lightgray;
+  }
 }

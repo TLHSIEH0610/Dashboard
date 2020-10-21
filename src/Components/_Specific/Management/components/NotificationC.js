@@ -439,13 +439,14 @@ const NotifiModalC = ({
   const EditNotifionFinish = (values) => {
     setUploading(true)
     console.log(values, record);
+    console.log(values.mail_to.split(','))
     const SetNotifiUrl = `/cmd?set={"notification":[{"cid":"${
       record.cid
     }", "timezone":"${values.timezone}", "conditions":{"level":"${
       values.level
     }"}, "mail":{"active":"${values.mail_active}", "mail_from":"${
       values.mail_from
-    }","mail_to":${JSON.stringify(values.mail_to)}, "token":"${
+    }","mail_to":${JSON.stringify(values.mail_to.split(','))}, "token":"${
       values.mail_token
     }"},"line":{"active":"${values.line_active}","token":"${
       values.line_token
@@ -707,9 +708,11 @@ const NotifiModalC = ({
           <Form.Item label="Mail From" name="mail_from">
             <Input />
           </Form.Item>
+          
           <Form.Item label="Mail To" name="mail_to">
             <Input />
           </Form.Item>
+          <p style={{marginLeft:'22%', marginTop:'-25px', color: 'gray'}}>(use <span style={{fontWeight:'500', color:'blue'}}>","</span>  to seperate different receivers)</p>
           <Form.Item label="Mail Token" name="mail_token">
             <Input />
           </Form.Item>

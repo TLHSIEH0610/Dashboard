@@ -30,7 +30,7 @@ import { useHistory } from "react-router-dom";
 import { UserLogOut } from "../../../Utility/Fetch";
 import Swal from "sweetalert2";
 
-const CloudList = () => {
+const Repository = () => {
   const [form] = Form.useForm();
   const CompanyPD = [
     "M300",
@@ -641,7 +641,7 @@ const CloudList = () => {
   );
 };
 
-export default CloudList;
+export default Repository;
 
 // http://192.168.0.95:8000/repository?upload_file={"cid":"12345678901234567890123456789011","name":"abc","type":"cfg","inf":inf}
 // http://192.168.0.95:8000/repository?download_file={"cid":"12345678901234567890123456789011","name":"abc","type":"cfg"}

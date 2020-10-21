@@ -1,5 +1,5 @@
 import React from "react";
-import { Modal, Tabs } from "antd";
+import { Modal, Tabs, Button } from "antd";
 import styles from "../topology.module.scss";
 
 import {
@@ -17,20 +17,25 @@ const DeviceStateC = ({ record, setDeviceStatevisible, DeviceStatevisible }) => 
   return (
     <Modal
       visible={DeviceStatevisible}
-      onOk={() => setDeviceStatevisible(false)}
       onCancel={() => setDeviceStatevisible(false)}
-      okText="confirm"
-      cancelText="cancel"
       centered={true}
       width={"50%"}
-      className={styles.modal}
+      footer={[
+        <Button
+          key="confirm"
+          type="primary"
+          onClick={() => setDeviceStatevisible(false)}
+        >
+          Confirm
+        </Button>
+    ]}
     >
-      <Tabs defaultActiveKey="1">
+      <Tabs defaultActiveKey="1" className={styles.Tabs}>
         <TabPane tab="Statistic" key="1" className={styles.tabpane}>
           <TxRxStatistic dataSource={record} />
         </TabPane>
         <TabPane tab="Connection" key="2" className={styles.tabpane}>
-          <StatusConnection dataSource={record} />
+          <StatusConnection dataSource={record} className={styles.connection}/>
         </TabPane>
         <TabPane tab="Strength" key="3" className={styles.tabpane}>
           <StatusStrength dataSource={record} />

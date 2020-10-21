@@ -12,7 +12,7 @@ const layout = {
 
 
 const TopoIoTC = ({ IoTvisible, setIoTvisible, IoTresponse, deviceindex, handleDeviceChange }) => {
-  console.log(IoTresponse)
+  console.log('執行了 TopoIoTC')
   const [form] = Form.useForm();
   const onFinish = (values) => {
     console.log(values);

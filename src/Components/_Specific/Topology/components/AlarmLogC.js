@@ -1,5 +1,5 @@
 import React from "react";
-import { Modal, Table } from "antd";
+import { Modal, Table, Button } from "antd";
 import styles from "../topology.module.scss";
 
 
@@ -35,14 +35,20 @@ const AlarmLogC = ({ getColumnSearchProps, dataSource, setAlarmTablevisible, Ala
     <>
       <Modal
         visible={AlarmTablevisible}
-        onOk={() => setAlarmTablevisible(false)}
         onCancel={() => setAlarmTablevisible(false)}
-        okText="confirm"
-        cancelText="cancel"
         centered={true}
         width={"70%"}
         className={styles.modal}
         destroyOnClose={true}
+        footer={[
+            <Button
+              key="confirm"
+              type="primary"
+              onClick={() => setAlarmTablevisible(false)}
+            >
+              Confirm
+            </Button>
+        ]}
       >
         <Table
           // loading={loading}

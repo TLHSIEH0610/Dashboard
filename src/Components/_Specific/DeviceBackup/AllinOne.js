@@ -1,6 +1,6 @@
 import React, { useState, useEffect, Fragment, useContext } from "react";
 import styles from "./devicebackup.module.scss";
-import { Button, Card, Form, Select, Tag, Input } from "antd";
+import { Button, Card, Form, Select, Tag } from "antd";
 import axios from "axios";
 import Swal from "sweetalert2";
 import {UserLogOut} from '../../../Utility/Fetch'
@@ -155,7 +155,7 @@ const AllinOne_test = () => {
   }
 
   function tagRender(props) {
-    const { label, value, closable, onClose } = props;
+    const { label, _, closable, onClose } = props;
     return (
       <Tag
         color="black"

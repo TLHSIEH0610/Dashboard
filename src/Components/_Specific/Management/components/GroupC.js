@@ -411,18 +411,18 @@ export const GroupManagementC = () => {
 
 export default GroupManagementC;
 
-const GroupModalC = ({
+const EditGroupModalC = ({
   GroupModalvisible,
   setGroupModalvisible,
   record,
+  setUploading
 }) => {
   const [form] = Form.useForm();
   const [Createform] = Form.useForm();
-  const [uploading, setUploading] = useState(false);
-  const [EditGroupLoading, setEditGroupLoading] = useState(false);
+  const [Btnuploading, setBtnuploading] = useState(false);
   const getGroupUrl = `/device_mgnt/group?list_group={"cid":"${record.cid}"}`;
   const [Grouploading, Groupresponse] = useURLloader(
-    getGroupUrl, uploading
+    getGroupUrl, Btnuploading
   );
   const [GroupData, setGroupData] = useState([{ gid: "", node_list: [] }]);
   // const NodeUrl = `/cmd?get={"nodeInf":{"nodeInf":{"cid":{},"gid":{},"token":{},"id":{}}}}`;
@@ -430,7 +430,6 @@ const GroupModalC = ({
   const [Nodeloading, Noderesponse] = useURLloader(NodeUrl);
   const [NodeList, setNodeList] = useState([]);
   const [currentPage, setCurrentPage] = useState("");
-  console.log('渲染了 GroupModalC')
 
   function callback(key) {
     setCurrentPage(key);
@@ -440,21 +439,26 @@ const GroupModalC = ({
     const deleteUrl = `/device_mgnt/group?delete_group={"cid":"${record.cid}","group_list":[{"name":"${grouprecord.gid}"}]}`;
     console.log(deleteUrl);
     setUploading(true);
+    setBtnuploading(true)
     axios
       .get(deleteUrl)
       .then((res) => {
         setUploading(false);
+        setBtnuploading(false)
         message.success("Delete successfully.");
         console.log(res);
       })
       .catch((error) => {
         setUploading(false);
+        setBtnuploading(false)
         message.error("Delete fail.");
         console.log(error);
       });
   };
   const UpdateGrouponFinish = (values) => {
     console.log(values);
+    setUploading(true);
+    setBtnuploading(true)
     let group_list = "";
     for (let i = 0; i < values.Group.length; i++) {
       if (i === values.Group.length - 1) {
@@ -468,7 +472,7 @@ const GroupModalC = ({
       }
     }
 
-    setEditGroupLoading(true);
+
     console.log(group_list);
     const EditGroupUrl = `/device_mgnt/group?modify_group={"cid":"${record.cid}","group_list":[${group_list}]}`;
     console.log(EditGroupUrl);
@@ -477,18 +481,21 @@ const GroupModalC = ({
       .then((res) => {
         console.log(res);
         message.success("Update successfully.");
-        setEditGroupLoading(false);
+        setUploading(false);
+        setBtnuploading(false)
       })
       .catch((erro) => {
         console.log(erro);
         message.error("Update fail.");
-        setEditGroupLoading(false);
+        setUploading(false);
+        setBtnuploading(false)
       });
   };
 
   const CreateGrouponFinish = (values) => {
     console.log("Received values of form:", values);
     setUploading(true);
+    setBtnuploading(true)
     const CreateGroupUrl = `/device_mgnt/group?create_group={"cid":"${
       record.cid
     }", "group_list":[{"name":"${
@@ -500,6 +507,7 @@ const GroupModalC = ({
       .get(CreateGroupUrl)
       .then((res) => {
         setUploading(false);
+        setBtnuploading(false)
         message.success("Create completely.");
         console.log(res);
       })
@@ -507,6 +515,7 @@ const GroupModalC = ({
         console.log(error);
         message.error("Create fail.");
         setUploading(false);
+        setBtnuploading(false)
       });
   };
   useEffect(() => {
@@ -664,7 +673,7 @@ const GroupModalC = ({
           <Button
             key="ok"
             type="primary"
-            loading={EditGroupLoading}
+            loading={Btnuploading}
             onClick={() => {
               form.submit();
             }}
@@ -733,7 +742,7 @@ const GroupModalC = ({
                   <Button
                     type="primary"
                     htmlType="submit"
-                    loading={uploading}
+                    loading={Btnuploading}
                     //   className={styles.clickBtn}
                   >
                     Submit
@@ -748,7 +757,7 @@ const GroupModalC = ({
             columns={columns}
             dataSource={GroupData}
             pagination={false}
-            loading={Grouploading}
+            loading={Btnuploading}
             // scroll={{ x: 1500, y: 600 }}
           />
         </TabPane>
@@ -758,5 +767,4 @@ const GroupModalC = ({
   );
 };
 
-
-export const GroupModalMC = React.memo(GroupModalC)
+export const EditGroupModalMC = React.memo( EditGroupModalC )

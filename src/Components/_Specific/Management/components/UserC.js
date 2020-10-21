@@ -27,7 +27,7 @@ import {
 } from "react-icons/fc";
 import { NotifiModalMC } from "./NotificationC";
 import { SchemeModalC } from "./SchemeC";
-import { GroupModalMC } from "./GroupC";
+import { EditGroupModalMC } from './GroupC'
 import { TokenModelC } from "./TokenC";
 import { CreateInfoModalMC, EditUserModalMC, CreateUserModalMC } from "./UserF";
 
@@ -35,6 +35,7 @@ const UserC = () => {
   const { state } = useContext(Context);
   const [form] = Form.useForm();
   const cid = localStorage.getItem("authUser.cid");
+  const [uploading, setUploading] = useState(false);
   const [Clist, setClist] = useState([]);
   const [CreateVisible, setCreateVisible] = useState(false);
   const [CreateUservisible, setCreateUservisible] = useState(false);
@@ -44,8 +45,7 @@ const UserC = () => {
     cid === "proscend"
       ? `/device_mgnt/group?list_group={${state.Login.Cid}}`
       : `/device_mgnt/group?list_group={"cid":"${cid}"}`;
-  const [Grouploading, Groupresponse] = useURLloader(getGroupUrl);
-  const [uploading, setUploading] = useState(false);
+  const [Grouploading, Groupresponse] = useURLloader(getGroupUrl, uploading);
   const [record, setRecord] = useState("");
   const [UserEditRecord, setUserEditRecord] = useState("");
   const [onEditcid, setOnEditcid] = useState("");
@@ -65,9 +65,7 @@ const UserC = () => {
   const [UserListloading, UserListResponse] = useURLloader(UserList, uploading);
   const CustInfoUrl = `/inf_mgnt?list_inf={} `;
   const [CustInfoLoading, CustInfoResponse] = useURLloader(
-    CustInfoUrl,
-    uploading
-  );
+    CustInfoUrl, uploading);
 
   useEffect(() => {
     if (UserListResponse && CustInfoResponse) {
@@ -512,10 +510,11 @@ const UserC = () => {
       />
 
       {EditGroupRecord && (
-        <GroupModalMC
+        <EditGroupModalMC
           GroupModalvisible={GroupModalvisible}
           setGroupModalvisible={setGroupModalvisible}
           record={EditGroupRecord}
+          setUploading={setUploading}
         />
       )}
 

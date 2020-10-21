@@ -1,14 +1,19 @@
 import React from "react";
 import styles from "../topology.module.scss";
-import { LanSetting, WanSetting, LteSetting } from "./DeviceSettingF";
-import {
-  Table,
-  Modal,
-  Form,
-  Tabs
-} from "antd";
+import { LanSetting, WanSetting, LteSetting, IdentityTable } from "./DeviceSettingF";
+import { Modal, Tabs, Card } from "antd";
 
 const { TabPane } = Tabs;
+
+const layout = {
+  labelCol: {
+    span: 8,
+  },
+  wrapperCol: {
+    span: 12,
+  },
+};
+
 // function callback(key) {
 //   console.log(key);
 //   const url = `/cmd?get={"device_cfg":{"filter":{"id":"${record.id}"},"nodeInf":{},"obj":{"${key}":{}}}}`;
@@ -32,20 +37,11 @@ const { TabPane } = Tabs;
 //     key === "lte" && setLte(res.data.response.device_cfg[0].obj.lte);
 //   });
 // }
-const DeviceSettingC = ({ DeviceSettingvisible, setDeviceSettingvisible, DeviceStateloading, identity, DeviceSettingonFinish, layout }) => {
-  const [form] = Form.useForm()
-  const identitycolumns = [
-    {
-      title: "Items",
-      dataIndex: "key",
-      key: "key",
-    },
-    {
-      title: "Data",
-      dataIndex: "value",
-      key: "value",
-    },
-  ];
+const DeviceSettingC = ({ DeviceSettingvisible, setDeviceSettingvisible, DeviceStateloading, identity }) => {
+
+  const DeviceSettingonFinish = (values) => {
+    console.log(values);
+  };
 
   return (
     <Modal
@@ -55,26 +51,23 @@ const DeviceSettingC = ({ DeviceSettingvisible, setDeviceSettingvisible, DeviceS
     okText="confirm"
     cancelText="cancel"
     centered={true}
-    width={"50%"}
+    width={"40%"}
     className={styles.modal}
   >
     <Tabs defaultActiveKey="1" >
       <TabPane tab="Identity" key="identity" className={styles.tabpane}>
-        <Table
-          loading={DeviceStateloading}
-          dataSource={identity}
-          columns={identitycolumns}
-          pagination={true}
-        />
+        <Card bordered={false} loading={DeviceStateloading}>
+         <IdentityTable identity={identity}/>
+        </Card>
       </TabPane>
       <TabPane tab="LAN" key="lan" className={styles.tabpane}>
-        <LanSetting layout={layout} form={form} onFinish={DeviceSettingonFinish} />
+        <LanSetting layout={layout}  onFinish={DeviceSettingonFinish} />
       </TabPane>
       <TabPane tab="WAN" key="wan" className={styles.tabpane}>
-        <WanSetting layout={layout} form={form} onFinish={DeviceSettingonFinish} />
+        <WanSetting layout={layout}  onFinish={DeviceSettingonFinish} />
       </TabPane>
       <TabPane tab="LTE" key="lte" className={styles.tabpane}>
-        <LteSetting layout={layout} form={form} onFinish={DeviceSettingonFinish} />
+        <LteSetting layout={layout}  onFinish={DeviceSettingonFinish} />
       </TabPane>
     </Tabs>
   </Modal>

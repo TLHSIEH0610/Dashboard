@@ -2,6 +2,7 @@
   "name": "web",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://github.com/TLHSIEH0610/Dashboard.git",
   "dependencies": {
     "@ant-design/charts": "^0.9.13",
     "@ant-design/compatible": "^1.0.5",
@@ -22,6 +23,7 @@
     "echarts": "^4.9.0",
     "echarts-for-react": "^2.0.16",
     "formik": "^2.1.5",
+    "gh-pages": "^3.1.0",
     "google-map-react": "^2.0.8",
     "google-maps-react": "^2.0.6",
     "http-proxy-middleware": "^1.0.5",
@@ -60,7 +62,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -77,5 +81,5 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "https://ba6e036d2d9a.ngrok.io"
+  "proxy": "https://4170c6bf2f7c.ngrok.io"
 }

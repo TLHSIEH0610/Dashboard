@@ -1,21 +1,25 @@
-import React from "react";
+import React, { useContext } from "react";
 import "echarts/lib/chart/pie";
 import ReactEchartsCore from "echarts-for-react/lib/core";
 import echarts from "echarts/lib/echarts";
 import "echarts/lib/component/tooltip";
 import "echarts/lib/component/title";
 import "echarts/lib/component/legend";
+import { useHistory } from 'react-router-dom'
+import Context from '../../../Utility/Reduxx'
 
 const PieChartC = ({ dataSource, data, name }) => {
-
-
+  const history = useHistory()
+  const { dispatch } = useContext(Context)
   const getOption = () => {
     const option = {
       title: {
         text: name,
         // subtext: "123",
         left: "center",
-        padding: [0, 0]
+        padding: [0, 0],
+        // subtext: '123',
+        // sublink : 'ads'
       },
       color: ["#28a745", "#ffc107", "#dc3545", "#343a40"],
       tooltip: {
@@ -79,6 +83,20 @@ const PieChartC = ({ dataSource, data, name }) => {
     return option;
   };
 
+  //Click事件
+  const onChartClick = (params)=>{
+    // console.log('123', params)
+    if(params.data.name===('excellent' || 'good' || 'fair' || 'poor')){
+      dispatch({ type: "setPietoTopo", payload: { strength: `${params.data.name}` }});
+    }else{
+      dispatch({ type: "setPietoTopo", payload: { health: `${params.data.name}` }});
+    }
+    history.push('./topology')
+}
+  const onEvents = {
+    'click': onChartClick,
+  }
+
   return (
     <ReactEchartsCore
       echarts={echarts}
@@ -86,6 +104,7 @@ const PieChartC = ({ dataSource, data, name }) => {
       notMerge={true}
       lazyUpdate={true}
       theme={"theme_name"}
+      onEvents= {onEvents}
     />
   );
 };

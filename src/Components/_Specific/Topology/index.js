@@ -3,6 +3,7 @@ import React, {
   useState,
   useRef,
   useContext,
+  Fragment,
 } from "react";
 import {
   Form,
@@ -20,15 +21,7 @@ import { useHistory } from "react-router-dom";
 import { UserLogOut } from "../../../Utility/Fetch";
 import Context from "../../../Utility/Reduxx";
 import useURLloader from "../../../hook/useURLloader";
-import {
-  MdSignalCellularConnectedNoInternet0Bar,
-  MdSignalCellular1Bar,
-  MdSignalCellular3Bar,
-  MdSignalCellular4Bar,
-  MdCastConnected,
-} from "react-icons/md";
-import { ImCircleDown, ImCancelCircle } from "react-icons/im";
-import { AiFillWarning } from "react-icons/ai";
+import { MdCastConnected } from "react-icons/md";
 import styles from "./topology.module.scss";
 import { SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
@@ -37,90 +30,13 @@ import { TopoIoTMC } from "./components/TopoIoTC";
 import { RiAlarmWarningFill, RiEdit2Fill } from "react-icons/ri";
 import { FcDocument, FcSettings } from "react-icons/fc";
 import { FaMapMarkerAlt } from "react-icons/fa";
-import OSMap from "../Track_Map/OSmap";
+import OpenStreetMapC from "../Track_Map/OpenStreetMap";
 import AlarmLogC from "./components/AlarmLogC";
 import DeviceStateC from "./components/DeviceStateC";
 import DeviceSettingC from "./components/DeviceSettingC";
-// import { healthIcon, strengthIcon } from './components/'
-
-const healthIcon = (props) => {
-  switch (props.health) {
-    case "up":
-      return (
-        <div className={styles.iconwrapper}>
-          <ImCircleDown className={styles.up} />
-          <p>up</p>
-        </div>
-      );
-    case "critical":
-      return (
-        <div className={styles.iconwrapper}>
-          <AiFillWarning className={styles.critical} />
-          <p>critical</p>
-        </div>
-      );
-    case "warning":
-      return (
-        <div className={styles.iconwrapper}>
-          <AiFillWarning className={styles.warning} />
-          <p>warning</p>
-        </div>
-      );
-    case "offline":
-      return (
-        <div className={styles.iconwrapper}>
-          <ImCancelCircle className={styles.offline} />
-          <p>offline</p>
-        </div>
-      );
-      default:
-        return
-  }
-
-};
-function strengthIcon(props) {
-  switch (props.strength) {
-    case "excellent":
-      return (
-        <div className={styles.iconwrapper}>
-          <MdSignalCellular4Bar className={styles.up} />
-          <p>excellent</p>
-        </div>
-      );
-    case "good":
-      return (
-        <div className={styles.iconwrapper}>
-          <MdSignalCellular3Bar className={styles.critical} />
-          <p>good</p>
-        </div>
-      );
-    case "fair":
-      return (
-        <div className={styles.iconwrapper}>
-          <MdSignalCellular1Bar className={styles.warning} />
-          <p>fair</p>
-        </div>
-      );
-    case "poor":
-      return (
-        <div className={styles.iconwrapper}>
-          <MdSignalCellularConnectedNoInternet0Bar className={styles.offline} />
-          <p>poor</p>
-        </div>
-      );
-      default:
-        return
-  }
-}
-
-const layout = {
-  labelCol: {
-    span: 8,
-  },
-  wrapperCol: {
-    span: 12,
-  },
-};
+import { healthIcon, strengthIcon } from "./components/TopologyF";
+import TopoFilterC from "./components/Filter";
+import TrackMap from '../Track_Map/track_map'
 
 const TopologyC = () => {
   const history = useHistory();
@@ -146,6 +62,7 @@ const TopologyC = () => {
   const [Mapvisible, setMapvisible] = useState(false);
   const [deviceindex, setDeviceindex] = useState(0);
   const EditableContext = React.createContext();
+  const [drawerVisible, setDrawerVisible] = useState(false)
 
   const EditableRow = ({ index, ...props }) => {
     const [form] = Form.useForm();
@@ -275,6 +192,7 @@ const TopologyC = () => {
       let dataSource = [];
       // console.log(responseData);
       responseData.forEach((item, index) => {
+        item.obj.status.alarm.forEach((alarm, alarmIndex)=> alarm['key'] = alarmIndex)
         dataSource.push({
           key: index,
           id: item.nodeInf.id,
@@ -391,29 +309,24 @@ const TopologyC = () => {
 
   const searchInput = useRef("");
 
-  //tabs點擊後回調
 
 
-  const DeviceSettingonFinish = (values) => {
-    console.log(values);
-  };
+  // const [filteredInfo, setFilteredInfo] = useState({});
+  // const [sortedInfo, setSortedInfo] = useState({});
+  // const handleChange = (pagination, filters, sorter) => {
+  //   console.log("Various parameters", pagination, filters, sorter);
+  //   setFilteredInfo(filters);
+  //   setSortedInfo(sorter);
+  // };
 
-  const [filteredInfo, setFilteredInfo] = useState({});
-  const [sortedInfo, setSortedInfo] = useState({});
-  const handleChange = (pagination, filters, sorter) => {
-    console.log("Various parameters", pagination, filters, sorter);
-    setFilteredInfo(filters);
-    setSortedInfo(sorter);
-  };
+  // const clearFilters = () => {
+  //   setFilteredInfo(null);
+  // };
 
-  const clearFilters = () => {
-    setFilteredInfo(null);
-  };
-
-  const clearAll = () => {
-    setFilteredInfo(null);
-    setSortedInfo(null);
-  };
+  // const clearAll = () => {
+  //   setFilteredInfo(null);
+  //   setSortedInfo(null);
+  // };
 
   function handleDeviceChange(value) {
     console.log(`selected ${value}`);
@@ -424,12 +337,12 @@ const TopologyC = () => {
     {
       title: "Device",
       dataIndex: "name",
-      width: "27%",
+      width: "35%",
       editable: true,
       key: "name",
-      ...getColumnSearchProps("name"),
-      filteredValue: filteredInfo ? filteredInfo.name : null,
-      onFilter: (value, record) => record.name.includes(value),
+      // ...getColumnSearchProps("name"),
+      // filteredValue: filteredInfo ? filteredInfo.name : null,
+      // onFilter: (value, record) => record.name.includes(value),
       render: (_, record) => {
         return (
           <div className={styles.rename}>
@@ -451,62 +364,74 @@ const TopologyC = () => {
     {
       title: "Model",
       dataIndex: "model",
-      width: "10%",
+      width: "15%",
       key: "2",
-      ...getColumnSearchProps("model"),
-      filteredValue: filteredInfo ? filteredInfo.model : null,
-      onFilter: (value, record) => record.model.includes(value),
+      // ...getColumnSearchProps("model"),
+      // filteredValue: filteredInfo ? filteredInfo.model : null,
+      // onFilter: (value, record) => record.model.includes(value),
     },
-    {
-      title: "Health",
-      dataIndex: "health",
-      width: "16%",
-      key: "health",
-      filters: [
-        { text: "up", value: "up" },
-        { text: "critical", value: "critical" },
-        { text: "warning", value: "warning" },
-        { text: "offline", value: "offline" },
-      ],
-      filteredValue: filteredInfo ? filteredInfo.health : null,
-      onFilter: (value, record) => record.health.includes(value),
-      sorter: (a, b) => a.health.length - b.health.length,
-      sortOrder: sortedInfo
-        ? sortedInfo.columnKey === "health" && sortedInfo.order
-        : null,
-      // ellipsis: true,
-      render: (_, record) => healthIcon(record),
-    },
-    {
-      title: "Strength",
-      dataIndex: "strength",
-      width: "16%",
-      key: "strength",
-      filters: [
-        { text: "excellent", value: "excellent" },
-        { text: "good", value: "good" },
-        { text: "fair", value: "fair" },
-        { text: "poor", value: "poor" },
-      ],
-      filteredValue: filteredInfo ? filteredInfo.strength : null,
-      onFilter: (value, record) => record.strength.includes(value),
-      sorter: (a, b) => a.strength.length - b.strength.length,
-      sortOrder: sortedInfo
-        ? sortedInfo.columnKey === "strength" && sortedInfo.order
-        : null,
-      ellipsis: true,
-      render: (_, record) => strengthIcon(record),
-    },
+    // {
+    //   title: "Status",
+    //   dataIndex: "status",
+    //   width: "10%",
+    //   key: "status",
+    //   // filters: [
+    //   //   { text: "up", value: "up" },
+    //   //   { text: "critical", value: "critical" },
+    //   //   { text: "warning", value: "warning" },
+    //   //   { text: "offline", value: "offline" },
+    //   // ],
+    //   // filteredValue: filteredInfo ? filteredInfo.health : null,
+    //   // onFilter: (value, record) => record.health.includes(value),
+    //   // sorter: (a, b) => a.health.length - b.health.length,
+    //   // sortOrder: sortedInfo
+    //   //   ? sortedInfo.columnKey === "health" && sortedInfo.order
+    //   //   : null,
+    //   // ellipsis: true,
+    //   render: (_, record) => {
+    //     return (
+    //       <div className={styles.iconwrapper}>
+    //       <span>{healthIcon(record.health)}</span>
+    //       <span>{strengthIcon(record.strength)}</span>
+    //       </div>
+
+    //       )
+
+    //   }
+    // },
+    // {
+    //   title: "Strength",
+    //   dataIndex: "strength",
+    //   width: "16%",
+    //   key: "strength",
+    //   // filters: [
+    //   //   { text: "excellent", value: "excellent" },
+    //   //   { text: "good", value: "good" },
+    //   //   { text: "fair", value: "fair" },
+    //   //   { text: "poor", value: "poor" },
+    //   // ],
+    //   // filteredValue: filteredInfo ? filteredInfo.strength : null,
+    //   // onFilter: (value, record) => record.strength.includes(value),
+    //   sorter: (a, b) => a.strength.length - b.strength.length,
+    //   sortOrder: sortedInfo
+    //     ? sortedInfo.columnKey === "strength" && sortedInfo.order
+    //     : null,
+    //   ellipsis: true,
+    //   render: (_, record) => strengthIcon(record.strength),
+    // },
 
     {
-      title: "Action",
-      dataIndex: "alarm",
-      width: "25%",
-      key: "5",
+      title: "Information",
+      dataIndex: "information",
+      width: "50%",
+      key: "information",
       render: (_, record, index) => {
         const alarmlog = record.alarm.length;
         return (
           <>
+            <Tooltip title={`health: ${record.health}`}>{healthIcon(record.health)}</Tooltip>
+            <Tooltip title={`signal: ${record.strength}`}>{strengthIcon(record.strength)}</Tooltip>
+            
             <Tooltip title="Alarm Log">
               <a
                 disabled={alarmlog ? false : true}
@@ -584,17 +509,20 @@ const TopologyC = () => {
                       console.log(
                         res.data.response.device_identity[0].obj.identity
                       );
-                      let key = Object.keys(
-                        res.data.response.device_identity[0].obj.identity
-                      );
-                      let value = Object.values(
-                        res.data.response.device_identity[0].obj.identity
-                      );
-                      let data = [];
-                      key.forEach((key, index) => {
-                        data.push({ key: key, value: value[`${index}`] });
-                      });
-                      setIdentity(data);
+                      let shorthand = res.data.response.device_identity[0].obj.identity
+                      let identity = {
+                        IMEI: shorthand.IMEI, 
+                        bootloader_version: shorthand.bootloader_version, 
+                        hardware_mcsv: shorthand.hardware_mcsv, 
+                        hostname: shorthand.hostname, 
+                        lan_eth_mac: shorthand.lan_eth_mac, 
+                        modem_firmware_version: shorthand.modem_firmware_version, 
+                        serial_number: shorthand.serial_number, 
+                        wan_eth_mac: shorthand.wan_eth_mac, 
+                        wifi_ap_mac: shorthand.wifi_ap_mac
+                      }
+                      console.log(identity)
+                      setIdentity(identity);
                     })
                     .catch((error) => {
                       console.log(error);
@@ -632,7 +560,7 @@ const TopologyC = () => {
   });
 
   return (
-    <Card>
+    <Fragment>
       <AlarmLogC
         dataSource={record.alarm}
         getColumnSearchProps={getColumnSearchProps}
@@ -658,14 +586,32 @@ const TopologyC = () => {
 
       <Modal
         visible={Mapvisible}
-        onOk={() => setMapvisible(false)}
-        onCancel={() => setMapvisible(false)}
-        okText="confirm"
-        cancelText="cancel"
+        onCancel={() => {
+          setMapvisible(false) 
+          setDrawerVisible(false)
+        }} 
         centered={true}
-        width={"35%"}
+        width={"80%"}
+        title="GPS Tracker"
+        footer={[
+          <Button
+            key="confirm"
+            type="primary"
+            onClick={() => {
+              setMapvisible(false)
+              setDrawerVisible(false)
+            }}
+          >
+            Confirm
+          </Button>
+      ]}
       >
-        <OSMap />
+        {/* <OpenStreetMapC
+          style={{ width: "100%" }}
+          centerPosition={[24.763963, 121.000095]}
+          currentZoom={12}
+        /> */}
+        <TrackMap drawerVisible={drawerVisible} setDrawerVisible={setDrawerVisible}/>
       </Modal>
 
       <DeviceSettingC
@@ -673,30 +619,28 @@ const TopologyC = () => {
         setDeviceSettingvisible={setDeviceSettingvisible}
         DeviceStateloading={DeviceStateloading}
         identity={identity}
-        DeviceSettingonFinish={DeviceSettingonFinish}
-        layout={layout}
       />
-
-      <Space style={{ marginBottom: 16 }}>
+      <Card style={{ marginBottom: "10px" }}>
+        <TopoFilterC setDataSource={setDataSource} dataSource={dataSource} />
+      </Card>
+      <Card>
+        {/* <Space style={{ marginBottom: 16 }}>
         <Button onClick={clearFilters}>Clear filters</Button>
         <Button onClick={clearAll}>Clear filters and sorters</Button>
-      </Space>
-      <Table
-        components={components}
-        rowClassName={() => "editable-row"}
-        bordered
-        loading={DeviceStateloading}
-        dataSource={dataSource}
-        columns={columns}
-        // pagination={false}
-        onChange={handleChange}
-      />
-    </Card>
+      </Space> */}
+        <Table
+          components={components}
+          rowClassName={() => "editable-row"}
+          bordered
+          loading={DeviceStateloading}
+          dataSource={dataSource}
+          columns={columns}
+          // pagination={false}
+          // onChange={handleChange}
+        />
+      </Card>
+    </Fragment>
   );
 };
 
 export default TopologyC;
-
-// /cmd?get={"device_identity":{}}
-/// cmd?get={"device_cfg":{                                                                        }}
-// /cmd?get={"device_cfg":{"filter":{"id":"015FcYbTCqw80jjS0dF9AACO"},"nodeInf":{},"obj":{"lan":{}}}}

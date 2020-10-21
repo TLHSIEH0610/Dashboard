@@ -46,7 +46,7 @@ const PieChart = () => {
                 PieData.sim.poor,
               ]
             }
-            data={["excellent", "good", "failr", "poor"]}
+            data={["excellent", "good", "fair", "poor"]}
             name={"Devices Strength"}
           />
         </Card>

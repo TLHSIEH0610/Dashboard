@@ -32,11 +32,11 @@ const CreateUserForm = ({ setUploading ,GroupList, record, CreateUservisible, se
     form.setFieldsValue({
       cid: record.cid
     });
-  },[])
+  },[CreateUservisible])
 
-  useEffect(()=>{
-    console.log(form.getFieldsValue(), form.isFieldTouched())
-  })
+  // useEffect(()=>{
+  //   console.log(form.getFieldsValue(), form.isFieldTouched())
+  // })
 
   const onFinish = (values) => {
     console.log("Received values of form:", values);
@@ -91,7 +91,7 @@ const CreateUserForm = ({ setUploading ,GroupList, record, CreateUservisible, se
     <Form name="CreateUser" autoComplete="off" form={form} onFinish={onFinish}>
       {state.Login.Cid === "" ? (
         <Form.Item name="cid" rules={[{ required: true, message: "" }]} label={'Customer'}>
-          <Input disabled={true} onChange={()=>{console.log(form.getFieldsValue(), form.getFieldValue(), form.isFieldTouched())}}/>
+          <Input disabled={true}/>
         </Form.Item>
       ) : (
         <Form.Item
@@ -220,10 +220,9 @@ export const CreateUserModalMC = React.memo(CreateUserForm)
 
 const EditUserForm = ({ GroupList, UserEditRecord, onEditcid, setUploading, setEditVisible, EditVisible }) => {
   const [form] = Form.useForm();
-  // console.log(GroupList,UserEditRecord, onEditcid)
+
 
   const EditUseronFinish = (values) => {
-    // console.log(values, UserEditRecord);
     setUploading(true);
     const EditUserUrl = values.password ===undefined? `/user_mgnt?modify_user={"cid":"${onEditcid}", "user_list":[{"name":"${
       values.name

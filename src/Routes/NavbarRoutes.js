@@ -1,22 +1,17 @@
 import React from 'react';
-import {GoDashboard} from 'react-icons/go'
-import {FaMapMarkerAlt} from 'react-icons/fa'
-import {FiSettings} from 'react-icons/fi'
-import { MdSettingsBackupRestore, MdCastConnected } from 'react-icons/md'
 import Dashboard from '../Pages/Dashboard'
-import Track from '../Pages/Track'
 import Topology from '../Pages/Topology'
 import Backup from '../Pages/BackupStore'
-import {ApartmentOutlined} from '@ant-design/icons'
 import Management from '../Pages/Management'
 import IoT from '../Pages/IoT'
+import { FcPieChart, FcParallelTasks, FcMultipleSmartphones, FcRotateToPortrait, FcEngineering } from 'react-icons/fc'
 
 
 export const NavRoutes = [
     {
         title: 'Dashboard',
         path: '/',
-        icon: <GoDashboard/>,
+        icon: <FcPieChart style={{fontSize:'1.5rem'}}/>,
         cName: 'NavText',
         auth: true,
         component: Dashboard
@@ -24,23 +19,15 @@ export const NavRoutes = [
     {
         title: 'Topology',
         path: '/topology',
-        icon: <ApartmentOutlined />,
+        icon: <FcParallelTasks style={{fontSize:'1.5rem'}}/>,
         cName: 'NavText',
         auth: true,
         component: Topology
     },
     {
-        title: 'Track',
-        path: '/track',
-        icon: <FaMapMarkerAlt/>,
-        cName: 'NavText',
-        auth: true,
-        component: Track
-    },
-    {
         title: 'IoT',
         path: '/iot',
-        icon: <MdCastConnected/>,
+        icon: <FcMultipleSmartphones style={{fontSize:'1.5rem'}}/>,
         cName: 'NavText',
         auth: true,
         component: IoT
@@ -48,7 +35,7 @@ export const NavRoutes = [
     {
         title: 'Device Backup',
         path: '/backuprestore',
-        icon: <MdSettingsBackupRestore/>,
+        icon: <FcRotateToPortrait style={{fontSize:'1.5rem'}}/>,
         cName: 'NavText',
         auth: true,
         component: Backup
@@ -56,19 +43,12 @@ export const NavRoutes = [
     {
         title: 'Management',
         path: '/management',
-        icon: <FiSettings/>,
+        icon: <FcEngineering style={{fontSize:'1.5rem'}}/>,
         cName: 'NavText',
         auth: true,
         component: Management
-    },
 
-    // {
-    //     title: 'Login',
-    //     path: '/login',
-    //     icon: <FiSettings/>,
-    //     cName: 'NavText',
-    //     component: Login
-    // }
+    },
 ]
 
 

@@ -119,8 +119,9 @@ return (
   <Descriptions
     bordered
     className={styles.desc}
+    column={{ xxl: 2, xl: 2, lg: 2, md: 2, sm: 1, xs: 1 }}
   >
-    <Descriptions.Item label="LAN">
+    <Descriptions.Item label="LAN" >
       ip4_adress: {connection.lan.ipv4.adress}
       <br />
       ip4_netmask: {connection.lan.ipv4.netmask}
@@ -130,12 +131,12 @@ return (
       ip6_up_time:{connection.lan.ipv6.uptime}  
       <br />
     </Descriptions.Item>
-  </Descriptions>
+  {/* </Descriptions>
   <Descriptions
     bordered
     className={styles.desc}
-  >
-    <Descriptions.Item label="LTE">
+  > */}
+    <Descriptions.Item label="LTE" >
       active: {connection.lte.active}
       <br />
       ip4_apn_address: {connection.lte.apn[0].ipv4.address}
@@ -155,12 +156,13 @@ return (
       ip4_uptime: {connection.lte.ipv4.uptime}
       <br />
     </Descriptions.Item>
-  </Descriptions>
+  {/* </Descriptions>
+
   <Descriptions
     bordered
     className={styles.desc}
-  >
-    <Descriptions.Item label="WAN">
+  > */}
+    <Descriptions.Item label="WAN" >
       active: {connection.wan.active}
       <br />
       ip4_address: {connection.wan.ipv4.address}
@@ -172,12 +174,12 @@ return (
       ip4_up_time:{connection.wan.ipv4.uptime}  
       <br />
     </Descriptions.Item>
-  </Descriptions>
+  {/* </Descriptions>
   <Descriptions
     bordered
     className={styles.desc}
-  >
-    <Descriptions.Item label="WWAN">
+  > */}
+    <Descriptions.Item label="WWAN" >
       active: {connection.wwan.active}
       <br />
       ip4_MAC: {connection.wwan.ipv4.MAC}
@@ -207,7 +209,7 @@ export const TxRxStatistic = ({ dataSource }) => {
   const getOption = () => {
 
     const option = {
-      title: {show: true, text:'DataUsage', textStyle:{fontWeight:'bold', fontFamily: 'sans-serif'},right:'auto',left:'auto' },
+      title: {show: true, text:'DataUsage', textStyle:{fontWeight:'bold', fontFamily: 'sans-serif'},right:'auto',left:'center' },
       legend: {show:true, right:'10%'},
       tooltip: {},
       dataset: {
