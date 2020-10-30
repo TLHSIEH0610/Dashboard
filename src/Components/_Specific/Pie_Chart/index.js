@@ -5,6 +5,8 @@ import useURLloader from "../../../hook/useURLloader";
 import PieChartC from "./PieChart";
 import Context from '../../../Utility/Reduxx'
 
+import { Translator } from '../../../i18n/index'
+
 const PieChart = () => {
   const { state } = useContext(Context) 
   const cid = localStorage.getItem('authUser.cid')
@@ -12,12 +14,15 @@ const PieChart = () => {
   const [loading, response] = useURLloader(url);
   const [PieData, setPieData] = useState([]);
 
+
   useEffect(() => {
     if (response) {
       setPieData(response.response.statistic.obj);
 
     }
   }, [response]);
+
+
 
   return (
     <Fragment>
@@ -32,8 +37,10 @@ const PieChart = () => {
                 PieData.health.offline,
               ]
             }
-            data={["up", "warning", "critical", "offline"]}
-            name={"Devices Health"}
+            // data={["up", "warning", "critical", "offline"]}
+            data={[Translator("ISMS.up"),Translator("ISMS.warning"),Translator("ISMS.critical"),Translator("ISMS.offline")]}
+            name={Translator('ISMS.DevicesHealth')}
+            //  <p>{t('quickAdd.DevicesHealth')}</p>
           />
         </Card>
         <Card className={styles.PieCard} loading={loading}>
@@ -42,12 +49,13 @@ const PieChart = () => {
               PieData.sim && [
                 PieData.sim.excellent,
                 PieData.sim.good,
-                PieData.sim.failr,
+                PieData.sim.fair,
                 PieData.sim.poor,
               ]
             }
-            data={["excellent", "good", "fair", "poor"]}
-            name={"Devices Strength"}
+            // data={["excellent", "good", "fair", "poor"]}
+            data={[Translator("ISMS.excellent"),Translator("ISMS.good"),Translator("ISMS.fair"),Translator("ISMS.poor")]}
+            name={Translator('ISMS.DevicesStrength')}
           />
         </Card>
       </div>

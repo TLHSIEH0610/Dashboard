@@ -1,18 +1,22 @@
 import React, { useState, useEffect, useContext } from "react";
 import styles from "./header.module.scss";
-import { Menu, Badge, Select } from "antd";
+import { Menu, Select } from "antd";
 import { FcManager, FcList } from "react-icons/fc";
-import { AiTwotoneBell } from "react-icons/ai";
 import { FaLanguage } from "react-icons/fa";
 import Context from "../../../Utility/Reduxx";
+import { UserLogOut } from "../../../Utility/Fetch";
+import Swal from "sweetalert2";
+import { useHistory } from "react-router-dom";
+import i18n from 'i18next';
+import { Translator } from '../../../i18n/index'
 
 const { SubMenu } = Menu;
 const { Option } = Select;
 
 const Header = () => {
   const { state, dispatch } = useContext(Context);
-  const [current, setCurrent] = useState("mail");
   const [User, setUser] = useState(localStorage.getItem("authUser.cid"));
+  const history = useHistory()
 
   useEffect(() => {
     setUser(localStorage.getItem("authUser.cid"));
@@ -23,10 +27,29 @@ const Header = () => {
     dispatch({ type: "setCid", payload: { Cid: value } });
   }
 
-  const handleClick = (e) => {
-    console.log("click ", e);
-    setCurrent(e.key);
+  useEffect(() => {
+  if (state.Global.Lang){ 
+      i18n.changeLanguage(state.Global.Lang)
   };
+}, [state.Global.Lang]);
+
+  const logout = async () => {
+    console.log('logout')
+    localStorage.clear();
+    await UserLogOut();
+    // setAuth(false);
+    Swal.fire({
+      title: "Sign Out Success",
+      icon: "success",
+      showConfirmButton: false,
+      timer: 1200,
+    }).then(() => {
+      dispatch({ type: "setUser", payload: { User: "" } });
+      history.push("/login");
+    });
+  };
+
+
 
   return (
     <div className={styles.head}>
@@ -46,30 +69,7 @@ const Header = () => {
         }}
       />
       <Menu
-        onClick={handleClick}
-        selectedKeys={[current]}
-        mode="horizontal"
-        className={styles.menu}
-      >
-        <SubMenu
-          key="inform"
-          icon={
-            <a href="#">
-              <Badge count={1}>
-                <AiTwotoneBell className={styles.inform} />
-              </Badge>
-            </a>
-          }
-        >
-          <Menu.Item key="test">
-            New Alarm
-            <br />
-          </Menu.Item>
-        </SubMenu>
-      </Menu>
-      <Menu
-        onClick={handleClick}
-        selectedKeys={[current]}
+        // selectedKeys={[current]}
         mode="horizontal"
         className={styles.menu}
       >
@@ -78,15 +78,16 @@ const Header = () => {
           icon={<FcManager className={styles.user} />}
           title={User}
         >
-          <Menu.Item key="setting1">Profile</Menu.Item>
-          <Menu.Item key="setting2">Setting</Menu.Item>
-          <Menu.Item key="setting3">Log-out</Menu.Item>
+          {/* <Menu.Item key="setting1">Profile</Menu.Item> */}
+          <Menu.Item key="setting2" onClick={()=>{
+            history.push('/mysetting')
+          }}>{Translator("ISMS.Setting")}</Menu.Item>
+          <Menu.Item key="setting3" onClick={()=>logout()}>{Translator("ISMS.LogOut")}</Menu.Item>
         </SubMenu>
       </Menu>
       {User === "proscend" && (
         <Menu
-          onClick={handleClick}
-          selectedKeys={[current]}
+          // selectedKeys={[current]}
           mode="horizontal"
           className={styles.menu}
         >
@@ -105,18 +106,24 @@ const Header = () => {
         </Menu>
       )}
       <Menu
-        onClick={handleClick}
-        selectedKeys={[current]}
+        // selectedKeys={[current]}
         mode="horizontal"
         className={styles.menu}
       >
         <SubMenu
           key="language"
           icon={<FaLanguage className={styles.language} />}
-          // title={UserName}
+          onClick={ (item) => {
+            const localeValue = item.key;
+            if (!localeValue) {
+              dispatch({ type: "setLang", payload: { Lang: 'en' } })
+            } else {
+              dispatch({ type: "setLang", payload: { Lang: localeValue } })
+            }
+          } }
         >
-          <Menu.Item key="traditionalChinese">ZH 繁體中文</Menu.Item>
-          <Menu.Item key="English">EN 英文</Menu.Item>
+          <Menu.Item key="zh-TW">ZH 繁體中文</Menu.Item>
+          <Menu.Item key="en">EN 英文</Menu.Item>
         </SubMenu>
       </Menu>
     </div>

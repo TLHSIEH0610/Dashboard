@@ -1,88 +1,115 @@
-.subHeader{
-    table{
-      max-width: 80%;
-      margin: 5px auto;
-    }
-    thead th{
-        background: #FFF8DC !important;
-        font-size:0.85rem;
-    }
+.subHeader {
+  table {
+    max-width: 80%;
+    margin: 5px auto;
+  }
+  thead th {
+    background: #fff8dc !important;
+    font-size: 0.85rem;
+  }
 }
 
 .stepsContent {
-    margin-top: 16px;
-    border: 1px dashed #e9e9e9;
-    border-radius: 2px;
-    background-color: #fafafa;
-    min-height: 200px;
-    text-align: center;
-    padding-top: 80px;
-  }
-  
-  .stepsAction {
-    margin-top: 24px;
-  }
-
-  .formwrap{
-    display: flex;
-    width: 100%;
-    // justify-content: space-around;
-    align-items: flex-start;
-    flex-wrap: wrap;
-    .formDiv{
-        margin-right:2%;
-    }
-    .submitBtn{
-        margin-top: auto;
-    }
-}
-.formDiv p{
-    font-size: 1.1rem;
-    font-weight: 600;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin-top: 16px;
+  border: 1px dashed #e9e9e9;
+  border-radius: 2px;
+  background-color: #fafafa;
+  min-height: 200px;
+  text-align: center;
+  padding-top: 80px;
 }
 
-.NotifiForm{
+.stepsAction {
+  margin-top: 24px;
+}
+
+.formwrap {
+  display: flex;
+  width: 100%;
+  // justify-content: space-around;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  .formDiv {
+    margin-right: 2%;
+  }
+  .submitBtn {
+    margin-top: auto;
+  }
+}
+.formDiv p {
+  font-size: 1.1rem;
+  font-weight: 600;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.NotifiForm {
   width: 50%;
   margin: 0 auto;
 }
 
-.InformationBtnWrapper{
+.InformationBtnWrapper {
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-  .NewUserInfoBtn{
-    margin: 16px 10px;
-  }
+.NewUserInfoBtn {
+  margin: 16px 10px;
+}
 
-
-.EditIcon, .TokenIcon, .NotificationIcon, .CreateUserIcon, .DeleteIcon, .ViewSchemeIcon, .EditGroupIcon{
+.EditIcon,
+.TokenIcon,
+.NotificationIcon,
+.CreateUserIcon,
+.DeleteIcon,
+.ViewSchemeIcon,
+.EditGroupIcon {
   font-size: 1.2rem;
   margin-right: 10px !important;
   cursor: pointer;
 }
-.EditIcon{
-  color:#A52A2A;
+.EditIcon {
+  color: #a52a2a;
 }
-
-// .CreateUserIcon{
-//   color:#008080;
-// }
-// .NotificationIcon{
-//   color:#008080;
-// }
-
-.groupPane{
-  height:500px;
+.groupPane {
+  height: 500px;
   overflow-y: scroll;
 }
+.desc {
+  th {
+    vertical-align: middle !important;
+  }
+  td {
+    vertical-align: middle !important;
+  }
+}
+.modal{
+  width: 70% !important;
+  overflow-x: auto;
+}
 
-// .NotifiModalForm{
-  // width: 700px;
-  // display: flex;
-  // flex-direction: column;
-  // align-items: flex-start;
-  // justify-content: center;
-// }
+.UserInfoTable {
+  overflow-x: auto;
+  th, td{
+    text-align: center !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .name {
+    width: 200px;
+  }
+  .password {
+    width: 200px;
+  }
+  .level {
+    width: 170px;
+  }
+  .gid {
+    width: 170px;
+  }
+  .modal{
+    width: 90% !important;
+
+}
+}

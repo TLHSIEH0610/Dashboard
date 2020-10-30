@@ -9,7 +9,7 @@ import {
   Collapse,
   Switch,
   Modal,
-  message
+  message,
 } from "antd";
 import axios from "axios";
 import Context from "../../../../Utility/Reduxx";
@@ -432,44 +432,47 @@ const NotifiModalC = ({
 }) => {
   const [form] = Form.useForm();
   const NotifiUrl = `/cmd?get={"notification":{"filter":{"cid":"${record.cid}"}}}`;
-  const [Notiloading, Notiresponse] = useURLloader(NotifiUrl);
-  const [uploading, setUploading] = useState(false)
-  // const [NotifiData, setNotifiData] = useState([]);
+  const [Notiloading, Notiresponse] = useURLloader(NotifiUrl, record.cid);
+  const [uploading, setUploading] = useState(false);
 
   const EditNotifionFinish = (values) => {
-    setUploading(true)
+    setUploading(true);
     console.log(values, record);
-    console.log(values.mail_to.split(','))
     const SetNotifiUrl = `/cmd?set={"notification":[{"cid":"${
       record.cid
     }", "timezone":"${values.timezone}", "conditions":{"level":"${
       values.level
     }"}, "mail":{"active":"${values.mail_active}", "mail_from":"${
       values.mail_from
-    }","mail_to":${JSON.stringify(values.mail_to.split(','))}, "token":"${
+    }","mail_to":${JSON.stringify(values.mail_to)}, "token":"${
       values.mail_token
     }"},"line":{"active":"${values.line_active}","token":"${
       values.line_token
     }"}}]}`;
     console.log(SetNotifiUrl);
-    axios.get(SetNotifiUrl).then((res) => {
-      setUploading(false)
-      message.success("update successfully.");
-      console.log(res);
-    }).catch((error)=>{
-      setUploading(false)
-      message.error("update fail.");
-      console.log(error)
-    })
+    axios
+      .get(SetNotifiUrl)
+      .then(() => {
+        setUploading(false);
+        message.success("update successfully.");
+        // console.log(form.getFieldsValue());
+      })
+      .catch((error) => {
+        setUploading(false);
+        message.error("update fail.");
+        console.log(error);
+      });
   };
 
   useEffect(() => {
     if (Notiresponse) {
       const NotifiData = Notiresponse.response.notification[0];
       // setNotifiData(NotifiData);
-      console.log('執行了 NotifiData');
+      console.log("執行了 NotifiData");
+      console.log(NotifiData);
       form.setFieldsValue({
         timezone: NotifiData.timezone,
+        // mail_active: NotifiData.mail.active,
         mail_active: NotifiData.mail.active,
         mail_from: NotifiData.mail.mail_from,
         mail_to: NotifiData.mail.mail_to,
@@ -478,8 +481,9 @@ const NotifiModalC = ({
         line_active: NotifiData.line.active,
         level: NotifiData.conditions.level,
       });
+      console.log(form.getFieldsValue());
     }
-  }, [Notiresponse]);
+  }, [Notiresponse, record.cid]);
 
   return (
     <Modal
@@ -488,7 +492,7 @@ const NotifiModalC = ({
       onOk={() => setNotifiModalvisible(false)}
       onCancel={() => setNotifiModalvisible(false)}
       centered={true}
-      width={"50%"}
+      className={styles.modal}
       destroyOnClose={true}
       footer={[
         <Button
@@ -506,14 +510,12 @@ const NotifiModalC = ({
       <Card loading={Notiloading} bordered={false}>
         <Form
           {...layout}
-          name="Notification"
-          autoComplete="off"
           onFinish={EditNotifionFinish}
           // onFinishFailed={onFinishFailed}
           form={form}
         >
           <Form.Item label="Time Zone" name="timezone">
-            <Select name="timezone">
+            <Select>
               <Option value="Etc/GMT+12">
                 (GMT-12:00) International Date Line West
               </Option>
@@ -697,32 +699,38 @@ const NotifiModalC = ({
               <Radio value="FATAL">FATAL</Radio>
             </Radio.Group>
           </Form.Item>
-          <Form.Item
-            name="mail_active"
-            label="Mail active"
-            valuePropName="checked"
-            initialValue={false}
-          >
-            <Switch />
+          <Form.Item name="mail_active" label="Mail active">
+            <Radio.Group>
+              <Radio value="true">on</Radio>
+              <Radio value="false">off</Radio>
+            </Radio.Group>
           </Form.Item>
           <Form.Item label="Mail From" name="mail_from">
             <Input />
           </Form.Item>
-          
+
           <Form.Item label="Mail To" name="mail_to">
-            <Input />
+            <Select
+              mode="tags"
+              style={{ width: "100%" }}
+              tokenSeparators={[","]}
+            >
+              {/* {NotifiData. <Option key={i.toString(36) + i}>{i.toString(36) + i}</Option>} */}
+            </Select>
+            {/* <Input /> */}
           </Form.Item>
-          <p style={{marginLeft:'22%', marginTop:'-25px', color: 'gray'}}>(use <span style={{fontWeight:'500', color:'blue'}}>","</span>  to seperate different receivers)</p>
+          {/* <p style={{ marginLeft: "22%", marginTop: "-25px", color: "gray" }}>
+            (use <span style={{ fontWeight: "500", color: "blue" }}>","</span>{" "}
+            to seperate different receivers)
+          </p> */}
           <Form.Item label="Mail Token" name="mail_token">
             <Input />
           </Form.Item>
-          <Form.Item
-            name="line_active"
-            label="Line active"
-            valuePropName="checked"
-            initialValue={false}
-          >
-            <Switch />
+          <Form.Item name="line_active" label="Line active">
+            <Radio.Group>
+              <Radio value="true">on</Radio>
+              <Radio value="false">off</Radio>
+            </Radio.Group>
           </Form.Item>
           <Form.Item label="Line Token" name="line_token">
             <Input />
@@ -733,7 +741,7 @@ const NotifiModalC = ({
   );
 };
 
-export const NotifiModalMC = React.memo(NotifiModalC)
+export const NotifiModalMC = React.memo(NotifiModalC);
 
 // http://192.168.0.95:8000/cmd?get={"notification":{}}
 // http://192.168.0.95:8000/cmd?get={"notification":{"filter":{"cid":"12345678901234567890123456789011"}}}

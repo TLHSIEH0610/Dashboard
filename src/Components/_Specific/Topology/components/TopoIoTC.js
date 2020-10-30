@@ -6,17 +6,21 @@ const { TabPane } = Tabs;
 const { Option } = Select;
 
 const layout = {
-  labelCol: { span: 10 },
-  wrapperCol: { span: 16 },
+  labelCol: { span: 9 },
+  wrapperCol: { span: 11 },
 };
 
 
-const TopoIoTC = ({ IoTvisible, setIoTvisible, IoTresponse, deviceindex, handleDeviceChange }) => {
+const TopoIoTC = ({ IoTvisible, setIoTvisible, IoTresponse, deviceindex, setDeviceindex }) => {
   console.log('執行了 TopoIoTC')
   const [form] = Form.useForm();
   const onFinish = (values) => {
     console.log(values);
   };
+  function handleDeviceChange(value) {
+    console.log(`selected ${value}`);
+    setDeviceindex(value);
+  }
 
   useEffect(() => {
     if(IoTresponse){
@@ -65,7 +69,7 @@ const TopoIoTC = ({ IoTvisible, setIoTvisible, IoTresponse, deviceindex, handleD
       okText="confirm"
       cancelText="cancel"
       centered={true}
-      width={"50%"}
+      width={"70%"}
       destroyOnClose={true}
     >
       <Select
@@ -83,60 +87,60 @@ const TopoIoTC = ({ IoTvisible, setIoTvisible, IoTresponse, deviceindex, handleD
           <Descriptions
             // title="Responsive Descriptions"
             bordered
-            column={{ xxl: 4, xl: 3, lg: 3, md: 3, sm: 2, xs: 1 }}
+            column={{ xxl: 2, xl: 2, lg: 2, md: 2, sm: 1, xs: 1 }}
             className={styles.desc}
           >
             <Descriptions.Item label="Battery" className={styles.descItem}>
-              Voltage_max:
+              Minimal Voltage:
               {IoTresponse[deviceindex].controller.today.battery.min_voltage_v}
               (V)
               <br />
-              Voltage_max:
+              Maximum Voltage:
               {IoTresponse[deviceindex].controller.today.battery.max_voltage_v}
               (V)
               <br />
             </Descriptions.Item>
-          </Descriptions>
+          {/* </Descriptions>
           <Descriptions
             // title="Responsive Descriptions"
             bordered
             column={{ xxl: 4, xl: 3, lg: 3, md: 3, sm: 2, xs: 1 }}
             className={styles.desc}
-          >
+          > */}
             <Descriptions.Item label="Charge" className={styles.descItem}>
-              Current_max:
+              Maximum Current:
               {IoTresponse[deviceindex].controller.today.charge.max_current_a}
               (A)
               <br />
-              Ampere_Hour:{" "}
+              AH:
               {IoTresponse[deviceindex].controller.today.charge.ampere_hour_ah}
               (A/H)
               <br />
               Watt: {IoTresponse[deviceindex].controller.today.charge.watt_w}(W)
               <br />
-              Watt_max:{" "}
+              Maximum Watt:
               {IoTresponse[deviceindex].controller.today.charge.max_watt_w}(W)
               <br />
-              Watt_total:{" "}
+              Total Watt:
               {IoTresponse[deviceindex].controller.today.charge.total_watt_w}(W)
               <br />
             </Descriptions.Item>
-          </Descriptions>
+          {/* </Descriptions>
           <Descriptions
             // title="Responsive Descriptions"
             bordered
             column={{ xxl: 4, xl: 3, lg: 3, md: 3, sm: 2, xs: 1 }}
             className={styles.desc}
-          >
+          > */}
             <Descriptions.Item label="Discharge" className={styles.descItem}>
-              Current_max:{" "}
+              Maximum Current:
               {
                 IoTresponse[deviceindex].controller.today.discharge
                   .max_current_a
-              }{" "}
+              }
               (A)
               <br />
-              Ampere_Hour:{" "}
+              AH:
               {
                 IoTresponse[deviceindex].controller.today.discharge
                   .ampere_hour_ah
@@ -146,40 +150,40 @@ const TopoIoTC = ({ IoTvisible, setIoTvisible, IoTresponse, deviceindex, handleD
               Watt: {IoTresponse[deviceindex].controller.today.discharge.watt_w}
               (W)
               <br />
-              Watt_max:{" "}
+              Maximum Watt:
               {IoTresponse[deviceindex].controller.today.discharge.max_watt_w}
               (W)
               <br />
-              Watt_total:{" "}
+              Total Watt:
               {IoTresponse[deviceindex].controller.today.discharge.total_watt_w}
               (W)
               <br />
             </Descriptions.Item>
           </Descriptions>
         </TabPane>
-        <TabPane tab="Pannel" key="Pannel" className={styles.tabpane}>
+        <TabPane tab="Solar Pannel" key="Pannel" className={styles.tabpane}>
           <Descriptions
             bordered
             className={styles.desc}
-            // column={{ xxl: 4, xl: 3, lg: 3, md: 3, sm: 2, xs: 1 }}
+            column={{ xxl: 2, xl: 2, lg: 2, md: 2, sm: 1, xs: 1 }}
           >
             <Descriptions.Item label="Current">
               {IoTresponse[deviceindex].controller.solar_pannel.current_a} (A)
             </Descriptions.Item>
-          </Descriptions>
-          <Descriptions bordered className={styles.desc}>
+          {/* </Descriptions> */}
+          {/* <Descriptions bordered className={styles.desc}> */}
             <Descriptions.Item label="Voltage">
               {IoTresponse[deviceindex].controller.solar_pannel.voltage_v} (V)
             </Descriptions.Item>
-          </Descriptions>
-          <Descriptions bordered className={styles.desc}>
+          {/* </Descriptions> */}
+          {/* <Descriptions bordered className={styles.desc}> */}
             <Descriptions.Item label="Watt">
               {IoTresponse[deviceindex].controller.solar_pannel.watt_w} (W)
             </Descriptions.Item>
-          </Descriptions>
-          <Descriptions bordered className={styles.desc}>
+          {/* </Descriptions> */}
+          {/* <Descriptions bordered className={styles.desc}> */}
             <Descriptions.Item label="Temperature">
-              {IoTresponse[deviceindex].controller.solar_pannel.temperature_c}{" "}
+              {IoTresponse[deviceindex].controller.solar_pannel.temperature_c}
               (C)
             </Descriptions.Item>
           </Descriptions>
@@ -189,74 +193,74 @@ const TopoIoTC = ({ IoTvisible, setIoTvisible, IoTresponse, deviceindex, handleD
             <Descriptions.Item label="Charge Current">
               {IoTresponse[deviceindex].controller.battery.charge_current_a} (A)
             </Descriptions.Item>
-          </Descriptions>
-          <Descriptions bordered className={styles.desc}>
-            <Descriptions.Item label="FullCharge Time">
+          {/* </Descriptions> */}
+          {/* <Descriptions bordered className={styles.desc}> */}
+            <Descriptions.Item label="Full Charged Time">
               {IoTresponse[deviceindex].controller.battery.full_charged_time}
             </Descriptions.Item>
-          </Descriptions>
-          <Descriptions bordered className={styles.desc}>
-            <Descriptions.Item label="OverDischarge Time">
+          {/* </Descriptions> */}
+          {/* <Descriptions bordered className={styles.desc}> */}
+            <Descriptions.Item label="Over Discharged Time">
               {IoTresponse[deviceindex].controller.battery.over_discharged_time}
             </Descriptions.Item>
-          </Descriptions>
-          <Descriptions bordered className={styles.desc}>
+          {/* </Descriptions> */}
+          {/* <Descriptions bordered className={styles.desc}> */}
             <Descriptions.Item label="SOC">
               {IoTresponse[deviceindex].controller.battery.soc_percentage} (%)
             </Descriptions.Item>
-          </Descriptions>
-          <Descriptions bordered className={styles.desc}>
+          {/* </Descriptions> */}
+          {/* <Descriptions bordered className={styles.desc}> */}
             <Descriptions.Item label="Temperature">
               {IoTresponse[deviceindex].controller.battery.temperature_c} (C)
             </Descriptions.Item>
-          </Descriptions>
-          <Descriptions bordered className={styles.desc}>
+          {/* </Descriptions> */}
+          {/* <Descriptions bordered className={styles.desc}> */}
             <Descriptions.Item label="Total Charge">
-              {IoTresponse[deviceindex].controller.battery.total_charge_ah}{" "}
+              {IoTresponse[deviceindex].controller.battery.total_charge_ah}
               (A/H)
             </Descriptions.Item>
-          </Descriptions>
-          <Descriptions bordered className={styles.desc}>
+          {/* </Descriptions> */}
+          {/* <Descriptions bordered className={styles.desc}> */}
             <Descriptions.Item label="Total DisCharge">
-              {IoTresponse[deviceindex].controller.battery.total_discharge_ah}{" "}
+              {IoTresponse[deviceindex].controller.battery.total_discharge_ah}
               (A/H)
             </Descriptions.Item>
-          </Descriptions>
-          <Descriptions bordered className={styles.desc}>
+          {/* </Descriptions> */}
+          {/* <Descriptions bordered className={styles.desc}> */}
             <Descriptions.Item label="Voltage">
               {IoTresponse[deviceindex].controller.battery.voltage_v} (V)
             </Descriptions.Item>
-          </Descriptions>
-          <Descriptions bordered className={styles.desc}>
+          {/* </Descriptions> */}
+          {/* <Descriptions bordered className={styles.desc}> */}
             <Descriptions.Item label="Charge State">
               {IoTresponse[deviceindex].controller.battery.charge_state} (W)
             </Descriptions.Item>
           </Descriptions>
         </TabPane>
         <TabPane tab="Load" key="Load" className={styles.tabpane}>
-          <Descriptions bordered className={styles.desc}>
+          <Descriptions bordered className={styles.desc} column={{ xxl: 2, xl: 2, lg: 2, md: 2, sm: 1, xs: 1 }}>
             <Descriptions.Item label="Current">
               {IoTresponse[deviceindex].controller.load.current_a} (A)
             </Descriptions.Item>
-          </Descriptions>
-          <Descriptions bordered className={styles.desc}>
+          {/* </Descriptions> */}
+          {/* <Descriptions bordered className={styles.desc}> */}
             <Descriptions.Item label="Voltage">
               {IoTresponse[deviceindex].controller.load.voltage_v} (V)
             </Descriptions.Item>
-          </Descriptions>
-          <Descriptions bordered className={styles.desc}>
+          {/* </Descriptions> */}
+          {/* <Descriptions bordered className={styles.desc}> */}
             <Descriptions.Item label="Watt">
               {IoTresponse[deviceindex].controller.load.watt_w} (W)
             </Descriptions.Item>
-          </Descriptions>
-          <Descriptions bordered className={styles.desc}>
+          {/* </Descriptions> */}
+          {/* <Descriptions bordered className={styles.desc}> */}
             <Descriptions.Item label="Load Light">
-              {IoTresponse[deviceindex].controller.load.load_light_percentage}{" "}
+              {IoTresponse[deviceindex].controller.load.load_light_percentage}
               (%)
             </Descriptions.Item>
-          </Descriptions>
-          <Descriptions bordered className={styles.desc}>
-            <Descriptions.Item label="Load On_Off">
+          {/* </Descriptions> */}
+          {/* <Descriptions bordered className={styles.desc}> */}
+            <Descriptions.Item label="Load ON/OFF">
               {IoTresponse[deviceindex].controller.load.load_on_off}
             </Descriptions.Item>
           </Descriptions>
@@ -268,10 +272,10 @@ const TopoIoTC = ({ IoTvisible, setIoTvisible, IoTresponse, deviceindex, handleD
             onFinish={onFinish}
             form={form}
           >
-            <Form.Item name="battery_capacity_ah" label="battery_capacity_ah">
+            <Form.Item name="battery_capacity_ah" label="Battery Capacity (AH)">
               <Input className={styles.IoTinput} />
             </Form.Item>
-            <Form.Item name="battery_type" label="battery_type">
+            <Form.Item name="battery_type" label="Battery Type">
               <Input className={styles.IoTinput} />
             </Form.Item>
             <Form.Item name="charge_limit_voltage_v" label="Charge limit(V)">
@@ -336,7 +340,7 @@ const TopoIoTC = ({ IoTvisible, setIoTvisible, IoTresponse, deviceindex, handleD
             </Form.Item>
             <Form.Item
               name="rasing_charge_reverse_voltage_v"
-              label="Rasing charge reverse(V)"
+              label="Rasing Charge Reverse Voltage(V)"
             >
               <Input className={styles.IoTinput} />
             </Form.Item>
@@ -364,32 +368,32 @@ const TopoIoTC = ({ IoTvisible, setIoTvisible, IoTresponse, deviceindex, handleD
           </Form>
         </TabPane>
         <TabPane tab="system" key="system" className={styles.tabpane}>
-          <Descriptions bordered className={styles.desc}>
+          <Descriptions bordered className={styles.desc} column={{ xxl: 2, xl: 2, lg: 2, md: 2, sm: 1, xs: 1 }}>
             <Descriptions.Item label="Charge Current">
               {IoTresponse[deviceindex].system.charge_current_a} (A)
             </Descriptions.Item>
-          </Descriptions>
-          <Descriptions bordered className={styles.desc}>
+          {/* </Descriptions> */}
+          {/* <Descriptions bordered className={styles.desc}> */}
             <Descriptions.Item label="DisCharge Current">
               {IoTresponse[deviceindex].system.discharge_current_a} (A)
             </Descriptions.Item>
-          </Descriptions>
-          <Descriptions bordered className={styles.desc}>
+          {/* </Descriptions> */}
+          {/* <Descriptions bordered className={styles.desc}> */}
             <Descriptions.Item label="Voltage_max">
               {IoTresponse[deviceindex].system.max_voltage_v} (V)
             </Descriptions.Item>
-          </Descriptions>
-          <Descriptions bordered className={styles.desc}>
+          {/* </Descriptions> */}
+          {/* <Descriptions bordered className={styles.desc}> */}
             <Descriptions.Item label="Hardware Version">
               {IoTresponse[deviceindex].system.hardware_version}
             </Descriptions.Item>
-          </Descriptions>
-          <Descriptions bordered className={styles.desc}>
+          {/* </Descriptions> */}
+          {/* <Descriptions bordered className={styles.desc}> */}
             <Descriptions.Item label="Serial Number">
               {IoTresponse[deviceindex].system.serial_number}
             </Descriptions.Item>
-          </Descriptions>
-          <Descriptions bordered className={styles.desc}>
+          {/* </Descriptions> */}
+          {/* <Descriptions bordered className={styles.desc}> */}
             <Descriptions.Item label="Software Version">
               {IoTresponse[deviceindex].system.software_version}
             </Descriptions.Item>

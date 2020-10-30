@@ -1,25 +1,44 @@
-import React from "react";
-import { Modal, Tabs, Button } from "antd";
+import React, { useEffect, useState } from "react";
+import { Modal, Tabs, Button, Spin, Alert } from "antd";
 import styles from "../topology.module.scss";
-
+import axios from 'axios'
+// import useURLloader from "../../../../hook/useURLloader";
 import {
-  StatusStrength,
-  StatusGPS,
-  StatusDNS,
-  StatusConnection,
-  TxRxStatistic,
+  StatusStrengthMF,
+  StatusGPSMF,
+  StatusDNSMF,
+  StatusConnectionMF,
+  TxRxStatisticMF,
 } from "./DeviceStateF";
 
 const { TabPane } = Tabs;
+
 const DeviceStateC = ({ record, setDeviceStatevisible, DeviceStatevisible }) => {
+  const [DeviceStatus, setDeviceStatus] = useState([])
+  const [uploading, setUploading] = useState(false)
+
+  useEffect(()=>{
+    if(record.id){
+    const DeviceStatusUrl=`/cmd?get={"device_status":{"filter":{"id":"${record.id}"},"nodeInf":{},"obj":{}}}`
+    setUploading(true)
+    axios.get(DeviceStatusUrl).then((res)=>{
+      console.log(res)
+      setDeviceStatus(res.data.response.device_status[0].obj)
+      setUploading(false)
+    }).catch((erro)=>{
+      console.log(erro)
+      setUploading(false)
+    })}
+  }, [record])
+
 
 
   return (
     <Modal
       visible={DeviceStatevisible}
       onCancel={() => setDeviceStatevisible(false)}
-      centered={true}
-      width={"50%"}
+      destroyOnClose={true}
+      className={styles.modal}
       footer={[
         <Button
           key="confirm"
@@ -30,25 +49,30 @@ const DeviceStateC = ({ record, setDeviceStatevisible, DeviceStatevisible }) => 
         </Button>
     ]}
     >
-      <Tabs defaultActiveKey="1" className={styles.Tabs}>
+      {DeviceStatus.status ? <Tabs defaultActiveKey="1" className={styles.Tabs}>
         <TabPane tab="Statistic" key="1" className={styles.tabpane}>
-          <TxRxStatistic dataSource={record} />
+          <TxRxStatisticMF uploading={uploading} DeviceStatus={DeviceStatus} />
         </TabPane>
         <TabPane tab="Connection" key="2" className={styles.tabpane}>
-          <StatusConnection dataSource={record} className={styles.connection}/>
+          <StatusConnectionMF uploading={uploading} DeviceStatus={DeviceStatus} className={styles.connection}/>
         </TabPane>
         <TabPane tab="Strength" key="3" className={styles.tabpane}>
-          <StatusStrength dataSource={record} />
+          <StatusStrengthMF uploading={uploading} DeviceStatus={DeviceStatus} />
         </TabPane>
         <TabPane tab="GPS" key="4" className={styles.tabpane}>
-          <StatusGPS dataSource={record} />
+          <StatusGPSMF uploading={uploading} DeviceStatus={DeviceStatus} />
         </TabPane>
         <TabPane tab="DNS" key="5" className={styles.tabpane}>
-          <StatusDNS dataSource={record} />
+          <StatusDNSMF uploading={uploading} DeviceStatus={DeviceStatus} />
         </TabPane>
-      </Tabs>
+      </Tabs> : <Spin tip="Loading...">
+    <Alert
+      message="Getting Data"
+      description="We are now getting data from server, please wait for a few seconds"
+    />
+  </Spin>}
     </Modal>
   );
 };
 
-export default DeviceStateC;
+export const DeviceStateMC = React.memo(DeviceStateC);

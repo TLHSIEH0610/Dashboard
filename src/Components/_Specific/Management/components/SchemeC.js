@@ -200,6 +200,7 @@ export const SchemeManageC = () => {
         <Modal
           title="New Scheme"
           visible={CreateSchemevisible}
+          className={styles.modal}
           onOk={() => setCreateSchemevisible(false)}
           onCancel={() => setCreateSchemevisible(false)}
           okButtonProps={{
@@ -222,7 +223,8 @@ export const SchemeManageC = () => {
       <Table
         columns={columns}
         dataSource={SchemeData}
-        scroll={{ x: 1500, y: 600 }}
+        // scroll={{ y: 600 }}
+        style={{overflowX:'auto'}}
       />
     </Card>
   );
@@ -253,7 +255,6 @@ export const SchemeModalC = ({
       okText="confirm"
       cancelText="cancel"
       centered={true}
-      width={"50%"}
       className={styles.modal}
       title='Scheme'
       destroyOnClose={true}
@@ -261,6 +262,7 @@ export const SchemeModalC = ({
       <Card loading={Schemeloading} bordered={false}>
       <Descriptions
         bordered
+        className={styles.desc}
         // column={{ xxl: 4, xl: 3, lg: 3, md: 3, sm: 2, xs: 1 }}
       >
         {SchemeData && <Descriptions.Item label="Current Scheme">

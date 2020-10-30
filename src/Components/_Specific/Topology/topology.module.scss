@@ -6,7 +6,6 @@
         padding-bottom: 0px;
     }
 }
-
 .critical{
     color:gold;
     margin-right: 4%;
@@ -24,44 +23,21 @@
     margin-right: 4%;
     font-size: 1.4rem;
 }
-// .modal{
-//     height: 100%;
-// }
-
-
 .desc{
-    // vertical-align: middle;
     th{
-        // width:50% !important;
         vertical-align: middle;
     }
     td{
-        // width:50% !important;
         vertical-align: middle;
     }
-    
-    // .item{
-    //     width: 50%;
-    //     // &th{
-    //     //     width:30% !important;
-    //     //     vertical-align: middle;
-    //     // }
-    //     // &td{
-    //     //     width:70% !important;
-    //     //     vertical-align: middle;
-    //     // }
-    // }
-
-
 }
-
-
 .Tabs{
     margin:20px;
     
     // overflow-y: scroll;
     .tabpane{
         overflow-y: scroll;
+
         // max-height: 450px;
         display: flex;
         flex-direction: column;
@@ -73,7 +49,6 @@
         }
     }
 }
-
 .alarmlog{
     color: red;
     margin-right: 4%;
@@ -83,6 +58,10 @@
         color:gray;
         cursor: not-allowed;
     }
+}
+.modal{
+    width: 70% !important;
+    overflow-x: auto;
 }
 
 .IoT{
@@ -103,10 +82,7 @@
     color:red;
 }
 .alarmtable{
-    // width: 90%;
     margin: 20px;
-    // overflow-y: scroll;
-    // height:450px;
 }
 .echartBar{
     margin: auto 0;
@@ -118,6 +94,7 @@
     display:flex;
     justify-content: center;
     align-items: center;
+    flex-wrap: wrap;
     p{
         margin-bottom:0;
     }
@@ -125,5 +102,68 @@
         color:#1890ff;
         margin-left:3px;
         cursor: pointer;
+    }
+}
+
+.FilterForm{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    .FilterDevice{
+        width: 280px;
+        margin-left: 15px;
+    }
+    .FilterModel{
+        width: 150px;
+        margin-left: 15px;
+    }
+    .FilterHealth{
+        width: 180px;
+        margin-left: 15px;
+    }
+    .FilterStrength{
+        width: 200px;
+        margin-left: 15px;
+    }
+}
+.iconDrop{
+    li{
+        white-space: pre-wrap !important;
+    }
+}
+.TopoTable{
+    th, td{
+        text-align: center !important;
+    }
+}
+
+@media(max-width:576px){
+    .TopoTable{
+        // th{
+        //     font-size: 1rem;
+        // }
+        td{
+            padding: 1px !important;
+            padding-right: 0px;
+        }
+    }
+    .rename{
+        flex-direction: column;
+        .RWDwrapper{
+            width: 240px;
+        }
+    }
+
+    .Status, .Map, .Setting, .IoT, alarmlog{
+        font-size: 1.1rem;
+    }
+    .modal{
+        width: 90% !important;
+    }
+    .alarmtable{
+            margin:0;
+    }
+    .Tabs{
+        margin-top:12px !important;
     }
 }

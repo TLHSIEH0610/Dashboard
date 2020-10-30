@@ -9,16 +9,16 @@ import Context from "../../../Utility/Reduxx";
 import { Button, Tooltip } from "antd";
 import { FcExternal, FcInternal } from 'react-icons/fc'
 import { FcList } from 'react-icons/fc'
+import { useTranslation } from 'react-i18next';
 
 const Nav = () => {
   const history = useHistory();
   const { state, dispatch } = useContext(Context);
   const showNav = state.Global.showNav
   const IsMD = state.Global.IsMD
-  console.log(IsMD)
-  // const [showNav, setShowNav] = useState(true);
-  // const [showMD, setShowMD] = useState(false);
   const [Auth, setAuth] = useState(localStorage.getItem("auth.isAuthed"));
+  const ShowSuperOnNav = state.Login.Cid === '' && localStorage.getItem('authUser.cid') === 'proscend'
+  const { t } = useTranslation();
   const ShowBar = () => {
     // setShowNav(!showNav);
     dispatch({
@@ -75,13 +75,12 @@ const Nav = () => {
   };
 
   useEffect(() => {
-    console.log(showNav, state.Global.MDMenue);
   }, [showNav]);
 
   useEffect(() => {
     window.addEventListener("resize", updateWidthAndHeight);
     return () => window.removeEventListener("resize", updateWidthAndHeight);
-  });
+  }, [window.innerWidth]);
 
   useEffect(() => {
     dispatch({
@@ -108,8 +107,7 @@ const Nav = () => {
       history.push("/login");
     });
   };
-  // state.Global.MDMenue
-  // state.Global.IsMD
+
   return (
     <div className={styles.container}>
       <div
@@ -124,21 +122,24 @@ const Nav = () => {
             </Link>
           </li>
           {NavRoutes.map((item, index) => {
+            // item.super? ShowSuperOnNav 
+            if(item.super && !ShowSuperOnNav){return}
             return (
-              <Tooltip title={item.title} placement="right" key={index}>
               <li className={item.navitem} key={index}>
-                <Link to={item.path}>
-                  {item.icon} {showNav ? <span>{item.title}</span> : null}
+                <Link to={item.path}><Tooltip title={item.title} placement="right" key={index}>
+                  {/* {item.icon}</Tooltip> {showNav ? <span>{item.title}</span> : null} */}
+                  {item.icon}</Tooltip> {showNav ? <span>{t(`ISMS.${item.title}`)} </span> : null}
                 </Link>
+                {/* {t('ISMS.goRegister1')} */}
               </li>
-              </Tooltip>
             );
           })}
         </ul>
         {Auth ? (
          showNav ? 
           <Button className={styles.LogoutBtn} onClick={logout}>
-            Sign Out
+            {/* Sign Out */}
+            {t('ISMS.LogOut')}
           </Button>
           :
           <Tooltip title={'Sign-out'} placement="right">
@@ -152,7 +153,7 @@ const Nav = () => {
               history.push("/login");
             }}
           >
-            Sign In
+            {t('ISMS.Login')}
           </button>
           :
           <Tooltip title={'Sign-in'} placement="right">

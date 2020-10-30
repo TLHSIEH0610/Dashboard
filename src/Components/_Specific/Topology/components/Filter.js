@@ -1,7 +1,9 @@
 import React, { useEffect, useState, useRef, useContext } from "react";
-// import styles from "../topology.module.scss";
-import { Form, Select, Tag, Button, Row, Col } from "antd";
+import styles from "../topology.module.scss";
+import { Form, Select, Tag, Button } from "antd";
 import Context from '../../../../Utility/Reduxx'
+
+import { Translator } from '../../../../i18n/index'
 
 const { Option } = Select;
 
@@ -10,17 +12,19 @@ const TopoFilterC = ({ setDataSource, dataSource }) => {
   const { state } = useContext(Context)
   const [restore, setRestore] = useState([]);
   const [modelOptions, setModelOptions] = useState("");
+
   let count = useRef(0);
 
   useEffect(() => {
-    console.log(count.current);
     if (count.current !== 0) {
       return;
     }
     setRestore(dataSource);
     form.setFieldsValue({device:[],model:[],health:[],strength:[]})
-  });
+  },[count.current, dataSource]);
+
   const healthoptions = [
+    // { value: "up" },
     { value: "up" },
     { value: "critical" },
     { value: "warning" },
@@ -68,7 +72,7 @@ const TopoFilterC = ({ setDataSource, dataSource }) => {
   const onFinish = (values) => {
     count.current++;
     let NewData = restore;
-    console.log(values)
+    // console.log(values)
     // if (!values.health && !values.strength && !values.model && !values.device) {
     //   return;
     // }
@@ -120,19 +124,12 @@ const TopoFilterC = ({ setDataSource, dataSource }) => {
   }
 
   return (
-    <Form onFinish={onFinish} form={form}>
-      <Row gutter={24} type="flex">
-        <Col span={6}>
-          <Form.Item name="device" label="Device">
-            {/* <Input
-              allowClear
-              onChange={(e)=>{
-                console.log(e.target.value)
-              }}
-            /> */}
+
+    <Form onFinish={onFinish} form={form} className={styles.FilterForm}>
+          <Form.Item name="device" label={Translator('ISMS.Device')} className={styles.FilterDevice}>
             <Select
               mode="multiple"
-              placeholder="search devices"
+              placeholder={Translator('ISMS.Search')}
               showArrow
               tagRender={tagRender}
               onFocus={() => {}}
@@ -148,23 +145,21 @@ const TopoFilterC = ({ setDataSource, dataSource }) => {
               })}
             </Select>
           </Form.Item>
-        </Col>
-        <Col span={4}>
-          <Form.Item name="model" label="Model">
+          <Form.Item name="model" label={Translator('ISMS.Model')} className={styles.FilterModel}>
             <Select
               mode="multiple"
               showArrow
+              placeholder={Translator('ISMS.Search')}
               tagRender={tagRender}
               style={{ width: "100%" }}
               options={modelOptions}
               onChange={()=>form.submit()}
             />
           </Form.Item>
-        </Col>
-        <Col span={4}>
-          <Form.Item name="health" label="Health">
+          <Form.Item name="health" label={Translator('ISMS.Health')} className={styles.FilterHealth}>
             <Select
               mode="multiple"
+              placeholder={Translator('ISMS.Search')}
               showArrow
               tagRender={tagRender}
               style={{ width: "100%" }}
@@ -172,11 +167,10 @@ const TopoFilterC = ({ setDataSource, dataSource }) => {
               onChange={()=>form.submit()}
             />
           </Form.Item>
-        </Col>
-        <Col span={4}>
-          <Form.Item name="strength" label="Strength">
+          <Form.Item name="strength" label={Translator('ISMS.Strength')} className={styles.FilterStrength}>
             <Select
               mode="multiple"
+              placeholder={Translator('ISMS.Search')}
               showArrow
               tagRender={tagRender}
               style={{ width: "100%" }}
@@ -184,9 +178,7 @@ const TopoFilterC = ({ setDataSource, dataSource }) => {
               onChange={()=>form.submit()}
             />
           </Form.Item>
-        </Col>
-        <Col span={2}>
-          <Form.Item>
+          <Form.Item style={{ marginLeft:'15px'}}> 
             <Button
               onClick={() => {
                 console.log(restore);
@@ -194,13 +186,14 @@ const TopoFilterC = ({ setDataSource, dataSource }) => {
                 form.setFieldsValue({device:[],model:[],health:[],strength:[]})
               }}
             >
-              Reset
+              {Translator('ISMS.Reset')}
             </Button>
           </Form.Item>
-        </Col>
-      </Row>
+        {/* </Col> */}
+      {/* </Row> */}
     </Form>
+
   );
 };
 
-export default TopoFilterC;
+export const TopoFilterMC = React.memo(TopoFilterC);

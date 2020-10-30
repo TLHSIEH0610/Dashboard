@@ -5,25 +5,25 @@
 .MDhideNav{
     display: none;
 }
-.bar {
-  &.showbar {
-    display: inline-block;
-  }
-  &.hidebar {
-    display: none;
-  }
-  height: 52.4px;
-  &:hover {
-    background: #dcdcdc;
-  }
+// .bar {
+//   &.showbar {
+//     display: inline-block;
+//   }
+//   &.hidebar {
+//     display: none;
+//   }
+//   height: 52.4px;
+//   &:hover {
+//     background: #dcdcdc;
+//   }
 
-  a {
-    color: #001529;
-    font-size: 25px;
-    line-height: 26px;
-    display: inline-block;
-  }
-}
+//   a {
+//     color: #001529;
+//     font-size: 25px;
+//     line-height: 26px;
+//     display: inline-block;
+//   }
+// }
 .NavIconWrapper {
   display: flex;
   flex-direction: column;
@@ -37,7 +37,7 @@
   top: 0;
   max-width: 200px;
   height: 100vh;
-  padding:0 10px;
+  padding:0 20px;
   justify-content: flex-start;
   align-items: center;
   background: #001529;
@@ -103,6 +103,7 @@
       color: hsla(0, 0%, 100%, 0.65);
       width: 130%;
       span{
+        font-size: 1.1rem;
         display: inline-block;
         width: 100px;
         margin-left: 10px;

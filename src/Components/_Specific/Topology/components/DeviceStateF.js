@@ -9,9 +9,9 @@ import "echarts/lib/component/title";
 import "echarts/lib/component/legend";
 
 
-export const StatusStrength = ({ dataSource }) => {
+const StatusStrength = ({ DeviceStatus }) => {
 
-  const statistic = dataSource.sim[0];
+  const statistic = DeviceStatus.status.sim;
   
   return (
     <div>
@@ -49,9 +49,11 @@ export const StatusStrength = ({ dataSource }) => {
   );
 };
 
-export const StatusGPS = ({ dataSource }) => {
+export const StatusStrengthMF = React.memo(StatusStrength)
 
-  const gps = dataSource.gps;
+const StatusGPS = ({ DeviceStatus }) => {
+
+  const gps = DeviceStatus.status.gps;
   return (
     <div>
       <Descriptions
@@ -79,9 +81,11 @@ export const StatusGPS = ({ dataSource }) => {
   );
 };
 
-export const StatusDNS = ({ dataSource }) => {
+export const StatusGPSMF = React.memo(StatusGPS)
 
-  const dns = dataSource.dns;
+const StatusDNS = ({ DeviceStatus }) => {
+
+  const dns = DeviceStatus.status.dns;
 
   return (
     <div>
@@ -109,10 +113,12 @@ export const StatusDNS = ({ dataSource }) => {
   );
 };
 
+export const StatusDNSMF = React.memo(StatusDNS) 
 
-export const StatusConnection = ({ dataSource }) => {
 
-  const connection = dataSource.connection
+const StatusConnection = ({ DeviceStatus }) => {
+
+  const connection = DeviceStatus.status.connection
 
 return (
   <div>
@@ -200,16 +206,18 @@ return (
   </Descriptions>
 </div>
 )
-}  
+} 
+
+export const StatusConnectionMF = React.memo(StatusConnection) 
 
 
-export const TxRxStatistic = ({ dataSource }) => {
+const TxRxStatistic = ({ DeviceStatus }) => {
 
-  const statistic = dataSource.statistic
+  const statistic = DeviceStatus.status.statistic
   const getOption = () => {
 
     const option = {
-      title: {show: true, text:'DataUsage', textStyle:{fontWeight:'bold', fontFamily: 'sans-serif'},right:'auto',left:'center' },
+      title: {show: true, text:'DataUsage', textStyle:{fontWeight:'bold', fontFamily: 'sans-serif'},right:'auto',left:'auto' },
       legend: {show:true, right:'10%'},
       tooltip: {},
       dataset: {
@@ -241,4 +249,6 @@ export const TxRxStatistic = ({ dataSource }) => {
     />
   );
 };
+
+export const TxRxStatisticMF = React.memo(TxRxStatistic)
 

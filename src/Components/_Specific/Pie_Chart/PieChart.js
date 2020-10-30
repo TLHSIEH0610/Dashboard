@@ -7,19 +7,26 @@ import "echarts/lib/component/title";
 import "echarts/lib/component/legend";
 import { useHistory } from 'react-router-dom'
 import Context from '../../../Utility/Reduxx'
+import { Translator } from '../../../i18n/index'
 
 const PieChartC = ({ dataSource, data, name }) => {
   const history = useHistory()
   const { dispatch } = useContext(Context)
+
   const getOption = () => {
     const option = {
       title: {
         text: name,
-        // subtext: "123",
+        subtext: `\n \n \n \n \n \n \n \n \n ${Translator("ISMS.Sum")} : ${dataSource && dataSource.reduce(function(a, b) {
+          return a + b;
+      }, 0) } `,
         left: "center",
-        padding: [0, 0],
-        // subtext: '123',
-        // sublink : 'ads'
+        padding: [10, 0],
+        subtextStyle: {
+          color: 'black',
+          fontSize: 15,
+          fontWeight:'bold'
+        }
       },
       color: ["#28a745", "#ffc107", "#dc3545", "#343a40"],
       tooltip: {
@@ -28,10 +35,10 @@ const PieChartC = ({ dataSource, data, name }) => {
       },
       legend: {
         orient: "horizontal",
-        left: '20%',
+        // left: '20%',
         data: data,
         align: "auto",
-        padding: [30, 0]
+        padding: [50, 30]
       },
       series: [
         {
@@ -42,7 +49,7 @@ const PieChartC = ({ dataSource, data, name }) => {
           top: 50,
           label: {
             show: true,
-            position: "outer",
+            position: "inside",
             bleedMargin: 5,
             alignTo: "none",
             formatter: '{b} : {c}',
@@ -52,7 +59,7 @@ const PieChartC = ({ dataSource, data, name }) => {
           emphasis: {
             label: {
               show: true,
-              fontSize: "30",
+              fontSize: "20",
               fontWeight: "bold",
             },
           },
@@ -98,6 +105,7 @@ const PieChartC = ({ dataSource, data, name }) => {
   }
 
   return (
+
     <ReactEchartsCore
       echarts={echarts}
       option={getOption()}
@@ -106,6 +114,7 @@ const PieChartC = ({ dataSource, data, name }) => {
       theme={"theme_name"}
       onEvents= {onEvents}
     />
+
   );
 };
 export default PieChartC;

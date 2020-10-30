@@ -372,7 +372,8 @@ export const GroupManagementC = () => {
           visible={EditGroupVisible}
           onOk={() => setEditGroupVisible(false)}
           onCancel={() => setEditGroupVisible(false)}
-          width={700}
+          // width={700}
+          className={styles.modal}
           okButtonProps={{
             form: "EditGroup",
             key: "submit",
@@ -399,6 +400,7 @@ export const GroupManagementC = () => {
                   columns={columns}
                   dataSource={item.group}
                   pagination={false}
+                  style={{overflowX:'auto'}}
                 />
               </Panel>
             );
@@ -564,7 +566,7 @@ const EditGroupModalC = ({
   const columns = [
     {
       title: "Group",
-      width: "10%",
+      width: "20%",
       dataIndex: "gid",
       key: "gid",
       render: (_, grouprecord, index) => {
@@ -660,7 +662,6 @@ const EditGroupModalC = ({
       onOk={() => setGroupModalvisible(false)}
       onCancel={() => setGroupModalvisible(false)}
       centered={true}
-      width={"80%"}
       className={styles.modal}
       destroyOnClose={true}
       footer={[

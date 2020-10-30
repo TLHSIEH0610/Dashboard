@@ -1,116 +1,123 @@
-import React, { useContext } from 'react'
-import { Form, Input, Button, Card } from 'antd';
-import Swal from 'sweetalert2'
+import React, { useContext } from "react";
+import { Form, Input, Button, Card } from "antd";
+import Swal from "sweetalert2";
 import { useHistory } from "react-router-dom";
-import { UserLogin } from '../../../Utility/Fetch'
-import Context from '../../../Utility/Reduxx'
-import styles from './login.module.scss'
-import { UserOutlined, LockOutlined } from '@ant-design/icons';
+import Context from "../../../Utility/Reduxx";
+import styles from "./login.module.scss";
+import { UserOutlined, LockOutlined } from "@ant-design/icons";
+import axios from "axios";
+import { Translator } from '../../../i18n/index'
+import { useTranslation } from 'react-i18next';
 
 const layout = {
-
   wrapperCol: {
-    span: 10,
-    offset: 6,
+    xs: { span: 5, offset: 0 },
+    sm: { span: 14, offset: 5 },
+    md: { span: 14, offset: 5 },
+    lg: { span: 14, offset: 5 },
+    xl: { span: 10, offset: 6 },
   },
-}
-
-const tailLayout = {
-  wrapperCol: {
-    offset: 6,
-    span: 16,
-  },
-}
+};
 
 const LoginInput = () => {
-  const { state, dispatch } = useContext(Context)  
+  const { state, dispatch } = useContext(Context);
   const history = useHistory();
-
-
-  const OnFinish = async (values) => {
-    const [response , data] = await UserLogin(values)
-    switch (response.status) {
-      case 200:
-        return Swal.fire({
-          title: 'Sign In Success',
-          icon: 'success',
+  const { t } = useTranslation();
+  const OnFinish = (values) => {
+    console.log(values);
+    const LogInUrl = `/login?user={"name":"${values.name}","password":"${values.password}"}`;
+    console.log(LogInUrl);
+    axios
+      .get(LogInUrl, { credentials: 'include' })
+      .then((res) => {
+        console.log(res);
+        Swal.fire({
+          title: t("ISMS.SignInSuccess"), 
+          icon: "success",
           showConfirmButton: false,
-          timer: 1200
+          timer: 1200,
         })
-        .then(()=>{
-            localStorage.setItem('authUser.name', data.cid);
-            localStorage.setItem('authUser.cid', data.cid);
-            localStorage.setItem('authUser.level', data.level);
-            localStorage.setItem('auth.isAuthed', true);
-            localStorage.setItem('super.cid', '');
-            dispatch({type:'setUser', payload:{User: data.cid}})
-        })
-        .then(() => {
-            // console.log(state)
-            if(state.Login.LogPath){
-              history.push(state.Login.LogPath)
-            }else{
-              history.push('/')
-            }
-          })
+        localStorage.setItem("authUser.name", res.data.response.cid);
+        localStorage.setItem("authUser.cid", res.data.response.cid);
+        localStorage.setItem("authUser.level", res.data.response.level);
+        localStorage.setItem("auth.isAuthed", true);
+        dispatch({ type: "setUser", payload: { User: res.data.response.cid } });
+        if (state.Login.LogPath) {
+          history.push(state.Login.LogPath);
+        } else {
+          history.push("/");
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        history.push("/login");
+      });
+  };
 
-      default:
-        console.log('fail')
-        return history.push('/login')
-    }
-  }
-
-  const onFinishFailed = errorInfo => {
-    console.log('Failed:', errorInfo);
+  const onFinishFailed = (errorInfo) => {
+    console.log("Failed:", errorInfo);
   };
 
   return (
-    <Card bodyStyle={{ width: '100%'}} className={styles.card}>
-    <Form
-      {...layout}
-      className={styles.form}
-      name="basic"
-      initialValues={{
-        remember: true,
-      }}
-      onFinish={OnFinish}
-      onFinishFailed={onFinishFailed}
-    >
-      <Form.Item
-        className={styles.item}
-        name="name"
-        rules={[
-          {
-            required: true,
-            message: 'Please input your username!',
-          },
-        ]}
+    <Card bodyStyle={{ width: "100%" }} className={styles.card}>
+      <Form
+        {...layout}
+        className={styles.form}
+        name="basic"
+        initialValues={{
+          remember: true,
+        }}
+        onFinish={OnFinish}
+        onFinishFailed={onFinishFailed}
       >
-        <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Username"/>
-      </Form.Item>
+        <Form.Item
+          className={styles.item}
+          name="name"
+          rules={[
+            {
+              required: true,
+              message: "Please input your username!",
+            },
+          ]}
+        >
+          <Input
+            prefix={<UserOutlined className="site-form-item-icon" />}
+            placeholder="Username"
+          />
+        </Form.Item>
 
-      <Form.Item
-        className={styles.item}
-        name="password"
-        rules={[
-          {
-            required: true,
-            message: 'Please input your password!',
-          },
-        ]}
+        <Form.Item
+          className={styles.item}
+          name="password"
+          rules={[
+            {
+              required: true,
+              message: "Please input your password!",
+            },
+          ]}
+        >
+          <Input.Password
+            prefix={<LockOutlined className="site-form-item-icon" />}
+          />
+        </Form.Item>
+        <Form.Item>
+          <Button type="primary" htmlType="submit">
+            {/* Log-in */}
+            {Translator('ISMS.Login')}
+          </Button>
+        </Form.Item>
+      </Form>
+      <div
+        className={styles.registerBtn}
+        onClick={() => {
+          history.push("/register");
+        }}
       >
-        <Input.Password prefix={<LockOutlined className="site-form-item-icon" />}/>
-      </Form.Item>
-      <Form.Item {...tailLayout}>
-        <Button type="primary" htmlType="submit">
-          Log-in
-        </Button>
-      </Form.Item>
-     
-    </Form>
-    <div className={styles.registerBtn} onClick={()=>{history.push('/register')}}> <span>Don't have an account?</span> Register and enjoy free trail </div>
+        <span>{Translator('ISMS.goRegister1')}</span> {Translator('ISMS.goRegister2')}
+        
+      </div>
     </Card>
   );
 };
 
-export default LoginInput
+export default LoginInput;

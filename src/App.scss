@@ -124,14 +124,13 @@ table {
 }
 * {
   box-sizing: border-box;
-  font-size: 16px;
+  font-size: 1rem;
   font-family: -apple-system,BlinkMacSystemFont,segoe ui,Roboto,helvetica neue,Arial,noto sans,sans-serif,apple color emoji,segoe ui emoji,segoe ui symbol,noto color emoji;
 }
-@media (max-width: 1000px) {
-  * {
-    font-size: 18px;
-  }
+body{
+  font-size: 1rem !important;
 }
+
 
 .container_ {
   display: flex;
@@ -170,4 +169,10 @@ table {
 
 [data-theme="dark"] .editable-row:hover .editable-cell-value-wrap {
   border: 1px solid #434343;
+}
+
+@media(max-width:768px){
+  *{
+    font-size: 1rem;
+  }
 }

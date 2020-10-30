@@ -1,10 +1,10 @@
 import React from 'react';
 import Dashboard from '../Pages/Dashboard'
 import Topology from '../Pages/Topology'
-import Backup from '../Pages/BackupStore'
+// import Backup from '../Pages/BackupStore'
 import Management from '../Pages/Management'
 import IoT from '../Pages/IoT'
-import { FcPieChart, FcParallelTasks, FcMultipleSmartphones, FcRotateToPortrait, FcEngineering } from 'react-icons/fc'
+import { FcPieChart, FcParallelTasks, FcMultipleSmartphones, FcEngineering } from 'react-icons/fc'
 
 
 export const NavRoutes = [
@@ -32,20 +32,21 @@ export const NavRoutes = [
         auth: true,
         component: IoT
     },
-    {
-        title: 'Device Backup',
-        path: '/backuprestore',
-        icon: <FcRotateToPortrait style={{fontSize:'1.5rem'}}/>,
-        cName: 'NavText',
-        auth: true,
-        component: Backup
-    },
+    // {
+    //     title: 'Device Backup',
+    //     path: '/backuprestore',
+    //     icon: <FcRotateToPortrait style={{fontSize:'1.5rem'}}/>,
+    //     cName: 'NavText',
+    //     auth: true,
+    //     component: Backup
+    // },
     {
         title: 'Management',
         path: '/management',
         icon: <FcEngineering style={{fontSize:'1.5rem'}}/>,
         cName: 'NavText',
         auth: true,
+        super:true,
         component: Management
 
     },

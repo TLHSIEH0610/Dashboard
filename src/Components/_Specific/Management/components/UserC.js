@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
 import {
-  Modal,
   message,
   Input,
   Table,
@@ -31,6 +30,7 @@ import { EditGroupModalMC } from './GroupC'
 import { TokenModelC } from "./TokenC";
 import { CreateInfoModalMC, EditUserModalMC, CreateUserModalMC } from "./UserF";
 
+
 const UserC = () => {
   const { state } = useContext(Context);
   const [form] = Form.useForm();
@@ -46,7 +46,6 @@ const UserC = () => {
       ? `/device_mgnt/group?list_group={${state.Login.Cid}}`
       : `/device_mgnt/group?list_group={"cid":"${cid}"}`;
   const [Grouploading, Groupresponse] = useURLloader(getGroupUrl, uploading);
-  const [record, setRecord] = useState("");
   const [UserEditRecord, setUserEditRecord] = useState("");
   const [onEditcid, setOnEditcid] = useState("");
   const [NotifiModalvisible, setNotifiModalvisible] = useState(false);
@@ -541,6 +540,7 @@ const UserC = () => {
 
         <Form form={form} component={false}>
           <Table
+          className={styles.UserInfoTable}
             loading={CustInfoLoading || UserListloading || uploading}
             columns={mergedColumns}
             dataSource={Clist}
