@@ -19,6 +19,8 @@ import useURLloader from "../../../../hook/useURLloader";
 import { FcDeleteDatabase, FcAddDatabase } from "react-icons/fc";
 import { RiEdit2Fill } from "react-icons/ri";
 import axios from "axios";
+import { Translator } from '../../../../i18n/index'
+
 
 const layout = {
   labelCol: { span: 8 },
@@ -48,8 +50,8 @@ const EditTokenForm = ({
       width: "20%",
       render: (_, EditTokenRecord, index) => {
         return (
-          <Form.Item name={["token_list", index]}>
-            <Input />
+          <Form.Item name={["token_list", index]} className={styles.EditTokenFormItem}>
+            <Input disabled/>
           </Form.Item>
         );
       },
@@ -61,7 +63,7 @@ const EditTokenForm = ({
       width: "20%",
       render: (_, EditTokenRecord, index) => {
         return (
-          <Form.Item name={["rename", index]}>
+          <Form.Item name={["rename", index]} className={styles.EditTokenFormItem}>
             <Input />
           </Form.Item>
         );
@@ -108,13 +110,14 @@ const EditTokenForm = ({
         console.log(res);
         setUploading(false);
         message.success("modify successfully");
+        form.resetFields(['rename'])
         setEdieTokenvisible(false);
       })
       .catch((error) => {
         console.log(error);
         setUploading(false);
         message.success("modify fail");
-        setEdieTokenvisible(false);
+        form.resetFields(['rename'])
       });
   };
 
@@ -140,7 +143,7 @@ const EditTokenForm = ({
     <Modal
       title="Edit Token"
       visible={EdieTokenvisible}
-      onCancel={() => setEdieTokenvisible(false)}
+      onCancel={() => {setEdieTokenvisible(false);}}
       okButtonProps={{
         form: "EditToken",
         key: "submit",
@@ -158,7 +161,7 @@ const EditTokenForm = ({
             form.submit();
           }}
         >
-          Submit
+           {Translator("ISMS.Submit")}
         </Button>,
       ]}
     >
@@ -230,9 +233,9 @@ export const TokenManagementC = () => {
   }
 
   const columns = [
-    { title: "Customer", dataIndex: "cid", key: "cid", width: "20%" },
+    { title: Translator("ISMS.Customer"), dataIndex: "cid", key: "cid", width: "20%" },
     {
-      title: "TokenList",
+      title: Translator("ISMS.TokenList"),
       dataIndex: "token_list",
       key: "token_list",
       width: "20%",
@@ -248,7 +251,7 @@ export const TokenManagementC = () => {
       },
     },
     {
-      title: "Action",
+      title: Translator("ISMS.Action"),
       dataIndex: "action",
       key: "action",
       width: "20%",
@@ -359,9 +362,3 @@ export const TokenModelC = ({ Tokenvisible, setTokenvisible, record }) => {
     </Modal>
   );
 };
-
-// http://192.168.0.95:8000/device_mgnt/token?generate_token={}  # {"response": {"token": "1f6da00e816e40e3987acbfa8ed2c104"}}
-// http://192.168.0.95:8000/device_mgnt/token?create_token={"cid":"12345678901234567890123456789011", "token_list":["11111111111111111111111111111111","22222222222222222222222222222222","33333333333333333333333333333333","44444444444444444444444444444444"]}
-// http://192.168.0.95:8000/device_mgnt/token?modify_token={"cid":"12345678901234567890123456789011", "token_list":[{"old_token":"11111111111111111111111111111111","new_token":"00001111111111111111111111111111"},{"old_token":"22222222222222222222222222222222","new_token":"00002222222222222222222222222222"}]}
-// http://192.168.0.95:8000/device_mgnt/token?delete_token={"cid":"12345678901234567890123456789012", "token_list":["00001111111111111111111111111111","00002222222222222222222222222222"]}
-// http://192.168.0.95:8000/device_mgnt/token?list_token={} # {"response": [{"cid":"", "token_list":["33333333333333333333333333333333","44444444444444444444444444444444"]}]}

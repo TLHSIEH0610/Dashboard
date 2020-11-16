@@ -1,9 +1,11 @@
-import React, { useEffect, useContext, useState, Fragment } from "react";
+import React, { useEffect, useState } from "react";
 import { Input, Form, Button, Space, Select, message, Modal } from "antd";
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
-import Context from "../../../../Utility/Reduxx";
+// import Context from "../../../../Utility/Reduxx";
 import axios from "axios";
 import styles from "../management.module.scss";
+import { Translator } from '../../../../i18n/index'
+
 
 const { Option } = Select;
 
@@ -20,29 +22,22 @@ const CreateUserForm = ({
   setCreateUservisible,
 }) => {
   const [form] = Form.useForm();
-  const { state } = useContext(Context);
+  // const { state } = useContext(Context);
   const [btnloading, setBtnloading] = useState(false);
 
   useEffect(() => {
-    console.log("執行了 createUserForm");
     form.setFieldsValue({
       cid: record.cid,
     });
   }, [CreateUservisible]);
 
-  // useEffect(()=>{
-  //   console.log(form.getFieldsValue(), form.isFieldTouched())
-  // })
-
   const onFinish = (values) => {
     console.log("Received values of form:", values);
-
     setUploading(true);
     setBtnloading(true);
-    const userlist = JSON.stringify(values.users);
-    console.log(userlist);
-    const url = `/user_mgnt?create_user={"cid":"${values.cid}", "user_list":${userlist}}`;
-    console.log(url);
+    console.log(values)
+    const url = `/user_mgnt?create_user={"cid":"${values.cid}", "user_list":${JSON.stringify(values.users)}}`;
+    console.log(values, url)
     axios
       .get(url)
       .then((res) => {
@@ -59,10 +54,11 @@ const CreateUserForm = ({
         message.error("Create fail.");
       });
   };
-
+  // /user_mgnt?create_user={"cid":"proscend", "user_list":[{"gid":[],"name":"super@proscend.com","password":"70746615DWDddw@","level":"get"}]}
+  // /user_mgnt?create_user={"cid":"proscend", "user_list":[{"gid":[],"name":"super@proscend.com","password":"70746615DWDddw", "level":"get"}]}
   return (
     <Modal
-      title="Create User Account"
+      title="Create User"
       visible={CreateUservisible}
       // onOk={() => setCreateUservisible(false)}
       onCancel={() => setCreateUservisible(false)}
@@ -78,32 +74,19 @@ const CreateUserForm = ({
             form.submit();
           }}
         >
-          Submit
+           {Translator("ISMS.Submit")}
         </Button>,
       ]}
     >
       <Form name="CreateUser" form={form} onFinish={onFinish}>
-        {state.Login.Cid === "" ? (
           <Form.Item
             name="cid"
             rules={[{ required: true, message: "" }]}
             label={"Customer"}
+            style={{display:'none'}}
           >
             <Input disabled={true} />
           </Form.Item>
-        ) : (
-          <Form.Item
-            name="cid"
-            label="CustomerID"
-            rules={[
-              {
-                required: true,
-              },
-            ]}
-          >
-            <Input disabled={true} />
-          </Form.Item>
-        )}
 
         <Form.List name="users">
           {(fields, { add, remove }) => {
@@ -128,7 +111,7 @@ const CreateUserForm = ({
                         {
                           type: "email",
                           required: true,
-                          message: "name@xxx.com is required",
+                          message: "must be name@xxx.com",
                         },
                       ]}
                     >
@@ -137,6 +120,7 @@ const CreateUserForm = ({
                     <Form.Item
                       {...field}
                       className={styles.password}
+                      style={{ width: 250 }}
                       name={[field.name, "password"]}
                       fieldKey={[field.fieldKey, "password"]}
                       rules={[
@@ -179,10 +163,11 @@ const CreateUserForm = ({
                       className={styles.gid}
                       name={[field.name, "gid"]}
                       fieldKey={[field.fieldKey, "gid"]}
-                      rules={[{ required: true, message: "Missin Group" }]}
+                      initialValue={[]}
+                      // rules={[{ required: true, message: "Missin Group" }]}
                     >
                       <Select
-                        style={{ width: 120 }}
+                        style={{ width: 150 }}
                         // onChange={handleChange}
                         mode={"multiple"}
                         placeholder="Group"
@@ -200,6 +185,7 @@ const CreateUserForm = ({
                               );
                             });
                           }
+                          // return
                         })}
                       </Select>
                     </Form.Item>
@@ -242,9 +228,10 @@ const EditUserForm = ({
   setUploading,
   setEditVisible,
   EditVisible,
+  uploading
 }) => {
   const [form] = Form.useForm();
-
+  // const [uploading, setUploading] = useState(false)
   const EditUseronFinish = (values) => {
     setUploading(true);
     const EditUserUrl =
@@ -263,17 +250,19 @@ const EditUserForm = ({
         console.log(res);
         setUploading(false);
         message.success("update successfully.");
+        form.resetFields()
+        setEditVisible(false)
       })
       .catch((error) => {
         console.log(error);
         setUploading(false);
         message.error("update fail.");
+        form.resetFields()
       });
     console.log(EditUserUrl);
   };
 
   useEffect(() => {
-    console.log("執行了 EditUserForm");
     form.setFieldsValue({
       name: UserEditRecord.name,
       level: UserEditRecord.level,
@@ -281,20 +270,26 @@ const EditUserForm = ({
     });
   }, [UserEditRecord]);
 
-  function handleChange(value) {
-    console.log(`selected ${value}`);
-  }
-
   return (
     <Modal
       title="EditUser"
       visible={EditVisible}
-      onOk={() => setEditVisible(false)}
+      // onOk={() => setEditVisible(false)}
       okButtonProps={{ form: "EditUser", key: "submit", htmlType: "submit" }}
       onCancel={() => setEditVisible(false)}
-      okText="Submit"
-      cancelText="Cancel"
       destroyOnClose={true}
+      footer={[
+        <Button
+          key="submit"
+          type="primary"
+          loading={uploading}
+          onClick={() => {
+            form.submit();
+          }}
+        >
+           {Translator("ISMS.Submit")}
+        </Button>,
+      ]}
     >
       <Form
         name="EditUser"
@@ -320,7 +315,7 @@ const EditUserForm = ({
           label="password"
           name="password"
           rules={[
-            { required: true, message: "Missing password" },
+            // { required: true, message: "Missing password" },
             {
               whitespace: true,
               message: "spaces are not allow!",
@@ -342,8 +337,6 @@ const EditUserForm = ({
           rules={[{ required: true, message: "Missing level" }]}
         >
           <Select
-            // style={{ width: 120 }}
-            onChange={handleChange}
           >
             <Option value="super">super</Option>
             <Option value="admin">admin</Option>
@@ -354,11 +347,9 @@ const EditUserForm = ({
         <Form.Item
           name="gid"
           label="Group"
-          // rules={[{ required: true, message: "Missing gid" }]}
+          initialValue={[]}
         >
           <Select
-            // style={{ width: 120 }}
-            onChange={handleChange}
             mode={"multiple"}
           >
             {GroupList.map((item, index) => {
@@ -381,21 +372,26 @@ const EditUserForm = ({
 
 export const EditUserModalMC = React.memo(EditUserForm);
 
-const CreateInfoForm = ({ CreateVisible, setCreateVisible, setUploading }) => {
-  console.log("執行了 CreateInfoForm");
+const  CreateInfoForm = ({ CreateVisible, setCreateVisible, setUploading }) => {
   const [form] = Form.useForm();
-  const CreateInfoonFinish = (values) => {
+  const  CreateInfoonFinish = async(values) => {
     console.log("Received values of form:", values);
     setUploading(true);
-    const url = ` /inf_mgnt?create_inf={"cid":"${values.cid}", "inf_list":{"company":"${values.company}", "contact":"${values.contact}", "mail":"${values.mail}", "phone":"${values.phone}"}}`;
-    console.log(url);
+    const CreateUserTokenUrl = `/user_mgnt?generate_token={}`
+    let UserToken
+    await axios.get(CreateUserTokenUrl).then((res) =>{
+      // console.log(res)
+      UserToken = res.data.response.token
+    })
+    const CreateInfo = ` /inf_mgnt?create_inf={"cid":"${UserToken}","inf_list":{"company":"${values.company ? values.company : ''}", "contact":"${values.contact ? values.contact: ''}", "mail":"${values.mail ? values.mail: ""}", "phone":"${values.phone ? values.phone : ''}"}}`;
+    console.log(CreateInfo);
     axios
-      .get(url)
+      .get(CreateInfo)
       .then((res) => {
         setUploading(false);
         message.success("update successfully.");
         setCreateVisible(false);
-        console.log(url);
+        // console.log(CreateInfo);
         console.log(res);
       })
       .catch((error) => {
@@ -403,11 +399,36 @@ const CreateInfoForm = ({ CreateVisible, setCreateVisible, setUploading }) => {
         setUploading(false);
         message.error("update fail.");
       });
+
+
+      // async function CreateToken(TokenTablerecord) {
+      //   setUploading(true);
+      //   const generateTokenUrl = `/device_mgnt/token?generate_token={}`;
+      //   let newToken;
+    
+      //   await axios.get(generateTokenUrl).then((res) => {
+      //     newToken = res.data.response.token;
+      //   });
+      //   axios
+      //     .get(
+      //       `/device_mgnt/token?create_token={"cid":"${TokenTablerecord.cid}", "token_list":["${newToken}"]}`
+      //     )
+      //     .then((resu) => {
+      //       console.log(resu);
+      //       setUploading(false);
+      //       message.success("Create successfully");
+      //     })
+      //     .catch((error) => {
+      //       console.log(error);
+      //       setUploading(false);
+      //       message.error("Create fail");
+      //     });
+      // }
   };
 
   return (
     <Modal
-      title="Create User Infomation"
+      title="Create Customer"
       visible={CreateVisible}
       // onOk={() => setCreateVisible(false)}
       onCancel={() => setCreateVisible(false)}
@@ -425,9 +446,9 @@ const CreateInfoForm = ({ CreateVisible, setCreateVisible, setUploading }) => {
         onFinish={CreateInfoonFinish}
         form={form}
       >
-        <Form.Item name={"cid"} label="CustomerID" rules={[{ required: true }]}>
+        {/* <Form.Item name={"cid"} label="CustomerID" rules={[{ required: true }]}>
           <Input />
-        </Form.Item>
+        </Form.Item> */}
         <Form.Item
           name={"company"}
           label="Company"
@@ -438,21 +459,21 @@ const CreateInfoForm = ({ CreateVisible, setCreateVisible, setUploading }) => {
         <Form.Item
           name={"contact"}
           label="Contact Person"
-          rules={[{ required: true }]}
+          // rules={[{ required: true }]}
         >
           <Input />
         </Form.Item>
         <Form.Item
           name={"mail"}
           label="Email"
-          rules={[{ type: "email", required: true }]}
+          // rules={[{ type: "email", required: true }]}
         >
           <Input />
         </Form.Item>
         <Form.Item
           name={"phone"}
           label="Phone"
-          rules={[{ type: "number", required: true }]}
+          // rules={[{ type: "number", required: true }]}
         >
           <Input />
         </Form.Item>
@@ -462,3 +483,88 @@ const CreateInfoForm = ({ CreateVisible, setCreateVisible, setUploading }) => {
 };
 
 export const CreateInfoModalMC = React.memo(CreateInfoForm);
+
+
+
+
+const  EditUserInfo = ({ EditCustomerInfovisible, setEditCustomerInfovisible, setUploading }) => {
+  const [form] = Form.useForm();
+  const  EditCustomerInfoOnFinish = async(values) => {
+    console.log("Received values of form:", values);
+    setUploading(true);
+    const CreateUserTokenUrl = `/user_mgnt?generate_token={}`
+    let UserToken
+    await axios.get(CreateUserTokenUrl).then((res) =>{
+      // console.log(res)
+      UserToken = res.data.response.token
+    })
+    const CreateInfo = ` /inf_mgnt?create_inf={"cid":"${UserToken}","inf_list":{"company":"${values.company ? values.company : ''}", "contact":"${values.contact ? values.contact: ''}", "mail":"${values.mail ? values.mail: ""}", "phone":"${values.phone ? values.phone : ''}"}}`;
+    console.log(CreateInfo);
+    axios
+      .get(CreateInfo)
+      .then((res) => {
+        setUploading(false);
+        message.success("update successfully.");
+        setEditCustomerInfovisible(false);
+        // console.log(CreateInfo);
+        console.log(res);
+      })
+      .catch((error) => {
+        console.log(error);
+        setUploading(false);
+        message.error("update fail.");
+      });
+
+  };
+
+  return (
+    <Modal
+      title="Create Customer"
+      visible={EditCustomerInfovisible}
+      onCancel={() => setEditCustomerInfovisible(false)}
+      okButtonProps={{
+        form: "CreateInfo",
+        key: "submit",
+        htmlType: "submit",
+      }}
+      okText="Create"
+      cancelText="Cancel"
+    >
+      <Form
+        {...layout}
+        name="Edit Info"
+        onFinish={EditCustomerInfoOnFinish}
+        form={form}
+      >
+        <Form.Item
+          name={"company"}
+          label="Customer"
+          rules={[{ required: true }]}
+          disabled = {true}
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item
+          name={"contact"}
+          label="Contact Person"
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item
+          name={"mail"}
+          label="Email"
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item
+          name={"phone"}
+          label="Phone"
+        >
+          <Input />
+        </Form.Item>
+      </Form>
+    </Modal>
+  );
+};
+
+export const EditUserInfoMC = React.memo(EditUserInfo);

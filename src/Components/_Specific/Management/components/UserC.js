@@ -26,10 +26,15 @@ import {
 } from "react-icons/fc";
 import { NotifiModalMC } from "./NotificationC";
 import { SchemeModalC } from "./SchemeC";
-import { EditGroupModalMC } from './GroupC'
+import { EditGroupModalMC } from "./GroupC";
 import { TokenModelC } from "./TokenC";
-import { CreateInfoModalMC, EditUserModalMC, CreateUserModalMC } from "./UserF";
-
+import {
+  CreateInfoModalMC,
+  EditUserModalMC,
+  CreateUserModalMC,
+  EditUserInfoMC,
+} from "./UserF";
+import { Translator } from "../../../../i18n/index";
 
 const UserC = () => {
   const { state } = useContext(Context);
@@ -52,11 +57,14 @@ const UserC = () => {
   const [SchemeModalvisible, setSchemeModalvisible] = useState(false);
   const [GroupModalvisible, setGroupModalvisible] = useState(false);
   const [Tokenvisible, setTokenvisible] = useState(false);
+  const [EditCustomerInfovisible, setEditCustomerInfovisible] = useState(false);
   const [TokenRecord, setTokenRecord] = useState("");
   const [NotifiRecord, setNotifiRecord] = useState("");
   const [EditGroupRecord, setEditGroupRecord] = useState("");
   const [CreateUserRecord, setCreateUserRecord] = useState("");
   const [SchemeRecord, setSchemeRecord] = useState("");
+  const [CustomerInfoRecord, setCustomerInfoRecord] = useState(false);
+
   const UserList =
     cid === "proscend"
       ? `/user_mgnt?list_user={${state.Login.Cid}}`
@@ -64,27 +72,45 @@ const UserC = () => {
   const [UserListloading, UserListResponse] = useURLloader(UserList, uploading);
   const CustInfoUrl = `/inf_mgnt?list_inf={} `;
   const [CustInfoLoading, CustInfoResponse] = useURLloader(
-    CustInfoUrl, uploading);
+    CustInfoUrl,
+    uploading
+  );
 
   useEffect(() => {
     if (UserListResponse && CustInfoResponse) {
       let CustomerList = [];
-      UserListResponse.response.forEach((item, index) => {
-        item.user_list.forEach((user, userIndex) => {
-          user["key"] = userIndex;
-        });
-        CustInfoResponse.response.forEach((info) => {
-          if (item.cid === info.cid) {
+      let Cid= new Set()
+      CustInfoResponse.response.forEach((item, index) => {
+        UserListResponse.response.forEach((userlist, userlistIndex) => {
+          userlist.user_list.forEach((user, userIndex) => {
+            user["key"] = userIndex;
+          });
+          console.log(UserListResponse, CustInfoResponse);
+          if (item.cid === userlist.cid && !Cid.has(item.cid)) {
+            Cid.add(item.cid)
             CustomerList.push({
               key: index,
               cid: item.cid,
-              user_list: item.user_list,
-              company: info.inf_list.company,
-              contact: info.inf_list.contact,
-              mail: info.inf_list.mail,
-              phone: info.inf_list.phone,
+              user_list: userlist.user_list,
+              company: item.inf_list.company,
+              contact: item.inf_list.contact,
+              mail: item.inf_list.mail,
+              phone: item.inf_list.phone,
             });
+          } else if(item.cid !== userlist.cid && !Cid.has(item.cid)){
+            Cid.add(item.cid)
+            CustomerList.push({
+              key: `${index}_${userlistIndex}`,
+              cid: item.cid,
+              company: item.inf_list.company,
+              contact: item.inf_list.contact,
+              mail: item.inf_list.mail,
+              phone: item.inf_list.phone,
+            });
+          }else{
+            return
           }
+          console.log(CustomerList);
         });
       });
       setClist(CustomerList);
@@ -109,92 +135,93 @@ const UserC = () => {
   }, [Groupresponse]);
 
   // const originData = [];
-  const EditableCell = ({
-    editing,
-    dataIndex,
-    title,
-    inputType,
-    record,
-    index,
-    children,
-    ...restProps
-  }) => {
-    const inputNode = inputType === "number" ? <InputNumber /> : <Input />;
-    return (
-      <td {...restProps}>
-        {editing ? (
-          <Form.Item
-            name={dataIndex}
-            style={{
-              margin: 0,
-            }}
-            rules={[
-              {
-                required: true,
-                message: `Please Input ${title}!`,
-              },
-            ]}
-          >
-            {inputNode}
-          </Form.Item>
-        ) : (
-          children
-        )}
-      </td>
-    );
-  };
+  // const EditableCell = ({
+  //   editing,
+  //   dataIndex,
+  //   title,
+  //   inputType,
+  //   record,
+  //   index,
+  //   children,
+  //   ...restProps
+  // }) => {
+  //   const inputNode = inputType === "number" ? <InputNumber /> : <Input />;
+  //   return (
+  //     <td {...restProps}>
+  //       {editing ? (
+  //         <Form.Item
+  //           name={dataIndex}
+  //           style={{
+  //             margin: 0,
+  //           }}
+  //           rules={[
+  //             {
+  //               required: true,
+  //               message: `Please Input ${title}!`,
+  //             },
+  //           ]}
+  //         >
+  //           {inputNode}
+  //         </Form.Item>
+  //       ) : (
+  //         children
+  //       )}
+  //     </td>
+  //   );
+  // };
 
-  const [editingKey, setEditingKey] = useState("");
+  // const [editingKey, setEditingKey] = useState("");
 
-  const isEditing = (record) => record.key === editingKey;
+  // const isEditing = (record) => record.key === editingKey;
 
-  const edit = (record) => {
-    form.setFieldsValue({
-      name: "",
-      age: "",
-      address: "",
-      ...record,
-    });
-    setEditingKey(record.key);
-  };
+  // const edit = (record) => {
+  //   form.setFieldsValue({
+  //     name: "",
+  //     age: "",
+  //     address: "",
+  //     ...record,
+  //   });
+  //   setEditingKey(record.key);
+  // };
 
   // const deleteInfo = (record) => {
   //   const DeleteInfoUrl = `/scheme_mgnt?delete_scheme={"cid":"${record.cid}"}`;
   // };
 
-  const cancel = () => {
-    setEditingKey("");
-  };
+  // const cancel = () => {
+  //   setEditingKey("");
+  // };
 
-  const save = async (key) => {
-    try {
-      setUploading(true);
-      const row = await form.validateFields();
-      const newData = [...Clist];
-      // console.log(newData,key)
-      const index = newData.findIndex((item) => key === item.key);
-      const EditUserInfo = `/inf_mgnt?modify_inf={"cid":"${row.cid}", "inf_list":{"company":"${row.company}", "contact":"${row.contact}", "mail":"${row.mail}", "phone":"${row.phone}"}}`;
-      console.log(EditUserInfo);
-      axios
-        .get(EditUserInfo)
-        .then((res) => {
-          console.log(res);
-          setUploading(false);
-          setEditingKey("");
-          message.success("update successfully.");
-        })
-        .catch((error) => {
-          setUploading(false);
-          console.log(error);
-          setEditingKey("");
-          message.error("update fail.");
-        });
-    } catch (errInfo) {
-      console.log("Validate Failed:", errInfo);
-    }
-  };
+  // const save = async (key) => {
+  //   try {
+  //     setUploading(true);
+  //     const row = await form.validateFields();
+  //     const newData = [...Clist];
+  //     // console.log(newData,key)
+  //     const index = newData.findIndex((item) => key === item.key);
+  //     const EditUserInfo = `/inf_mgnt?modify_inf={"cid":"${row.cid}", "inf_list":{"company":"${row.company}", "contact":"${row.contact}", "mail":"${row.mail}", "phone":"${row.phone}"}}`;
+  //     console.log(EditUserInfo);
+  //     axios
+  //       .get(EditUserInfo)
+  //       .then((res) => {
+  //         console.log(res);
+  //         setUploading(false);
+  //         // setEditingKey("");
+  //         message.success("update successfully.");
+  //       })
+  //       .catch((error) => {
+  //         setUploading(false);
+  //         console.log(error);
+  //         // setEditingKey("");
+  //         message.error("update fail.");
+  //       });
+  //   } catch (errInfo) {
+  //     console.log("Validate Failed:", errInfo);
+  //   }
+  // };
 
   const deleteUserInfo = (record) => {
+    console.log(record);
     setUploading(true);
     const DeleteUrl = `/inf_mgnt?delete_inf={"cid":"${record.cid}"}`;
     console.log(DeleteUrl);
@@ -295,95 +322,98 @@ const UserC = () => {
   };
 
   const columns = [
+    // {
+    //   title: Translator("ISMS.Customer"),
+    //   width: "15%",
+    //   dataIndex: "cid",
+    //   key: "cid",
+    //   editable: true,
+    // },
     {
-      title: "Customer",
-      width: "15%",
-      dataIndex: "cid",
-      key: "cid",
-      editable: true,
-    },
-    {
-      title: "Company",
-      width: "10%",
+      title: Translator("ISMS.Customer"),
+      // width: "10%",
       dataIndex: "company",
       key: "company",
-      editable: true,
+      // editable: true,
     },
+    // {
+    //   title: Translator("ISMS.Contact"),
+    //   width: "15%",
+    //   dataIndex: "contact",
+    //   key: "contact",
+    //   editable: true,
+    // },
+    // {
+    //   title: Translator("ISMS.Email"),
+    //   width: "15%",
+    //   dataIndex: "mail",
+    //   key: "mail",
+    //   editable: true,
+    // },
+    // {
+    //   title: Translator("ISMS.Phone"),
+    //   width: "15%",
+    //   dataIndex: "phone",
+    //   key: "phone",
+    //   editable: true,
+    // },
     {
-      title: "Contact",
-      width: "15%",
-      dataIndex: "contact",
-      key: "contact",
-      editable: true,
-    },
-    {
-      title: "Email",
-      width: "15%",
-      dataIndex: "mail",
-      key: "mail",
-      editable: true,
-    },
-    {
-      title: "Phone",
-      width: "15%",
-      dataIndex: "phone",
-      key: "phone",
-      editable: true,
-    },
-    {
-      title: "Operation",
-      width: "30%",
+      title: Translator("ISMS.Operation"),
       dataIndex: "information",
       key: "information",
       render: (_, record) => {
-        const editable = isEditing(record);
+        // const editable = isEditing(record);
         const show =
-          localStorage.getItem("authUser.cid") && state.Login.Cid === "";
-        return editable ? (
-          <span>
-            <a
-              href="/#"
-              onClick={(e) => {
-                e.preventDefault();
-                save(record.key);
-              }}
-              style={{
-                marginRight: 8,
-              }}
-            >
-              Save
-            </a>
-            <Popconfirm title="Sure to cancel?" onConfirm={cancel}>
-              <a href="/#">Cancel</a>
-            </Popconfirm>
-          </span>
-        ) : (
+          localStorage.getItem("authUser.cid") === "proscend" &&
+          state.Login.Cid === "";
+        // return editable ?
+        return (
+          //   <span>
+          //     <a
+          //       href="/#"
+          //       onClick={(e) => {
+          //         e.preventDefault();
+          //         save(record.key);
+          //       }}
+          //       style={{
+          //         marginRight: 8,
+          //       }}
+          //     >
+          //       Save
+          //     </a>
+          //     <Popconfirm title="Sure to cancel?" onConfirm={cancel}>
+          //       <a href="/#">Cancel</a>
+          //     </Popconfirm>
+          //   </span>
+          // ) : (
           <div className={styles.InformationBtnWrapper}>
-            <Tooltip title="Edit Info">
+            <Tooltip title="Information">
               <a
                 href="/#"
-                disabled={editingKey !== ""}
+                // disabled={editingKey !== ""}
                 onClick={(e) => {
                   e.preventDefault();
-                  edit(record);
+                  // edit(record);
+                  setCustomerInfoRecord(record);
+                  setEditCustomerInfovisible(true);
                 }}
               >
                 <RiEdit2Fill className={styles.EditIcon} />
               </a>
             </Tooltip>
-            {show && (
-              <Tooltip title="Delete Info">
-                <Popconfirm
-                  title="Sure to Delete?"
-                  onConfirm={() => {
-                    deleteUserInfo(record);
-                  }}
-                >
-                  <FcDeleteDatabase className={styles.DeleteIcon} />
-                </Popconfirm>
-              </Tooltip>
-            )}
-            <Tooltip title="Create User">
+            <Tooltip title="Scheme">
+              <a
+                href="/#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setSchemeRecord(record);
+                  setSchemeModalvisible(true);
+                }}
+              >
+                <FcViewDetails className={styles.ViewSchemeIcon} />
+              </a>
+            </Tooltip>
+            <Tooltip title="User">
               <a
                 href="/#"
                 onClick={(e) => {
@@ -397,7 +427,7 @@ const UserC = () => {
               </a>
             </Tooltip>
 
-            <Tooltip title="Edit Group">
+            <Tooltip title="Device Group">
               <a
                 href="/#"
                 onClick={(e) => {
@@ -407,6 +437,18 @@ const UserC = () => {
                 }}
               >
                 <FcConferenceCall className={styles.EditGroupIcon} />
+              </a>
+            </Tooltip>
+            <Tooltip title="Device Token">
+              <a
+                href="/#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setTokenRecord(record);
+                  setTokenvisible(true);
+                }}
+              >
+                <FcKey className={styles.TokenIcon} />
               </a>
             </Tooltip>
             <Tooltip title="Notification">
@@ -421,53 +463,40 @@ const UserC = () => {
                 <FcSpeaker className={styles.NotificationIcon} />
               </a>
             </Tooltip>
-
-            <Tooltip title="Token">
-              <a
-                href="/#"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setTokenRecord(record);
-                  setTokenvisible(true);
-                }}
-              >
-                <FcKey className={styles.TokenIcon} />
-              </a>
-            </Tooltip>
-            <Tooltip title="View Scheme">
-              <a
-                href="/#"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setSchemeRecord(record);
-                  setSchemeModalvisible(true);
-                }}
-              >
-                <FcViewDetails className={styles.ViewSchemeIcon} />
-              </a>
-            </Tooltip>
+            {show && (
+              <Tooltip title="Delete Customer">
+                <Popconfirm
+                  title="Sure to Delete?"
+                  onConfirm={() => {
+                    deleteUserInfo(record);
+                  }}
+                >
+                  <FcDeleteDatabase className={styles.DeleteIcon} />
+                </Popconfirm>
+              </Tooltip>
+            )}
           </div>
         );
       },
     },
   ];
 
-  const mergedColumns = columns.map((col) => {
-    if (!col.editable) {
-      return col;
-    }
+  // const mergedColumns = columns.map((col) => {
+  //   if (!col.editable) {
+  //     return col;
+  //   }
 
-    return {
-      ...col,
-      onCell: (record) => ({
-        record,
-        inputType: col.dataIndex === "age" ? "number" : "text",
-        dataIndex: col.dataIndex,
-        title: col.title,
-        editing: isEditing(record),
-      }),
-    };
-  });
+  //   return {
+  //     ...col,
+  //     onCell: (record) => ({
+  //       record,
+  //       inputType: col.dataIndex === "age" ? "number" : "text",
+  //       dataIndex: col.dataIndex,
+  //       title: col.title,
+  //       // editing: isEditing(record),
+  //     }),
+  //   };
+  // });
 
   return (
     <div>
@@ -487,11 +516,18 @@ const UserC = () => {
         setCreateVisible={setCreateVisible}
       />
 
+      <EditUserInfoMC
+        setUploading={setUploading}
+        EditCustomerInfovisible={EditCustomerInfovisible}
+        setEditCustomerInfovisible={setEditCustomerInfovisible}
+      />
+
       <EditUserModalMC
         GroupList={GroupList}
         UserEditRecord={UserEditRecord}
         onEditcid={onEditcid}
         setUploading={setUploading}
+        uploading={uploading}
         EditVisible={EditVisible}
         setEditVisible={setEditVisible}
       />
@@ -513,6 +549,7 @@ const UserC = () => {
           GroupModalvisible={GroupModalvisible}
           setGroupModalvisible={setGroupModalvisible}
           record={EditGroupRecord}
+          uploading={uploading}
           setUploading={setUploading}
         />
       )}
@@ -523,10 +560,7 @@ const UserC = () => {
         record={TokenRecord}
       />
 
-
-
       <Card>
-        
         {state.Login.Cid === "" && cid === "proscend" && (
           <Button
             type="primary"
@@ -534,26 +568,26 @@ const UserC = () => {
             className={styles.NewUserInfoBtn}
             loading={uploading}
           >
-            New User Info
+            {Translator("ISMS.Create Customer")}
           </Button>
         )}
 
         <Form form={form} component={false}>
           <Table
-          className={styles.UserInfoTable}
+            className={styles.UserInfoTable}
             loading={CustInfoLoading || UserListloading || uploading}
-            columns={mergedColumns}
+            columns={columns}
             dataSource={Clist}
             expandable={{ expandedRowRender }}
-            components={{
-              body: {
-                cell: EditableCell,
-              },
-            }}
-            rowClassName="editable-row"
-            pagination={{
-              onChange: cancel,
-            }}
+            // components={{
+            //   body: {
+            //     cell: EditableCell,
+            //   },
+            // }}
+            // rowClassName="editable-row"
+            // pagination={{
+            //   onChange: cancel,
+            // }}
           />
         </Form>
       </Card>

@@ -12,42 +12,7 @@ const layout = {
   },
 };
 
-const IdentityTable = ({ DeviceConfig }) => {
-  const identity = DeviceConfig.identity;
 
-  return (
-    <Descriptions
-      bordered
-      // column={{ xxl: 4, xl: 3, lg: 3, md: 3, sm: 2, xs: 1 }}
-      className={styles.desc}
-    >
-      {identity && (
-        <Descriptions.Item label="Identity">
-          IMEI: {identity.IMEI}
-          <br />
-          bootloader_version: {identity.bootloader_version}
-          <br />
-          hardware_mcsv: {identity.hardware_mcsv}
-          <br />
-          hostname: {identity.hostname}
-          <br />
-          lan_eth_mac: {identity.lan_eth_mac}
-          <br />
-          modem_firmware_version: {identity.modem_firmware_version}
-          <br />
-          serial_number: {identity.serial_number}
-          <br />
-          wan_eth_mac: {identity.wan_eth_mac}
-          <br />
-          wifi_ap_mac: {identity.wifi_ap_mac}
-          <br />
-        </Descriptions.Item>
-      )}
-    </Descriptions>
-  );
-};
-
-export const IdentityTableMF = React.memo(IdentityTable);
 
 const LanSetting = ({ DeviceConfig, id, setUploading, uploading }) => {
   const [form] = Form.useForm();
@@ -70,7 +35,7 @@ const LanSetting = ({ DeviceConfig, id, setUploading, uploading }) => {
   };
 
   useEffect(() => {
-    if (DeviceConfig) {
+    if (lan.ipv4) {
       console.log(DeviceConfig)
       form.setFieldsValue({
         ipv4_address: lan.ipv4.address,
@@ -83,7 +48,7 @@ const LanSetting = ({ DeviceConfig, id, setUploading, uploading }) => {
         ipv6_assignment: lan.ipv6.dhcp.assigment,
       });
     }
-  }, []);
+  }, [lan.ipv4]);
 
   return (
     <Form {...layout} onFinish={onFinish} form={form}>
@@ -221,7 +186,7 @@ const WanSetting = ({ DeviceConfig, id, setUploading, uploading }) => {
   };
 
   useEffect(() => {
-    if (DeviceConfig) {
+    if (wan.ethernet) {
       form.setFieldsValue({
         ipv4_type_1: wan.ethernet.dhcp.dns.ipv4[0].type,
         ipv4_address_1: wan.ethernet.dhcp.dns.ipv4[0].address,
@@ -245,7 +210,7 @@ const WanSetting = ({ DeviceConfig, id, setUploading, uploading }) => {
         static_netmask: wan.ethernet.static.ipv4.netmask,
       });
     }
-  }, []);
+  }, [wan.ethernet]);
 
   return (
     <Form {...layout} onFinish={onFinish} form={form}>
@@ -388,7 +353,7 @@ const LteSetting = ({ DeviceConfig, id, setUploading, uploading  }) => {
   const [form] = Form.useForm();
   const lte = DeviceConfig.lte;
   useEffect(() => {
-    if (DeviceConfig) {
+    if (lte) {
       form.setFieldsValue({
         mode: lte.config.mode,
         mtu: lte.config.mtu,
@@ -412,7 +377,7 @@ const LteSetting = ({ DeviceConfig, id, setUploading, uploading  }) => {
         recovery_apn_action: lte.policy.recovery.recover_apn.action,
       });
     }
-  }, []);
+  }, [lte]);
 
   const onFinish = (values) => {
     setUploading(true)
@@ -548,3 +513,72 @@ const LteSetting = ({ DeviceConfig, id, setUploading, uploading  }) => {
 };
 
 export const LteSettingMF = React.memo(LteSetting);
+
+
+
+const PeriodSetting = ({ DeviceConfig, id, setUploading, uploading  }) => {
+  const [form] = Form.useForm();
+  const Period = DeviceConfig.report_period;
+
+  useEffect(() => {
+
+    if (Period) {
+      form.setFieldsValue({
+        alive: Period.alive,
+        gps: Period.gps,
+        iot: Period.iot,
+        status: Period.status,
+        timeout: Period.timeout,
+      });
+    }
+  }, [Period]);
+
+  const onFinish = (values) => {
+    setUploading(true)
+    const SetPeriodUrl = `/cmd?set={"device_cfg":{"filter":{"id":"${id}"},"obj":{"report_period":{"alive":${values.alive},"timeout":${values.timeout},
+    "status":${values.status},"iot":${values.iot},"gps":${values.gps}}}}}`;
+    console.log(SetPeriodUrl)
+    axios.get(SetPeriodUrl).then((res)=>{
+      console.log(res)
+      setUploading(false)
+      message.success("update successfully.");
+    })
+    .catch((error)=>{
+      console.log(error)
+      setUploading(false)
+      message.error("update fail.");
+    })
+  }
+
+
+  return (
+    <Form {...layout} onFinish={onFinish} form={form}>
+      <Form.Item name={"alive"} label="Alive">
+        <Input />
+      </Form.Item>
+      <Form.Item name={"status"} label="Status">
+        <Input />
+      </Form.Item>
+      <Form.Item name={"iot"} label="IoT">
+        <Input />
+      </Form.Item>
+      <Form.Item name={"gps"} label="GPS">
+        <Input />
+      </Form.Item>
+      <Form.Item name={"timeout"} label="Timeout">
+        <Input />
+      </Form.Item>
+      <Form.Item  wrapperCol={{ span: 6, offset: 18 }}>
+        <Button
+          type="primary"
+          htmlType="submit"
+          loading={uploading}
+        >
+          Submit
+        </Button>
+      </Form.Item>
+    </Form>
+  );
+};
+
+export const PeriodSettingMF = React.memo(PeriodSetting);

@@ -4,7 +4,7 @@ table{
         padding: 0.4%;
         transform: translate(-2%, 0);
         font-weight: 700;
-        font-size: 1.1rem;
+        // font-size: 1.1rem;
     }
     th, td{
         text-align: center !important;
@@ -17,25 +17,22 @@ table{
     width:100%;
     margin: 10px 0 !important;
 }
-.Form{
-    display: flex;
-}
 .step{
     display: flex !important;
     width:80% !important;
     padding:20px !important;
     margin: auto;
 }
+.Tabicon{
+    margin-right: 15px ;
+    font-size: 26px;
+}
 @media(max-width: 1380px){
     .Form{
         display: block;
     }
 }
-// .formitem{
-//     // margin-bottom: 0 !important;
-//     margin-right: 2% !important;
-//     width:100%;
-// }
+
 .outerspace{
     width:100%;
 }
@@ -70,7 +67,37 @@ table{
     }
 }
 .formDiv p{
-    font-size: 1.1rem;
+    // font-size: 1.1rem;
     font-weight: 600;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+.table{
+    width: 100%;
+    text-align: center;
+    overflow-x: auto;
+    th{
+        text-align: center !important;
+    } 
+    td{
+        border-top: 1px #D3D3D3 solid;
+        border-bottom: 1px #D3D3D3 solid;
+        text-align: center;
+    }
+}
+.clickBtn{
+    margin: 0 20px 20px 0;
+    display: flex;
+    align-items: center;
+    height:auto !important;
+}
+
+
+.card{
+    max-width: 100% !important;
+}
+
+.actionCol{
+    display: flex;
+    // min-width: 200px;
+    text-align: center;
 }

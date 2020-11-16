@@ -15,11 +15,11 @@ const { Option } = Select;
 
 const Header = () => {
   const { state, dispatch } = useContext(Context);
-  const [User, setUser] = useState(localStorage.getItem("authUser.cid"));
+  const [User, setUser] = useState(localStorage.getItem("authUser.name"));
   const history = useHistory()
 
   useEffect(() => {
-    setUser(localStorage.getItem("authUser.cid"));
+    setUser(localStorage.getItem("authUser.name"));
   }, [state.Login.User]);
 
   function handleChange(value) {
@@ -43,10 +43,9 @@ const Header = () => {
       icon: "success",
       showConfirmButton: false,
       timer: 1200,
-    }).then(() => {
-      dispatch({ type: "setUser", payload: { User: "" } });
-      history.push("/login");
-    });
+    })
+    dispatch({ type: "setUser", payload: { User: "" } });
+    history.push("/login");
   };
 
 
@@ -68,8 +67,8 @@ const Header = () => {
           });
         }}
       />
+
       <Menu
-        // selectedKeys={[current]}
         mode="horizontal"
         className={styles.menu}
       >
@@ -78,16 +77,15 @@ const Header = () => {
           icon={<FcManager className={styles.user} />}
           title={User}
         >
-          {/* <Menu.Item key="setting1">Profile</Menu.Item> */}
           <Menu.Item key="setting2" onClick={()=>{
             history.push('/mysetting')
           }}>{Translator("ISMS.Setting")}</Menu.Item>
           <Menu.Item key="setting3" onClick={()=>logout()}>{Translator("ISMS.LogOut")}</Menu.Item>
         </SubMenu>
       </Menu>
-      {User === "proscend" && (
+
+      {User === "super@proscend.com" && (
         <Menu
-          // selectedKeys={[current]}
           mode="horizontal"
           className={styles.menu}
         >
@@ -106,7 +104,6 @@ const Header = () => {
         </Menu>
       )}
       <Menu
-        // selectedKeys={[current]}
         mode="horizontal"
         className={styles.menu}
       >

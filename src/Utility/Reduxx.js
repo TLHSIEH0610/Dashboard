@@ -8,7 +8,7 @@ export default Context;
 const iniState = {
   Global: { innerWidth:'', innerHeight:'', IsMD: false, showNav: true, Lang:'en' },
   Login: { IsLogin: false, LogPath: "/", User: null, Cid: "" },
-  Topology: { id: "id", deviceStatusByID: "", health: null, strength: null },
+  Topology: { id: "id", deviceStatusByID: "", health: null, strength: null, device: null },
   BackupRestore: {
     BackupReq: "",
     ActionStatusList: "",
@@ -64,6 +64,10 @@ const reducer = (state = iniState, action) => {
       newState = { ...state };
       newState.Topology.health = action.payload.health;
       newState.Topology.strength = action.payload.strength;
+      return newState;
+    case "setMaptoTopo":
+      newState = { ...state };
+      newState.Topology.device = action.payload.device;
       return newState;
     case "setIsMD":
       newState = { ...state };

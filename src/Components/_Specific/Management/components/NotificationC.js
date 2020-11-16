@@ -9,7 +9,9 @@ import {
   Collapse,
   Switch,
   Modal,
-  message,
+  message, 
+  Spin,
+  Alert
 } from "antd";
 import axios from "axios";
 import Context from "../../../../Utility/Reduxx";
@@ -107,8 +109,10 @@ export const NotifiManageC = () => {
   };
 
   return (
-    <Card loading={Notiloading}>
-      <Collapse defaultActiveKey={["0"]} accordion>
+    <Card >
+      {Notiloading ? <div className={styles.spin}>
+    <Spin />
+  </div> : <Collapse defaultActiveKey={["0"]} accordion>
         {NotifiData.map((item, index) => {
           return (
             <Panel key={index} header={item.cid}>
@@ -420,7 +424,7 @@ export const NotifiManageC = () => {
             </Panel>
           );
         })}
-      </Collapse>
+      </Collapse>}
     </Card>
   );
 };
@@ -468,8 +472,8 @@ const NotifiModalC = ({
     if (Notiresponse) {
       const NotifiData = Notiresponse.response.notification[0];
       // setNotifiData(NotifiData);
-      console.log("執行了 NotifiData");
-      console.log(NotifiData);
+      // console.log("執行了 NotifiData");
+      // console.log(NotifiData);
       form.setFieldsValue({
         timezone: NotifiData.timezone,
         // mail_active: NotifiData.mail.active,
@@ -481,7 +485,7 @@ const NotifiModalC = ({
         line_active: NotifiData.line.active,
         level: NotifiData.conditions.level,
       });
-      console.log(form.getFieldsValue());
+      // console.log(form.getFieldsValue());
     }
   }, [Notiresponse, record.cid]);
 
@@ -507,8 +511,13 @@ const NotifiModalC = ({
         </Button>,
       ]}
     >
-      <Card loading={Notiloading} bordered={false}>
-        <Form
+      {/* <Card loading={Notiloading} bordered={false}> */}
+        {Notiloading ?         <Spin tip="Loading...">
+          <Alert
+            message="Getting Data"
+            description="We are now getting data from server, please wait for a few seconds"
+          />
+        </Spin>: <Form
           {...layout}
           onFinish={EditNotifionFinish}
           // onFinishFailed={onFinishFailed}
@@ -715,7 +724,6 @@ const NotifiModalC = ({
               style={{ width: "100%" }}
               tokenSeparators={[","]}
             >
-              {/* {NotifiData. <Option key={i.toString(36) + i}>{i.toString(36) + i}</Option>} */}
             </Select>
             {/* <Input /> */}
           </Form.Item>
@@ -735,8 +743,8 @@ const NotifiModalC = ({
           <Form.Item label="Line Token" name="line_token">
             <Input />
           </Form.Item>
-        </Form>
-      </Card>
+        </Form>}
+      {/* </Card> */}
     </Modal>
   );
 };

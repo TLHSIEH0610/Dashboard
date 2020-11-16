@@ -11,6 +11,7 @@ import { FcExternal, FcInternal } from 'react-icons/fc'
 import { FcList } from 'react-icons/fc'
 import { useTranslation } from 'react-i18next';
 
+
 const Nav = () => {
   const history = useHistory();
   const { state, dispatch } = useContext(Context);
@@ -116,7 +117,8 @@ const Nav = () => {
       >
         <ul className={styles.navitems}>
           <li className={styles.title} style={showNav ? null: {background:'white'}}>
-            {showNav ? <h2>ISMS</h2> : null}
+            {/* {showNav ? <h2>ISMS</h2> : null} */}
+            {showNav ? <img src={require("../../../image/ISMS.png")} className={styles.Logo}/> : null}
             <Link to="#" className={styles.cross} onClick={ShowBar}>
               { showNav ? <ImCross /> : <FcList style={{fontSize:'1.5rem'}}/> }
             </Link>

@@ -1,29 +1,17 @@
-
+.Logo{
+  height:80px;
+}
+.LogoSmall{
+  height: 25px;
+  margin-top: 120%;
+  margin-right: 25%;
+}
 .MD {
   display: none;
 }
 .MDhideNav{
     display: none;
 }
-// .bar {
-//   &.showbar {
-//     display: inline-block;
-//   }
-//   &.hidebar {
-//     display: none;
-//   }
-//   height: 52.4px;
-//   &:hover {
-//     background: #dcdcdc;
-//   }
-
-//   a {
-//     color: #001529;
-//     font-size: 25px;
-//     line-height: 26px;
-//     display: inline-block;
-//   }
-// }
 .NavIconWrapper {
   display: flex;
   flex-direction: column;
@@ -91,7 +79,8 @@
         width: auto;
         font-size: 10px;
         position: absolute;
-        right: 0%;
+        right: -15%;
+        top: -5%
       }
     }
     li a {

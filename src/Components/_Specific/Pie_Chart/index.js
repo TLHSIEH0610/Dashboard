@@ -1,34 +1,43 @@
 import React, { Fragment, useState, useEffect, useContext } from "react";
 import styles from "./Pie.module.scss";
-import { Card } from "antd";
+import { Card, Spin } from "antd";
 import useURLloader from "../../../hook/useURLloader";
 import PieChartC from "./PieChart";
 import Context from '../../../Utility/Reduxx'
-
 import { Translator } from '../../../i18n/index'
 
 const PieChart = () => {
   const { state } = useContext(Context) 
   const cid = localStorage.getItem('authUser.cid')
   const url =cid==='proscend' ? `/cmd?get={"statistic":{"filter":{${state.Login.Cid}}}}`:`/cmd?get={"statistic":{"filter":{"cid":"${cid}"}}}` ;
+
   const [loading, response] = useURLloader(url);
   const [PieData, setPieData] = useState([]);
 
-
   useEffect(() => {
     if (response) {
-      setPieData(response.response.statistic.obj);
 
+      setPieData(response.response.statistic.obj);
     }
   }, [response]);
-
-
 
   return (
     <Fragment>
       <div className={styles.PieWrapper}>
-        <Card className={styles.PieCard} loading={loading}>
-          <PieChartC
+        <Card className={styles.PieCard} bodyStyle={{padding:0}}>
+
+          {loading ? 
+          <Spin>
+            <PieChartC
+            dataSource={
+              [100,0,0,0]
+            }
+            data={[Translator("ISMS.up"),Translator("ISMS.warning"),Translator("ISMS.critical"),Translator("ISMS.offline")]}
+            name={Translator('ISMS.DevicesHealth')}
+          />
+          </Spin>
+          :
+            <PieChartC
             dataSource={
               PieData.health && [
                 PieData.health.up,
@@ -37,14 +46,19 @@ const PieChart = () => {
                 PieData.health.offline,
               ]
             }
-            // data={["up", "warning", "critical", "offline"]}
             data={[Translator("ISMS.up"),Translator("ISMS.warning"),Translator("ISMS.critical"),Translator("ISMS.offline")]}
             name={Translator('ISMS.DevicesHealth')}
-            //  <p>{t('quickAdd.DevicesHealth')}</p>
-          />
+          />}
+
         </Card>
-        <Card className={styles.PieCard} loading={loading}>
-          <PieChartC
+        <Card className={styles.PieCard} bodyStyle={{padding:0}}>
+          {loading? <Spin>
+            <PieChartC
+            dataSource={[100,0,0,0]}
+            data={[Translator("ISMS.excellent"),Translator("ISMS.good"),Translator("ISMS.fair"),Translator("ISMS.poor")]}
+            name={Translator('ISMS.DevicesStrength')}
+          />
+          </Spin> :<PieChartC
             dataSource={
               PieData.sim && [
                 PieData.sim.excellent,
@@ -53,10 +67,9 @@ const PieChart = () => {
                 PieData.sim.poor,
               ]
             }
-            // data={["excellent", "good", "fair", "poor"]}
             data={[Translator("ISMS.excellent"),Translator("ISMS.good"),Translator("ISMS.fair"),Translator("ISMS.poor")]}
             name={Translator('ISMS.DevicesStrength')}
-          />
+          />}
         </Card>
       </div>
     </Fragment>

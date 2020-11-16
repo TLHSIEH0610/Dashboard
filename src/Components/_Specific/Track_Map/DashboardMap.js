@@ -1,95 +1,157 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import styles from "./track_map.module.scss";
 import useURLloader from "../../../hook/useURLloader";
-import { Form, Card, Drawer, DatePicker, Button, Table } from "antd";
-import OpenStreetMapC from "./OpenStreetMap";
+import { Card, Spin } from "antd";
+import MarkerClusterGroup from "react-leaflet-markercluster";
+import { Map, Marker, Popup, TileLayer } from "react-leaflet";
+import { Icon } from "leaflet";
+import Context from "../../../Utility/Reduxx";
+import { useHistory } from "react-router-dom";
 
-const { RangePicker } = DatePicker;
+export const alarm = new Icon({
+  iconUrl:
+    "https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png",
+  shadowUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png",
+  iconSize: [35, 50],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41],
+});
+
+export const normal = new Icon({
+  iconUrl:
+    "https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png",
+  shadowUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png",
+  iconSize: [35, 50],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41],
+});
 
 const DashboardMap = () => {
-
-  const TrackUrl = "/api/track.json";
-  const [Trackloading, Trackresponse] = useURLloader(TrackUrl);
-
-  const [currentZoom, setCurrentZoom] = useState(13);
-  const [centerPosition, setCenterPosition] = useState([
-    24.774222535724427,
-    121.00916565583707,
-  ]);
-  const [coordinates, setCoordinates] = useState([]);
-//   const [restoreCoordinates, setRestoreCoordinates] = useState([])
-  const count = useRef(0)
-
+  const { state, dispatch } = useContext(Context);
+  const cid = localStorage.getItem("authUser.cid");
+  const history = useHistory();
+  const StatusUrl = `/cmd?get={"device_status":{"filter":{${
+    cid === "proscend"
+      ? state.Login.Cid === ""
+        ? ""
+        : state.Login.Cid
+      : `"cid":"${cid}"`
+  }},"nodeInf":{},"obj":{}}}`;
+  const [Statusloading, StatusResponse] = useURLloader(StatusUrl);
+  // const [currentZoom, setCurrentZoom] = useState(13);
+  const currentZoom = 8
+  // const [centerPosition, setCenterPosition] = useState([40.692646, -74.033839]);
+  const centerPosition = [24.793256, 121.013987]
+  const [GPSList, setGPSList] = useState([]);
 
   useEffect(() => {
-    if (Trackresponse) {
-      count.current++
-      console.log(Trackresponse);
-      let coordinates = [...Trackresponse.position];
-      coordinates.forEach((item, index) => {
-        item["key"] = index;
-        let date = new Date(item.time * 1000);
-        item["readableTime"] = `${date.getFullYear()}-${
-          date.getMonth() + 1
-        }-${date.getDate()}_${date.getHours()}:${date.getMinutes()}`;
+    if (StatusResponse && StatusResponse.response) {
+      // console.log(StatusResponse);
+      let GPSList = [];
+      StatusResponse.response.device_status.forEach((item) => {
+        GPSList.push({
+          latitude: item.obj.status.gps.latitude,
+          longitude: item.obj.status.gps.longitude,
+          id: item.nodeInf.id,
+          name: item.nodeInf.name,
+          health: item.nodeInf.health,
+          sim: item.nodeInf.sim,
+          lastUpdate: item.nodeInf.lastUpdate,
+        });
       });
-      console.log(coordinates);
-      setCoordinates(coordinates);
-    //   setCenterPosition([coordinates[coordinates.length-1].lat, coordinates[coordinates.length-1].lng])
-    //   if(count.current===1){
-    //     setRestoreCoordinates(coordinates)
-    //   }
+      // console.log(GPSList);
+      setGPSList(GPSList);
+      // setCenterPosition([GPSList[0].latitude, GPSList[0].longitude]);
     }
-  }, [Trackresponse]);
+  }, [StatusResponse]);
 
-
-
-
-  const columns = [
-    {
-      title: "Time",
-      dataIndex: "readableTime",
-      key: "readableTime",
-      render: (text) => <a>{text}</a>,
-    },
-    {
-      title: "Health",
-      dataIndex: "health",
-      key: "health",
-    },
-    {
-      title: "Strength",
-      dataIndex: "strength",
-      key: "strength",
-    },
-    {
-      title: "Height",
-      dataIndex: "height",
-      key: "height",
-    },
-    {
-      title: "Latitude",
-      dataIndex: "lat",
-      key: "lat",
-    },
-    {
-      title: "Longitude",
-      dataIndex: "lng",
-      key: "lng",
-    },
-  ];
+  const onPopCkick = (item) => {
+    console.log(item);
+    dispatch({
+      type: "setMaptoTopo",
+      payload: { device: `${item.name === "" ? item.id : item.name}` },
+    });
+    // if(params.data.name===('excellent' || 'good' || 'fair' || 'poor')){
+    //   dispatch({ type: "setPietoTopo", payload: { strength: `${params.data.name}` }});
+    // }else{
+    //   dispatch({ type: "setPietoTopo", payload: { health: `${params.data.name}` }});
+    // }
+    history.push("./topology");
+  };
 
   return (
-    <div>
-      <Card loading={Trackloading} bordered={false} style={{padding:'0'}} bodyStyle={{padding:'0'}}>
-        <OpenStreetMapC
-          centerPosition={centerPosition}
-          currentZoom={currentZoom}
-          coordinates={coordinates}
-        />
-      </Card>
-    </div>
+    <Card bodyStyle={{ padding: "6px" }} style={{}}>
+      {Statusloading ? (
+        <Spin>
+          <Map
+            center={centerPosition}
+            zoom={currentZoom}
+            className={styles.DashboardMap}
+          >
+            <TileLayer
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+            />
+          </Map>
+        </Spin>
+      ) : (
+        <Map
+          center={centerPosition}
+          zoom={currentZoom}
+          className={styles.DashboardMap}
+        >
+          <TileLayer
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+          />
+
+          <MarkerClusterGroup
+            disableClusteringAtZoom={18}
+            removeOutsideVisibleBounds={true}
+          >
+            {GPSList &&
+              GPSList.map((item, index) => {
+                let lastUpdate = new Date(item.lastUpdate*1000);
+                return (
+                  <Marker
+                    key={index}
+                    position={[item.latitude, item.longitude]}
+                    icon={item.health === "up" ? normal : alarm}
+                  >
+                    <Popup>
+                      Device: {item.name !== "" ? item.name : item.id}
+                      <br />
+                      Status: {item.health}
+                      <br />
+                      Signal: {item.sim}
+                      <br />
+                      LastUpdate:{" "}
+                      {`${lastUpdate.getFullYear()}-${
+                        lastUpdate.getMonth() + 1
+                      }-${lastUpdate.getDate()} ${lastUpdate.getHours()}:${lastUpdate.getMinutes()}`}
+                      <br />
+                      <a
+                        href="/#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          onPopCkick(item);
+                        }}
+                      >
+                        see detail
+                      </a>
+                    </Popup>
+                  </Marker>
+                );
+              })}
+          </MarkerClusterGroup>
+        </Map>
+      )}
+    </Card>
   );
 };
 
-export default DashboardMap
+export default DashboardMap;

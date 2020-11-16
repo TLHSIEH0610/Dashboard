@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { BrowserRouter, Route, Redirect, Switch } from "react-router-dom";
 // import Dashboard from "./Pages/Dashboard";
 import Nav from "./Components/_Common/Navbar";
@@ -9,6 +9,7 @@ import Header from "./Components/_Common/Header";
 import { Provider } from "./Utility/Reduxx";
 import { NavRoutes } from "./Routes/NavbarRoutes";
 import WrongPage from "./Pages/WrongPage";
+import InternalError from "./Pages/WrongPage/InternalFail";
 import ManagOnNav from './Pages/Management/ManagOnNav'
 import "antd/dist/antd.css";
 
@@ -31,6 +32,7 @@ const App = () => {
                 <Route path="/mysetting" exact component={ManagOnNav}></Route>
                 <Route path="/login" exact component={Login}></Route>
                 <Route path="/register" exact component={Register}></Route>
+                <Route path="/internalerror" exact component={InternalError}></Route>
                 {NavRoutes.map((item, index) => {
                   return (
                     <Route
@@ -48,6 +50,7 @@ const App = () => {
                   );
                 })}
                 <Route component={WrongPage}></Route>
+                
               </Switch>
             </div>
           </div>

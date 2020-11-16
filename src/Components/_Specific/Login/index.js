@@ -30,18 +30,18 @@ const LoginInput = () => {
     axios
       .get(LogInUrl, { credentials: 'include' })
       .then((res) => {
-        console.log(res);
+        console.log(res.data, res.data.response.name);
         Swal.fire({
           title: t("ISMS.SignInSuccess"), 
           icon: "success",
           showConfirmButton: false,
           timer: 1200,
         })
-        localStorage.setItem("authUser.name", res.data.response.cid);
+        localStorage.setItem("authUser.name", res.data.response.name);
         localStorage.setItem("authUser.cid", res.data.response.cid);
         localStorage.setItem("authUser.level", res.data.response.level);
         localStorage.setItem("auth.isAuthed", true);
-        dispatch({ type: "setUser", payload: { User: res.data.response.cid } });
+        dispatch({ type: "setUser", payload: { User: res.data.response.name } });
         if (state.Login.LogPath) {
           history.push(state.Login.LogPath);
         } else {
@@ -50,6 +50,12 @@ const LoginInput = () => {
       })
       .catch((error) => {
         console.log(error);
+        Swal.fire({
+          title: t("ISMS.SignInError"), 
+          icon: "error",
+          showConfirmButton: false,
+          timer: 1200,
+        })
         history.push("/login");
       });
   };

@@ -1,6 +1,7 @@
 import React from "react";
 import PieChart from "../../Components/_Specific/Pie_Chart";
 import DashboardMap from "../../Components/_Specific/Track_Map/DashboardMap";
+import styles from './index.module.scss'
 
 const Dashboard = () => {
   return (

@@ -1,15 +1,12 @@
 import React, { useEffect, useState, useContext } from "react";
 import {
   Select,
-  Card,
   Form,
   Input,
   Tag,
   Button,
-  Collapse,
   Modal,
   Table,
-  Transfer,
   Tabs,
   message,
   Tooltip,
@@ -20,97 +17,15 @@ import styles from "../management.module.scss";
 import axios from "axios";
 import useURLloader from "../../../../hook/useURLloader";
 import { FcDeleteRow } from "react-icons/fc";
+import { RiEdit2Fill } from 'react-icons/ri'
+import { Translator } from '../../../../i18n/index'
+
 
 const { TabPane } = Tabs;
 const { Option } = Select;
-const { Panel } = Collapse;
-const layout = {
-  labelCol: { span: 8 },
-  wrapperCol: { span: 16 },
-};
-
-const EditGroupForm = ({ onFinish, record, NodeList }) => {
-  console.log(onFinish);
-  const [form] = Form.useForm();
-  const [mockData, setmockData] = useState([]);
-  const [targetKeys, settargetKeys] = useState([]);
-
-  useEffect(() => {
-    if (record) {
-      console.log(record, NodeList);
-      let targetKeys = [];
-      let mockData = [];
-      console.log(typeof record.node_list);
-      if (typeof record.node_list === "string") {
-        const data = {
-          key: record.node_list,
-          title: `${record.node_list}`,
-          description: `${record.node_list}`,
-        };
-        targetKeys.push(data.key);
-      } else {
-        record.node_list.forEach((item) => {
-          const data = {
-            key: item,
-            title: `${item}`,
-            description: `${item}`,
-          };
-          targetKeys.push(data.key);
-          // mockData.push(data);
-        });
-      }
-      NodeList.forEach((item) => {
-        mockData.push({
-          key: item.id,
-          title: `${item.id}`,
-          description: `${item.id}`,
-        });
-      });
-      setmockData(mockData);
-      settargetKeys(targetKeys);
-    }
-  }, []);
-
-  const filterOption = (inputValue, option) =>
-    option.description.indexOf(inputValue) > -1;
-
-  const handleChange = (targetKeys) => {
-    settargetKeys(targetKeys);
-  };
-
-  const handleSearch = (dir, value) => {
-    console.log("search:", dir, value);
-  };
-
-  return (
-    <Form
-      {...layout}
-      name="EditGroup"
-      onFinish={onFinish}
-      form={form}
-    >
-      <Form.Item name={"EditDevice"}>
-        <Transfer
-          dataSource={mockData}
-          showSearch
-          filterOption={filterOption}
-          targetKeys={targetKeys}
-          onChange={handleChange}
-          onSearch={handleSearch}
-          render={(item) => item.title}
-          listStyle={{
-            width: "100%",
-            height: 300,
-          }}
-          operations={["Add", "Remove"]}
-        />
-      </Form.Item>
-    </Form>
-  );
-};
 
 export const GroupManagementC = () => {
-  const [form] = Form.useForm();
+  // const [form] = Form.useForm();
   const { state } = useContext(Context);
   const NodeUrl = `/cmd?get={"nodeInf":{"nodeInf":{"cid":{},"gid":{},"token":{},"id":{}}}}`;
   const [_, Noderesponse] = useURLloader(NodeUrl);
@@ -125,288 +40,150 @@ export const GroupManagementC = () => {
   const [GroupList, setGroupList] = useState([
     { cid: "", gid: "", node_list: [""], key: "" },
   ]);
-  const [EditGroupVisible, setEditGroupVisible] = useState(false);
+  // const [EditGroupVisible, setEditGroupVisible] = useState(false);
   const [record, setRecord] = useState([]);
-  console.log('渲染了 GroupManagementC')
-  useEffect(() => {
-    
-    if (Noderesponse) {
-      console.log(Noderesponse);
-      let NodeList = [];
-      Noderesponse.response.nodeInf.forEach((item, index) => {
-        NodeList.push({ key: index, id: item.nodeInf.id });
-      });
-      console.log(NodeList);
-      setNodeList(NodeList);
-    }
-  }, [Noderesponse]);
+  const [GroupModalvisible, setGroupModalvisible] = useState(false)
 
   useEffect(() => {
     if (Groupresponse) {
       let GroupList = [];
-      console.log(Groupresponse);
       Groupresponse.response.forEach((item, index) => {
+        if(!item.group_list.length){
+          GroupList.push(
+            {cid : item.cid, key: index, length: 2}
+          );
+        }
         item.group_list.forEach((group, groupIndex) => {
-          group["key"] = groupIndex;
+          group["key"] = `${groupIndex}_${index}`;
+          group["cid"] = item.cid;
+          group["length"] = item.group_list.length;
+          GroupList.push(
+            group
+          );
         });
-        GroupList.push({
-          key: index,
-          cid: item.cid,
-          group: item.group_list,
-        });
+
       });
-      console.log(GroupList);
       setGroupList(GroupList);
     }
   }, [Groupresponse]);
+  
 
-  function callback(key) {
-    console.log(key);
-  }
-  const EditGrouponFinish = (values) => {
-    console.log(values);
-    setUploading(true);
-    const cid = localStorage.getItem("authUser.cid");
-    const proscendCid = state.Login.Cid;
-    const EditGroupUrl =
-      cid === "proscend" && proscendCid !== ""
-        ? `/device_mgnt/group?modify_group={${proscendCid}, "group_list":[{"name":"${
-            record.gid
-          }","node_list":${JSON.stringify(values.EditDevice)}}]}`
-        : `/device_mgnt/group?modify_group={"cid":"${cid}","group_list":[{"name":"${
-            record.gid
-          }","node_list":${JSON.stringify(values.EditDevice)}}]}`;
-    console.log(EditGroupUrl);
-    axios
-      .get(EditGroupUrl)
-      .then((res) => {
-        console.log(res);
-        setUploading(false);
-      })
-      .catch((erro) => {
-        console.log(erro);
-        setUploading(false);
+  useEffect(() => {
+    
+    if (Noderesponse) {
+      let NodeList = [];
+      Noderesponse.response.nodeInf.forEach((item, index) => {
+        NodeList.push({ key: index, id: item.nodeInf.id, cid: item.nodeInf.cid});
       });
-  };
-
-  const onFinish = (values) => {
-    console.log("Received values of form:", values);
-    setUploading(true);
-    const cid = localStorage.getItem("authUser.cid");
-    const user = state.Login.Cid;
-    const CreateGroupUrl =
-      cid === "proscend" && user !== ""
-        ? `/device_mgnt/group?create_group={${
-            state.Login.Cid
-          }, "group_list":[{"name":"${
-            values.groupName
-          }","node_list":${JSON.stringify(values.Device_ID)}}]}`
-        : `/device_mgnt/group?create_group={"cid":"${cid}", "group_list":[{"name":"${
-            values.groupName
-          }","node_list":${JSON.stringify(values.Device_ID)}}]}`;
-    console.log(CreateGroupUrl);
-    form.resetFields(["Device_ID", "groupName"]);
-    axios
-      .get(CreateGroupUrl)
-      .then((res) => {
-        setUploading(false);
-        console.log(res);
-      })
-      .catch((error) => {
-        console.log(error);
-        setUploading(false);
-      });
-  };
-
-  function tagRender(props) {
-    const { label, _, closable, onClose } = props;
-    return (
-      <Tag
-        color="black"
-        closable={closable}
-        onClose={onClose}
-        style={{ marginRight: 3 }}
-      >
-        {label}
-      </Tag>
-    );
-  }
-
+      setNodeList(NodeList);
+    }
+  }, [Noderesponse]);
+  const cidList = new Set()
+  const cidList2 = new Set()
   const columns = [
     {
-      title: "Group",
+      title: Translator("ISMS.Customer"),
+      dataIndex: ["cid"],
+      key: "cid",
+      width: "10%%",
+      render: (value, row, index) => {
+        console.log(value, row, index)
+        
+        const obj = {
+          children: value,
+          props: {},
+        };
+        
+        if(!cidList.has(row.cid) && row.node_list ){
+          cidList.add(row.cid)
+          obj.props.rowSpan = row.length;
+        }else if(!row.node_list){
+          obj.props.rowSpan = 1;
+        }
+        else{
+          obj.props.rowSpan = 0;
+        }
+
+        return obj
+      }
+    },
+    {
+      title: Translator("ISMS.Group"),
       dataIndex: ["gid"],
       key: "gid",
       width: "10%%",
     },
     {
-      title: "Device",
+      title: Translator("ISMS.Device"),
       dataIndex: ["node_list"],
       key: "node_list",
       width: "70%",
       render: (_, record) => {
-        if (typeof record.node_list === "object") {
-          return record.node_list.map((item, index) => {
-            return (
-              <Tag key={index} color="default">
-                {item}
-              </Tag>
+        // console.log(record)
+        if(record.node_list){
+        return  record.node_list.map((node, nodeIndex)=>{
+              return (
+                <Tag key={nodeIndex} color="default">
+                  {node}
+                </Tag>
             );
-          });
-        } else {
-          return <Tag color="default">{record.node_list}</Tag>;
+         
+          })
         }
       },
     },
     {
-      title: "Action",
+      title: Translator("ISMS.Action"),
       dataIndex: "action",
       width: "20%",
       render: (_, record) => {
-        return (
-          <div>
-            <Button
-              onClick={() => {
-                setEditGroupVisible(true);
+
+        const obj = {
+          children: <div>
+          <Tooltip title="Edit Info">
+            <a
+              href="/#"
+              onClick={(e) => {
+                e.preventDefault()
+                // setEditGroupVisible(true);
+                setGroupModalvisible(true)
                 setRecord(record);
               }}
             >
-              Edit
-            </Button>
-            <Button
-              onClick={() => {
-                const cid = localStorage.getItem("authUser.cid");
-                const deleteUrl =
-                  cid === "proscend" && state.Login.Cid !== ""
-                    ? `/device_mgnt/group?delete_group={${state.Login.Cid},"group_list":[{"name":"${record.gid}"}]}`
-                    : `/device_mgnt/group?delete_group={"cid":"${cid}","group_list":[{"name":"${record.gid}"}]}`;
-                console.log(deleteUrl);
-                setUploading(true);
-                axios
-                  .get(deleteUrl)
-                  .then((res) => {
-                    setUploading(false);
-                    console.log(res);
-                  })
-                  .catch((error) => {
-                    setUploading(false);
-                    console.log(error);
-                  });
-              }}
-            >
-              Delete
-            </Button>
-          </div>
-        );
+              <RiEdit2Fill className={styles.EditIcon} />
+            </a>
+           </Tooltip>
+        </div>,
+          props: {},
+        };
+
+        if(!cidList2.has(record.cid) && record.node_list ){
+          cidList2.add(record.cid)
+          obj.props.rowSpan = record.length;
+        }else if(!record.node_list){
+          obj.props.rowSpan = 1;
+        }
+        else{
+          obj.props.rowSpan = 0;
+        }
+        return obj
+
       },
     },
   ];
 
   return (
     <div>
-      <Card>
-        <Form
-          // loading={uploading}
-          name="dynamic_form_nest_item"
-          onFinish={onFinish}
-          autoComplete="off"
-          form={form}
-          className={styles.Form}
-        >
-          <div className={styles.formwrap}>
-            <div className={styles.formDiv}>
-              <p>Device</p>
-              <Form.Item
-                // label='Device'
-                style={{ width: 250 }}
-                className={styles.formitem}
-                name="Device_ID"
-                rules={[{ required: true, message: "Deivce Id is required!" }]}
-              >
-                <Select
-                  mode="multiple"
-                  placeholder="Select devices"
-                  showArrow
-                  tagRender={tagRender}
-                  // style={{ width: 230 }}
-                  className={styles.deviceinput}
-                  onFocus={() => {}}
-                >
-                  {NodeList.map((item, index) => {
-                    return (
-                      <Option key={index} value={item.id}>
-                        {item.id}
-                      </Option>
-                    );
-                  })}
-                </Select>
-              </Form.Item>
-            </div>
-            <div className={styles.formDiv}>
-              <p>Group Name</p>
-              <Form.Item
-                // label='Action'
-                className={styles.formitem}
-                name="groupName"
-                rules={[{ required: true, message: "Group name is required" }]}
-              >
-                <Input />
-              </Form.Item>
-            </div>
-            <Form.Item className={styles.submitBtn}>
-              <Button
-                type="primary"
-                htmlType="submit"
-                loading={uploading}
-                //   className={styles.clickBtn}
-              >
-                Submit
-              </Button>
-            </Form.Item>
-          </div>
-        </Form>
-      </Card>
-      <Card loading={Grouploading}>
-        <Modal
-          title="Edit Group"
-          visible={EditGroupVisible}
-          onOk={() => setEditGroupVisible(false)}
-          onCancel={() => setEditGroupVisible(false)}
-          // width={700}
-          className={styles.modal}
-          okButtonProps={{
-            form: "EditGroup",
-            key: "submit",
-            htmlType: "submit",
-          }}
-          okText="Submit"
-          cancelText="Cancel"
-        >
-          <EditGroupForm
-            form={form}
-            record={record}
-            onFinish={EditGrouponFinish}
-            NodeList={NodeList}
-          />
-        </Modal>
-        <Collapse defaultActiveKey={["0"]} onChange={callback}>
-          {GroupList.map((item, index) => {
-            //   console.log(item)
-            return (
-              <Panel key={index} header={item.cid}>
+          <EditGroupModalC record={record} setGroupModalvisible={setGroupModalvisible} GroupModalvisible={GroupModalvisible} uploading={uploading} setUploading={setUploading}/>
                 <Table
-                  loading={uploading}
-                  key={index}
+                  loading={uploading || Grouploading}
+                  // key={index}
                   columns={columns}
-                  dataSource={item.group}
+                  // dataSource={item.group}
+                  dataSource={GroupList}
                   pagination={false}
                   style={{overflowX:'auto'}}
                 />
-              </Panel>
-            );
-          })}
-        </Collapse>
-      </Card>
     </div>
   );
 };
@@ -417,14 +194,16 @@ const EditGroupModalC = ({
   GroupModalvisible,
   setGroupModalvisible,
   record,
+  uploading,
   setUploading
 }) => {
+
   const [form] = Form.useForm();
   const [Createform] = Form.useForm();
-  const [Btnuploading, setBtnuploading] = useState(false);
+  // const [uploading, setUploading] = useState(false);
   const getGroupUrl = `/device_mgnt/group?list_group={"cid":"${record.cid}"}`;
   const [Grouploading, Groupresponse] = useURLloader(
-    getGroupUrl, Btnuploading
+    getGroupUrl, uploading
   );
   const [GroupData, setGroupData] = useState([{ gid: "", node_list: [] }]);
   // const NodeUrl = `/cmd?get={"nodeInf":{"nodeInf":{"cid":{},"gid":{},"token":{},"id":{}}}}`;
@@ -441,18 +220,18 @@ const EditGroupModalC = ({
     const deleteUrl = `/device_mgnt/group?delete_group={"cid":"${record.cid}","group_list":[{"name":"${grouprecord.gid}"}]}`;
     console.log(deleteUrl);
     setUploading(true);
-    setBtnuploading(true)
+    setUploading(true)
     axios
       .get(deleteUrl)
       .then((res) => {
         setUploading(false);
-        setBtnuploading(false)
+        setUploading(false)
         message.success("Delete successfully.");
         console.log(res);
       })
       .catch((error) => {
         setUploading(false);
-        setBtnuploading(false)
+        setUploading(false)
         message.error("Delete fail.");
         console.log(error);
       });
@@ -460,7 +239,7 @@ const EditGroupModalC = ({
   const UpdateGrouponFinish = (values) => {
     console.log(values);
     setUploading(true);
-    setBtnuploading(true)
+    setUploading(true)
     let group_list = "";
     for (let i = 0; i < values.Group.length; i++) {
       if (i === values.Group.length - 1) {
@@ -475,29 +254,29 @@ const EditGroupModalC = ({
     }
 
 
-    console.log(group_list);
+    // console.log(group_list);
     const EditGroupUrl = `/device_mgnt/group?modify_group={"cid":"${record.cid}","group_list":[${group_list}]}`;
-    console.log(EditGroupUrl);
+    // console.log(EditGroupUrl);
     axios
       .get(EditGroupUrl)
       .then((res) => {
         console.log(res);
         message.success("Update successfully.");
         setUploading(false);
-        setBtnuploading(false)
+        setUploading(false)
       })
       .catch((erro) => {
         console.log(erro);
         message.error("Update fail.");
         setUploading(false);
-        setBtnuploading(false)
+        setUploading(false)
       });
   };
 
   const CreateGrouponFinish = (values) => {
     console.log("Received values of form:", values);
     setUploading(true);
-    setBtnuploading(true)
+    setUploading(true)
     const CreateGroupUrl = `/device_mgnt/group?create_group={"cid":"${
       record.cid
     }", "group_list":[{"name":"${
@@ -509,7 +288,7 @@ const EditGroupModalC = ({
       .get(CreateGroupUrl)
       .then((res) => {
         setUploading(false);
-        setBtnuploading(false)
+        setUploading(false)
         message.success("Create completely.");
         console.log(res);
       })
@@ -517,7 +296,7 @@ const EditGroupModalC = ({
         console.log(error);
         message.error("Create fail.");
         setUploading(false);
-        setBtnuploading(false)
+        setUploading(false)
       });
   };
   useEffect(() => {
@@ -542,10 +321,11 @@ const EditGroupModalC = ({
     if (Noderesponse) {
       console.log(Noderesponse)
       let NodeList = [];
-      Noderesponse.response.nodeInf.forEach((item, index) => {
+      Noderesponse.response && Noderesponse.response.nodeInf.forEach((item, index) => {
         NodeList.push({ key: index, id: item.nodeInf.id });
       });
       setNodeList(NodeList);
+      console.log(NodeList)
     }
   }, [Noderesponse]);
 
@@ -566,14 +346,13 @@ const EditGroupModalC = ({
   const columns = [
     {
       title: "Group",
-      width: "20%",
+      width: "30%",
       dataIndex: "gid",
       key: "gid",
       render: (_, grouprecord, index) => {
         return (
           <div style={{ display: "flex", flexDirection: "column", justifyContent:'center', alignItems:'center' }}>
             <Form
-              // loading={uploading}
               name={["Group", index]}
               onFinish={UpdateGrouponFinish}
               autoComplete="off"
@@ -581,7 +360,6 @@ const EditGroupModalC = ({
               className={styles.Form}
             >
               <Form.Item
-                // label='Device'
                 style={{ marginBottom:'10px' }}
                 className={styles.formitem}
                 name={["Group", index, "gid"]}
@@ -596,14 +374,7 @@ const EditGroupModalC = ({
                 title="Sure to delete?"
                 onConfirm={()=>{deleteGroup(grouprecord)}}
               >
-                {/* <a
-                onClick={(e) => {
-                  e.preventDefault();
-
-                }}
-              > */}
                 <FcDeleteRow className={styles.DeleteGroupIcon} style={{fontSize:'2rem', cursor:'pointer' }}/>
-                {/* </a> */}
               </Popconfirm>
             </Tooltip>
           </div>
@@ -612,13 +383,12 @@ const EditGroupModalC = ({
     },
     {
       title: "Device",
-      width: "90%",
+      width: "70%",
       dataIndex: "node_list",
       key: "node_list",
-      render: (_, record, index) => {
+      render: (_, __, index) => {
         return (
           <Form
-            // loading={uploading}
             name={["GroupDevice", index]}
             onFinish={UpdateGrouponFinish}
             autoComplete="off"
@@ -626,8 +396,6 @@ const EditGroupModalC = ({
             className={styles.Form}
           >
             <Form.Item
-              // label='Device'
-              // style={{ width: 250 }}
               className={styles.formitem}
               name={["GroupDevice", index, "node_list"]}
               rules={[{ required: true, message: "Deivce Id is required!" }]}
@@ -674,7 +442,7 @@ const EditGroupModalC = ({
           <Button
             key="ok"
             type="primary"
-            loading={Btnuploading}
+            loading={uploading}
             onClick={() => {
               form.submit();
             }}
@@ -687,7 +455,7 @@ const EditGroupModalC = ({
       {/* <Card > */}
       <Tabs defaultActiveKey="1" onChange={callback}>
         <TabPane tab="Create Group" key="Create Group">
-          <Card loading={Nodeloading} bordered={false}>
+          {/* <Card loading={Nodeloading || Grouploading} bordered={false}> */}
             <Form
               name="CreateGroup"
               onFinish={CreateGrouponFinish}
@@ -708,6 +476,7 @@ const EditGroupModalC = ({
                     ]}
                   >
                     <Select
+                      loading={Nodeloading || Grouploading || uploading}
                       mode="multiple"
                       placeholder="Select devices"
                       showArrow
@@ -743,7 +512,7 @@ const EditGroupModalC = ({
                   <Button
                     type="primary"
                     htmlType="submit"
-                    loading={Btnuploading}
+                    loading={uploading}
                     //   className={styles.clickBtn}
                   >
                     Submit
@@ -751,14 +520,14 @@ const EditGroupModalC = ({
                 </Form.Item>
               </div>
             </Form>
-          </Card>
+          {/* </Card> */}
         </TabPane>
         <TabPane tab="Edit Group" key="Edit Group" className={styles.groupPane}>
           <Table
             columns={columns}
             dataSource={GroupData}
             pagination={false}
-            loading={Btnuploading}
+            loading={uploading}
             // scroll={{ x: 1500, y: 600 }}
           />
         </TabPane>

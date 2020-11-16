@@ -1,11 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Map, Marker, Popup, TileLayer, Polyline } from "react-leaflet";
 import styles from "./track_map.module.scss";
 import MarkerClusterGroup from "react-leaflet-markercluster";
 import { Card } from "antd";
 import useURLloader from "../../../hook/useURLloader";
-import { HiLocationMarker } from 'react-icons/hi'
-// import L from "leaflet";
 import { Icon } from "leaflet";
 import { Tag } from 'antd'
 
@@ -34,7 +32,7 @@ const normal = new Icon({
 const OpenStreetMapC = ({ centerPosition, currentZoom, coordinates, PolylineData }) => {
   const TrackUrl = "/api/track.json";
   const [Trackloading, Trackresponse] = useURLloader(TrackUrl);
-  const [coordinate, setCoordinate] = useState(null); //當日單點座標
+  // const [coordinate, setCoordinate] = useState(null); //當日單點座標
 
 
 
@@ -42,7 +40,7 @@ const OpenStreetMapC = ({ centerPosition, currentZoom, coordinates, PolylineData
   useEffect(() => {
     if (Trackresponse) {
       console.log(Trackresponse);
-      setCoordinate(Trackresponse[Object.keys(Trackresponse)[0]].position);
+      // setCoordinate(Trackresponse[Object.keys(Trackresponse)[0]].position);
       console.log(Trackresponse[Object.keys(Trackresponse)[0]].position);
     }
   }, [Trackresponse]);
@@ -50,7 +48,7 @@ const OpenStreetMapC = ({ centerPosition, currentZoom, coordinates, PolylineData
 
 
   return (
-    <Card loading={Trackloading}>
+    
       <Map
         // ref={mapRef}
         center={centerPosition}
@@ -82,7 +80,7 @@ const OpenStreetMapC = ({ centerPosition, currentZoom, coordinates, PolylineData
             ))}
         </MarkerClusterGroup>
       </Map>
-    </Card>
+   
   );
 };
 

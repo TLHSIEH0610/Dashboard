@@ -1,13 +1,14 @@
 import React, { useContext } from "react";
 import { Tabs } from "antd";
-import { UserOutlined, UsergroupDeleteOutlined, KeyOutlined, NotificationOutlined  } from "@ant-design/icons";
-import { GiUpgrade } from 'react-icons/gi'
+import { UserOutlined, UsergroupDeleteOutlined, KeyOutlined, NotificationOutlined, AppstoreOutlined } from "@ant-design/icons";
 import UserC from './components/UserC'
 import { SchemeManageC } from './components/SchemeC'
 import { GroupManagementC } from './components/GroupC'
 import { NotifiManageC } from './components/NotificationC'
 import { TokenManagementC } from './components/TokenC'
 import Context from "../../../Utility/Reduxx";
+import { Translator } from '../../../i18n/index'
+
 
 const { TabPane } = Tabs;
 
@@ -17,12 +18,12 @@ const ManagementC = () => {
   const cid = localStorage.getItem('authUser.cid')
   const show = cid ==='proscend' && state.Login.Cid === ''
   return (
-    show ? <Tabs defaultActiveKey="User">
+    <Tabs defaultActiveKey="User">
       <TabPane
         tab={
           <span>
             <UserOutlined />
-           User
+            {Translator("ISMS.User")}
           </span>
         }
         key="User"
@@ -33,7 +34,7 @@ const ManagementC = () => {
         tab={
           <span>
             <UsergroupDeleteOutlined />
-           Group
+           {Translator("ISMS.Group")}
           </span>
         }
         key="group"
@@ -44,7 +45,7 @@ const ManagementC = () => {
         tab={
           <span>
             <KeyOutlined />
-           Token
+           {Translator("ISMS.Token")}
           </span>
         }
         key="token"
@@ -55,7 +56,7 @@ const ManagementC = () => {
         tab={
           <span>
             <NotificationOutlined />
-           Notification
+           {Translator("ISMS.Notification")}
           </span>
         }
         key="Notification"
@@ -65,28 +66,28 @@ const ManagementC = () => {
       <TabPane
         tab={
           <span>
-            <GiUpgrade />
-           scheme
+            <AppstoreOutlined />
+           {Translator("ISMS.Scheme")}
           </span>
         }
         key="scheme"
       >
         <SchemeManageC/>
       </TabPane>
-    </Tabs> :
-    <Tabs defaultActiveKey="User">
-    <TabPane
-      tab={
-        <span>
-          <UserOutlined />
-         User
-        </span>
-      }
-      key="User"
-    >
-      <UserC/>
-    </TabPane>
-  </Tabs>
+    </Tabs>
+  //   <Tabs defaultActiveKey="User">
+  //   <TabPane
+  //     tab={
+  //       <span>
+  //         <UserOutlined />
+  //        {Translator("ISMS.User")}
+  //       </span>
+  //     }
+  //     key="User"
+  //   >
+  //     <UserC/>
+  //   </TabPane>
+  // </Tabs>
   );
 };
 

@@ -13,13 +13,16 @@ const PieChartC = ({ dataSource, data, name }) => {
   const history = useHistory()
   const { dispatch } = useContext(Context)
 
+
   const getOption = () => {
     const option = {
       title: {
         text: name,
-        subtext: `\n \n \n \n \n \n \n \n \n ${Translator("ISMS.Sum")} : ${dataSource && dataSource.reduce(function(a, b) {
-          return a + b;
-      }, 0) } `,
+        subtext: `\n \n \n \n \n \n \n \n \n ${ dataSource ? Translator("ISMS.Sum") : 'no data'}  ${dataSource ? dataSource.reduce(function(a, b) {
+            return a + b
+
+          ;
+      }, 0) : '' }  `,
         left: "center",
         padding: [10, 0],
         subtextStyle: {

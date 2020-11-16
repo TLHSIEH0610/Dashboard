@@ -23,25 +23,41 @@
     margin-right: 4%;
     font-size: 1.4rem;
 }
+
+:global(.ant-descriptions-view) {
+    overflow: auto !important;
+}
+
+//   .override-ant-descriptions-view {
+//     :global(.ant-descriptions-view) {
+//         overflow: auto !important;
+//     }
+//   }
+
+
 .desc{
+
     th{
         vertical-align: middle;
+        // width:50% !important;
     }
     td{
         vertical-align: middle;
+        // width:50% !important;
     }
 }
 .Tabs{
     margin:20px;
-    
+    // overflow-x: auto !important;
     // overflow-y: scroll;
     .tabpane{
         overflow-y: scroll;
-
+        // overflow-x: auto !important;
         // max-height: 450px;
         display: flex;
         flex-direction: column;
         justify-content: center;
+
         .connection{
             // padding-top:20px !important;
             overflow-y: scroll; 
@@ -61,7 +77,7 @@
 }
 .modal{
     width: 70% !important;
-    overflow-x: auto;
+    overflow-x: auto !important;
 }
 
 .IoT{
@@ -108,13 +124,13 @@
 .FilterForm{
     display: flex;
     flex-wrap: wrap;
-    align-items: flex-end;
+    align-items: flex-start;
     .FilterDevice{
-        width: 280px;
+        width: 295px;
         margin-left: 15px;
     }
     .FilterModel{
-        width: 150px;
+        width: 170px;
         margin-left: 15px;
     }
     .FilterHealth{
@@ -137,6 +153,16 @@
     }
 }
 
+.FourEightFiveBar{
+    width: 50%;
+    margin-bottom: 10px !important;
+}
+.Refresh{
+    cursor: pointer;
+    font-size: 1.5rem;
+    margin-left: 25px;
+}
+
 @media(max-width:576px){
     .TopoTable{
         // th{
@@ -154,7 +180,7 @@
         }
     }
 
-    .Status, .Map, .Setting, .IoT, alarmlog{
+    .Status, .Map, .Setting, .IoT, .alarmlog{
         font-size: 1.1rem;
     }
     .modal{
@@ -165,5 +191,9 @@
     }
     .Tabs{
         margin-top:12px !important;
+    }
+    .FourEightFiveBar{
+        width: 100%;
+        margin-top: 30px !important;
     }
 }

@@ -8,7 +8,6 @@ import React, {
 import {
   Form,
   Input,
-  Button,
   Card,
   Table,
   Modal,
@@ -33,7 +32,7 @@ import { DeviceStateMC } from "./components/DeviceStateC";
 import { DeviceSettingMC } from "./components/DeviceSettingC";
 import { healthIcon, strengthIcon } from "./components/TopologyF";
 import { TopoFilterMC } from "./components/Filter";
-import TrackMap from "../Track_Map/track_map";
+import TrackMap from "../Track_Map/TrackerMap";
 import { useTranslation } from 'react-i18next';
 
 const TopologyC = () => {
@@ -48,18 +47,16 @@ const TopologyC = () => {
     NodeInfoUrl,
     uploading
   );
-  const IoTUrl = `api/IoT_solar.json`;
-  const [_, IoTresponse] = useURLloader(IoTUrl);
   const [dataSource, setDataSource] = useState([]);
-  const [IoTDeviceList, setIoTDeviceList] = useState([]);
+  // const [IoTDeviceList, setIoTDeviceList] = useState([]);
   const [AlarmTablevisible, setAlarmTablevisible] = useState(false);
   const [DeviceStatevisible, setDeviceStatevisible] = useState(false);
   const [DeviceSettingvisible, setDeviceSettingvisible] = useState(false);
   const [IoTvisible, setIoTvisible] = useState(false);
   const [Mapvisible, setMapvisible] = useState(false);
-  const [deviceindex, setDeviceindex] = useState(0);
+  // const [deviceindex, setDeviceindex] = useState(0);
   const EditableContext = React.createContext();
-  const [drawerVisible, setDrawerVisible] = useState(false);
+  // const [drawerVisible, setDrawerVisible] = useState(false);
   const [AlarmRecord, setAlarmRecord] = useState([])
   const [DeviceStatusRecord, setDeviceStatusRecord]  = useState([]) 
   const [SettingRecord, setSettingRecord]  = useState([])
@@ -85,12 +82,13 @@ const TopologyC = () => {
     children,
     dataIndex,
     record,
-    // handleSave,
+    handleSave,
     ...restProps
   }) => {
     const [editing, setEditing] = useState(false);
     const inputRef = useRef();
     const form = useContext(EditableContext);
+
     useEffect(() => {
       if (editing) {
         inputRef.current.focus();
@@ -104,6 +102,8 @@ const TopologyC = () => {
       });
     };
 
+
+
     const save = async (e) => {
       try {
         const values = await form.validateFields();
@@ -112,12 +112,13 @@ const TopologyC = () => {
           return;
         }
         setUploading(true);
-        // handleSave({ ...record, ...values });
+        
         // const cid = localStorage.getItem("authUser.cid");
         const RenameUrl = `/cmd?set={"node_name":{"filter":{"cid":"${record.cid}"},"list":[{"id":"${record.id}","name":"${values.name}"}]}}`;
         axios
           .get(RenameUrl)
           .then((res) => {
+            handleSave({ ...record, ...values });
             console.log(res);
             message.success("rename successfully.");
             setUploading(false);
@@ -181,17 +182,8 @@ const TopologyC = () => {
     },
   };
 
-  // const handleSave = (row) => {
-  //   const newData = [...dataSource];
-  //   const index = newData.findIndex((item) => row.key === item.key);
-  //   const item = newData[index];
-  //   newData.splice(index, 1, { ...item, ...row });
-  //   setDataSource(newData);
-  // };
-
   useEffect(() => {
     if (NodeInfoResponse) {
-      // let responseData = NodeInfoResponse.response.device_status;
       let NodeInfo = [];
       // console.log(responseData);
       NodeInfoResponse.response.nodeInf.forEach((item, index) => {
@@ -209,20 +201,6 @@ const TopologyC = () => {
       setDataSource(NodeInfo);
     }
   }, [NodeInfoResponse]);
-
-  useEffect(() => {
-    console.log(IoTresponse)
-    if (IoTresponse) {
-      let IoTDeviceList = [];
-      IoTresponse.forEach((item) => {
-        IoTDeviceList.push(item.id);
-      });
-      setIoTDeviceList(IoTDeviceList);
-      console.log(IoTDeviceList)
-    }
-  }, [IoTresponse]);
-
-
 
   const menu = (record, index) => {
     return(
@@ -286,14 +264,14 @@ const TopologyC = () => {
         </Tooltip>
         <Tooltip title="View IoT">
           <a
-            disabled={IoTDeviceList.includes(record.id) ? false : true}
+            // disabled={IoTDeviceList.includes(record.id) ? false : true}
             href="/#"
             key={index}
             onClick={(e) => {
               e.preventDefault();
               setIoTvisible(true);
               setIoTRecord(record);
-              console.log(record, IoTDeviceList);
+              console.log(record);
             }}
           >
             <MdCastConnected className={styles.IoT} />
@@ -369,6 +347,14 @@ const TopologyC = () => {
     },
   ];
 
+  const handleSave = (row) => {
+    const newData = [...dataSource];
+    const index = newData.findIndex((item) => row.key === item.key);
+    const item = newData[index];
+    newData.splice(index, 1, { ...item, ...row });
+    setDataSource(newData)
+  };
+
   columns = columns.map((col) => {
     if (!col.editable) {
       return col;
@@ -381,7 +367,7 @@ const TopologyC = () => {
         editable: col.editable,
         dataIndex: col.dataIndex,
         title: col.title,
-        // handleSave: handleSave,
+        handleSave: handleSave,
       }),
     };
   });
@@ -396,46 +382,36 @@ const TopologyC = () => {
       
       <DeviceStateMC
         record={DeviceStatusRecord}
+        setRecord={setDeviceStatusRecord}
         DeviceStatevisible={DeviceStatevisible}
         setDeviceStatevisible={setDeviceStatevisible}
       />
 
-      {IoTresponse && (
+
         <TopoIoTMC
           IoTvisible={IoTvisible}
           setIoTvisible={setIoTvisible}
-          IoTresponse={IoTresponse}
-          deviceindex={deviceindex}
-          setDeviceindex={setDeviceindex}
+          // setDeviceindex={setDeviceindex}
           record={IoTRecord}
+          setRecord={setIoTRecord}
         />
-      )}
+
 
       <Modal
         visible={Mapvisible}
         onCancel={() => {
           setMapvisible(false);
-          setDrawerVisible(false);
+          // setDrawerVisible(false);
         }}
-        centered={true}
+        centered={false}
         width={"80%"}
-        title="GPS Tracker"
-        footer={[
-          <Button
-            key="confirm"
-            type="primary"
-            onClick={() => {
-              setMapvisible(false);
-              setDrawerVisible(false);
-            }}
-          >
-            Confirm
-          </Button>,
-        ]}
+        title="Location"
+        footer = {null}
+        className={styles.modal}
       >
         <TrackMap
-          drawerVisible={drawerVisible}
-          setDrawerVisible={setDrawerVisible}
+          // drawerVisible={drawerVisible}
+          // setDrawerVisible={setDrawerVisible}
           record={MapRecord}
         />
       </Modal>
@@ -445,9 +421,10 @@ const TopologyC = () => {
         setDeviceSettingvisible={setDeviceSettingvisible}
         // NodeInfoLoading={NodeInfoLoading}
         record={SettingRecord}
+        setRecord={setSettingRecord}
       />
       <Card style={{ marginBottom: "10px" }} className={styles.TopoTableCard}>
-        <TopoFilterMC setDataSource={setDataSource} dataSource={dataSource} />
+        <TopoFilterMC setDataSource={setDataSource} dataSource={dataSource} uploading={NodeInfoLoading}/>
       </Card>
       <Card bodyStyle={{ padding: "2px" }}>
         <Table

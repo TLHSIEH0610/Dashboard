@@ -95,6 +95,21 @@
   }
 }
 
+.spin {
+  text-align: center;
+  background: rgba(252, 250, 250, 0.05);
+  border-radius: 4px;
+  margin-bottom: 20px;
+  padding: 100px 30px ;
+  margin: 20px 0;
+}
+.Form{
+  width: 100% !important;
+}
+.EditTokenFormItem{
+  display: flex;
+  justify-content: center;
+}
 @media (max-width: 768px) {
   .name {
     width: 200px;
