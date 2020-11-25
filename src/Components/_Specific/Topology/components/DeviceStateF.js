@@ -1,5 +1,5 @@
 import React from "react";
-import { Descriptions, Space } from "antd";
+import { Descriptions } from "antd";
 import styles from "../topology.module.scss";
 import "echarts/lib/chart/bar";
 import ReactEchartsCore from "echarts-for-react/lib/core";
@@ -7,6 +7,8 @@ import echarts from "echarts/lib/echarts";
 import "echarts/lib/component/tooltip";
 import "echarts/lib/component/title";
 import "echarts/lib/component/legend";
+
+
 
 const IdentityTable = ({ DeviceIdentity }) => {
   return (

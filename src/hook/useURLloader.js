@@ -16,9 +16,9 @@ const useURLloader = (url, dep) => {
   useEffect(() => {
     setLoading(true);
     axios
-      .get(url)
+      .post(url)
       .then((res) => {
-        // console.log( '執行了',url)
+        console.log( '執行了',url)
         setData(res.data);
         setLoading(false);
       })
@@ -26,20 +26,18 @@ const useURLloader = (url, dep) => {
         console.log(error);
         setLoading(false);
         if (error.response && error.response.status === 401) {
-          const isAuthed = localStorage.getItem("auth.isAuthed");
-          if (!isAuthed) {
-            return;
-          }
           dispatch({
             type: "LogPath",
             payload: { LogPath: location.pathname },
           });
           UserLogOut();
-          history.push("/login");                                                                         
+          history.push("/userlogin");                                                                         
         } else {
           history.push("/internalerror");
         }
       });
+
+      // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dep, url]);
 
   return [loading, data];

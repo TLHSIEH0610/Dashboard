@@ -1,19 +1,32 @@
-import React, { useEffect, useState } from "react";
+import React, { Fragment, useEffect, useState, useContext } from "react";
 import styles from "./track_map.module.scss";
-import { Spin, Alert } from "antd";
+import { Spin, Alert, Modal, Form, DatePicker, Button, Drawer, Table, message } from "antd";
 import axios from "axios";
-import { Map, Marker, TileLayer, Popup } from "react-leaflet";
+import { Map, Marker, TileLayer, Popup, Polyline } from "react-leaflet";
+import moment from "moment";
+import Context from "../../../Utility/Reduxx";
+import { useHistory } from "react-router-dom";
+import { UserLogOut } from "../../../Utility/Fetch";
 
-const TrackMap = ({ record }) => {
-  // const [currentZoom, setCurrentZoom] = useState(17);
-  const currentZoom = 17;
+const { RangePicker } = DatePicker;
+
+const TrackMap = ({ record, Mapvisible, setMapvisible, setRecord }) => {
+  const [PolylineData, setPolylineData] = useState([]);
+  const [currentZoom, setCurrentZoom] = useState(17);
+  const [form] = Form.useForm();
   const [centerPosition, setCenterPosition] = useState([
     24.774222535724427,
     121.00916565583707,
   ]);
   const [coordinate, setCoordinate] = useState([]);
   const [uploading, setUploading] = useState(false);
+  const [GPSuploading, setGPSUploading] = useState(false);
   const [nodeInfo, setNodeInfo] = useState(null);
+  const [selectedDate, setselectedDate] = useState([]);
+  const [restoreCoordinates, setRestoreCoordinates] = useState([]);
+  const [drawerVisible, setDrawerVisible] = useState(false);
+  const history = useHistory();
+  const { dispatch } = useContext(Context);
 
 
   useEffect(() => {
@@ -21,13 +34,15 @@ const TrackMap = ({ record }) => {
       setUploading(true);
       const StatusUrl = `/cmd?get={"device_status":{"filter":{"id":"${record.id}"},"nodeInf":{},"obj":{}}}`;
       axios
-        .get(StatusUrl)
+        .post(StatusUrl)
         .then((res) => {
           const ResData = res.data.response.device_status[0].obj.status.gps;
-          console.log([ResData.latitude, ResData.longitude]);
+          // console.log([ResData.latitude, ResData.longitude]);
           setCoordinate([ResData.latitude, ResData.longitude]);
           setCenterPosition([ResData.latitude, ResData.longitude]);
-          res.data.response.device_status[0].nodeInf.lastUpdate = new Date(res.data.response.device_status[0].nodeInf.lastUpdate);
+          res.data.response.device_status[0].nodeInf.lastUpdate = new Date(
+            res.data.response.device_status[0].nodeInf.lastUpdate *1000
+          );
           setNodeInfo(res.data.response.device_status[0].nodeInf);
           setUploading(false);
         })
@@ -38,51 +53,202 @@ const TrackMap = ({ record }) => {
     }
   }, [record.id]);
 
+  const onFinish = (values) => {
+    setGPSUploading(true);
+    // console.log(values);
+    const from_time = values.RangePicker[0]._d.getTime()/1000;
+    const To_time = values.RangePicker[1]._d.getTime()/1000;
+    console.log(values.RangePicker[0]._d, values.RangePicker[1]._d)
+    const GPStrackUrl = `cmd?get={"gps_track":{"filter":{"id":"${record.id}"},"utc_range":{"start":${parseInt(from_time)},"end":${parseInt(To_time)}},"nodeInf":{},"obj":{}}}`;
+    console.log(parseInt(from_time), parseInt(To_time))
+    axios
+      .post(GPStrackUrl)
+      .then((res) => {
+        // console.log(res.data)
+        const coordinateArr = res.data.response.gps_track[0].gps.list
+        // console.log(coordinateArr)
+        setPolylineData(coordinateArr.map(item=>[item[1],item[2]]))
+        setselectedDate(coordinateArr);
+        // console.log(selectedDate)
+        if(coordinateArr?.length){
+          setRestoreCoordinates(coordinateArr)
+        }
+        setDrawerVisible(true);
+        setGPSUploading(false);
+      })
+      .catch((error) => {
+        if (error.response && error.response.status === 401) {
+          dispatch({ type: "setLogin", payload: { IsLogin: false } });
+          UserLogOut();
+          history.push("/userlogin");
+        }
+        console.log(error);
+        setGPSUploading(false);
+        message.error("no data");
+      });
+  };
 
-  return uploading ? (
-    <Spin>
-      <Alert
-        message="Getting Data"
-        description="We are now getting data from server, please wait for a few seconds"
-      />
-    </Spin>
-  ) : (
-    <Map
-      center={centerPosition}
-      zoom={currentZoom}
-      className={styles.TrackerMap}
+  function disabledDate(current) {
+    return (
+      current &&
+      (current < moment().subtract(7, "days") ||
+        current > moment().add(0, "days"))
+    );
+  }
+
+  const columns = [
+    {
+      title: "Time",
+      dataIndex: "readableTime",
+      render: (_, record) => {
+        const time = new Date(record[0]*1000);
+        return `${time.getFullYear()}-${
+          time.getMonth() + 1
+        }-${time.getDate()} ${time.getHours()}:${time.getMinutes()}`;
+      },
+    },
+    {
+      title: "Latitude",
+      dataIndex: "lat",
+      responsive: ['md'],
+      render: (_, record) => {
+        return record[1];
+      },
+    },
+    {
+      title: "Longitude",
+      dataIndex: "lng",
+      responsive: ['md'],
+      render: (_, record) => {
+        return record[2];
+      },
+    },
+    {
+      title: "height",
+      dataIndex: "height",
+      render: (_, record) => {
+        return record[3];
+      },
+    },
+  ];
+
+  return (
+    <Modal
+      visible={Mapvisible}
+      onCancel={() => {
+        setMapvisible(false);
+        setRecord({ id: null });
+        setDrawerVisible(false);
+      }}
+      centered={false}
+      width={"80%"}
+      title="Location"
+      footer={null}
+      style={drawerVisible&&{marginTop:'2%'}}
+      className={styles.modal}
     >
-      <TileLayer
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-      />
-      {coordinate && <Marker position={coordinate}>
-      {nodeInfo && <Popup>
-        Device: {nodeInfo.name !== "" ? nodeInfo.name : nodeInfo.id}
-        <br />
-        Status: {nodeInfo.health}
-        <br />
-        Signal: {nodeInfo.sim}
-        <br />
-        LastUpdate: {`${nodeInfo.lastUpdate.getFullYear()}-${
-          nodeInfo.lastUpdate.getMonth() + 1
-        }-${nodeInfo.lastUpdate.getDate()} ${nodeInfo.lastUpdate.getHours()}:${nodeInfo.lastUpdate.getMinutes()}`}
-        <br />
-      </Popup>}
-        
-        </Marker>}
+      {uploading ? (
+        <Spin>
+          <Alert
+            message="Getting Data"
+            description="We are now getting data from server, please wait for a few seconds"
+          />
+        </Spin>
+      ) : (
+        <Fragment>
+          <Drawer
+            placement={"top"}
+            closable={true}
+            onClose={() => {
+              setDrawerVisible(false);
+              setCoordinate(restoreCoordinates.length? [
+                restoreCoordinates.pop()[1],
+                restoreCoordinates.pop()[2],
+              ] : coordinate);
+              setCenterPosition(restoreCoordinates.length ?[
+                restoreCoordinates[restoreCoordinates.length - 1][1],
+                restoreCoordinates[restoreCoordinates.length - 1][2]
+              ] : coordinate);
+              setPolylineData([]);
+              // setCurrentZoom(12)
+            }}
+            bodyStyle={{ paddingTop: "2px" }}
+            visible={drawerVisible}
+            destroyOnClose={true}
+            mask={false}
+            maskClosable={false}
+          >
+            <Table
+              columns={columns}
+              dataSource={selectedDate}
+              className={styles.drawertable}
+              pagination={false}
+              rowKey={(index)=>index}
+              onRow={(record) => {
+                return {
+                  onClick: () => {
+                    setCenterPosition([record[1], record[2]]);
+                    setCoordinate([
+                        record[1],
+                        record[2],
+                    ]);
+                    setCurrentZoom(17);
+                  },
+                };
+              }}
+            />
+          </Drawer>
+          <Form
+            name="SelectTime"
+            onFinish={onFinish}
+            form={form}
+            style={{ display: "flex" }}
+          >
+            <Form.Item name="RangePicker">
+              <RangePicker disabledDate={disabledDate} format="YYYY-MM-DD" showTime={false} />
+            </Form.Item>
+            <Form.Item name="DateSubmite" style={{ marginLeft: "3%" }}>
+              <Button type="primary" htmlType="submit" loading={GPSuploading}>
+                Submit
+              </Button>
+            </Form.Item>
+          </Form>
+          <Map
+            center={centerPosition}
+            zoom={currentZoom}
+            className={styles.TrackerMap}
 
-    </Map>
+          >
+            <TileLayer
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+            />
+            {PolylineData && <Polyline positions={PolylineData}/> } 
+            {coordinate && (
+              <Marker position={coordinate}>
+                {nodeInfo && (
+                  <Popup>
+                    position: {`${coordinate[0]}, ${coordinate[1]}`}
+                    <br />
+                    Device: {nodeInfo.name !== "" ? nodeInfo.name : nodeInfo.id}
+                  </Popup>
+                )}
+              </Marker>
+            )}
+          </Map>
+        </Fragment>
+      )}
+    </Modal>
   );
 };
-
 export default TrackMap;
 
 // const [selectedDate, setselectedDate] = useState([]);
-
-// const [coordinates, setCoordinates] = useState([]);
 // const [restoreCoordinates, setRestoreCoordinates] = useState([]);
 // const [drawerVisible, setDrawerVisible] = useState(false);
+
+// const [coordinates, setCoordinates] = useState([]);
+
 // const [PolylineData, setPolylineData] = useState([]);
 
 // const onFinish = (values) => {
@@ -193,8 +359,7 @@ export default TrackMap;
 // ];
 // <div>
 
-{
-  /* <Card
+/* <Card
         
         bordered={false}
         style={{ padding: "0" }}
@@ -260,7 +425,6 @@ export default TrackMap;
           </Form.Item>
         </Form>
       </Card> */
-}
 
 // {Trackloading ? (
 //   <Spin tip="Loading...">

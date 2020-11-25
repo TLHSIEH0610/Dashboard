@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import {
   Form,
   Input,
@@ -11,6 +11,9 @@ import {
 import axios from "axios";
 import styles from "../management.module.scss";
 import useURLloader from "../../../../hook/useURLloader";
+import { UserLogOut } from '../../../../Utility/Fetch'
+import { useHistory } from 'react-router-dom'
+import Context from "../../../../Utility/Reduxx";
 
 const layout = {
   labelCol: {
@@ -28,16 +31,15 @@ const CreateSchemeF = ({CreateSchemevisible, setCreateSchemevisible, uploading, 
   const [form] = Form.useForm();
   const SchemeListUrl = `/scheme_mgnt?list_scheme={}`;
   const [SchemeLisloading, SchemeLisresponse] = useURLloader(SchemeListUrl);
-
-
-
-
+  const history = useHistory()
+  const { dispatch } = useContext(Context);
+  
   const CreateSchemeOnFinish = (values) =>{
       setUploading(true)
 
       const CreateSchemeUrl = `scheme_mgnt?create_scheme={"cid":"${values.cid}", "scheme_list":{"user":${values.user},"group":${values.group},"device":${values.device},"expire":${values.expire._d.getTime()},"tracking":${values.tracking},"tracking_pool":${values.tracking_pool},"iot":${values.iot},"iot_poor":${values.iot_poor},"period_status":${values.period_status},"period_gps":${values.period_gps},"period_alive":${values.period_alive},"period_iot":${values.period_iot},"alive_timeout":${values.alive_timeout}}}`
 
-      axios.get(CreateSchemeUrl).then((res)=>{
+      axios.post(CreateSchemeUrl).then((res)=>{
         console.log(res.data)
         setUploading(false)
         message.success("create successfully.");
@@ -45,6 +47,11 @@ const CreateSchemeF = ({CreateSchemevisible, setCreateSchemevisible, uploading, 
       })
       .catch((error)=>{
         console.log(error)
+        if (error.response && error.response.status === 401) {
+          dispatch({ type: "setLogin", payload: { IsLogin: false } });
+          UserLogOut();
+          history.push("/userlogin");                                                                         
+        } 
         setUploading(false)
         message.error("create fail.");
       })

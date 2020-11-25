@@ -20,6 +20,7 @@ const TopoFilterC = ({ setDataSource, dataSource, uploading }) => {
     }
     setRestore(dataSource);
     form.setFieldsValue({ device: [], model: [], health: [], strength: [] });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [count.current, dataSource, uploading]);
 
   useEffect(() => {
@@ -66,6 +67,7 @@ const TopoFilterC = ({ setDataSource, dataSource, uploading }) => {
         dispatch({ type: "setMaptoTopo", payload: { device: "" } });
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [restore]);
 
   const onFinish = (values) => {

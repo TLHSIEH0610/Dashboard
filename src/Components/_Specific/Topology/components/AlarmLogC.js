@@ -1,11 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { Modal, Table, Button, Tabs } from "antd";
 import styles from "../topology.module.scss";
 import axios from "axios";
+import { UserLogOut } from '../../../../Utility/Fetch'
+import { useHistory } from 'react-router-dom'
+import Context from "../../../../Utility/Reduxx";
 
 const { TabPane } = Tabs;
 
 const AlarmLogC = ({
+  setRecord,
   record,
   setAlarmTablevisible,
   AlarmTablevisible,
@@ -13,67 +17,68 @@ const AlarmLogC = ({
   const [alarmLog, setAlarmLog] = useState([]);
   const [currentAlarm, setCurrentAlarm] = useState([]);
   const [uploading, setUploading] = useState(false);
+  const history = useHistory()
+  const { dispatch } = useContext(Context);
 
   useEffect(() => {
-    const AlarmLogUrl = `/cmd?get={"alarm_log":{"filter":{"id":"${record.id}"}}}`;
-    setUploading(true);
-    axios
-      .get(AlarmLogUrl)
-      .then((res) => {
-        let alarmLog = [];
-        res.data.response.alarm_log.list[0].alarm_list.forEach(
-          (item, index) => {
-            item.key = index;
-            alarmLog.push(item);
-          }
-        );
-        setAlarmLog(alarmLog);
-        setUploading(false);
-      })
-      .catch(() => {
-        setUploading(false);
-      });
-  }, [record]);
+    if(record.id){
+      setUploading(true);
+    function AlarmLogUrl() {
+      return axios.post(`/cmd?get={"alarm_log":{"filter":{"id":"${record.id}"}}}`)
+    }
+    function CurrentAlarmUrl() {
+      return axios.post(`/cmd?get={"current_alarm":{"filter":{"id": "${record.id}"}}}`)
+    }
+    axios.all([AlarmLogUrl(), CurrentAlarmUrl()])
+    .then(axios.spread((acct, perms) => {
+      let alarmLog = [];
+      acct.data.response.alarm_log.list[0].alarm_list.forEach(
+        (item, index) => {
+          item.key = index;
+          alarmLog.push(item);
+        }
+      );
+      setAlarmLog(alarmLog);
 
-  useEffect(() => {
-    const CurrentAlarmUrl = `/cmd?get={"current_alarm":{"filter":{"id": "${record.id}"}}}`;                        
-    setUploading(true);
-    axios
-      .get(CurrentAlarmUrl)
-      .then((res) => {
-        let currentAlarm = [];
-        res.data.response.current_alarm.list[0].alarm_list.forEach(
-          (item, index) => {
-            item.key = index;
-            currentAlarm.push(item);
-          }
-        );
-        setCurrentAlarm(currentAlarm);
-        setUploading(false);
-      })
-      .catch(() => {
-        setUploading(false);
-      });
-  }, [record]);
+      let currentAlarm = [];
+      perms.data.response.current_alarm.list[0].alarm_list.forEach(
+        (item, index) => {
+          item.key = index;
+          currentAlarm.push(item);
+        }
+      );
+      setCurrentAlarm(currentAlarm);
+
+      setUploading(false);
+    }))
+    .catch((error) => { 
+      if (error.response && error.response.status === 401) {
+        dispatch({ type: "setLogin", payload: { IsLogin: false } });
+        UserLogOut();
+        history.push("/userlogin");                                                                         
+      } 
+      console.error(error); 
+      setUploading(false); })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [record.id]);
+
 
   const alarmcolumns = [
     {
       title: "Level",
       dataIndex: "level",
       key: "level",
-      // ...getColumnSearchProps("level"),
     },
     {
       title: "Message",
       dataIndex: "message",
       key: "message",
-      // ...getColumnSearchProps("message"),
     },
     {
       title: "TrigerTime",
       dataIndex: "trigger_time",
       key: "trigger_time",
-      // ...getColumnSearchProps("trigger_time"),
       render:(text) => {
         let date = new Date(text * 1000);
         return(
@@ -87,7 +92,6 @@ const AlarmLogC = ({
       title: "RecoverTime",
       dataIndex: "recover_time",
       key: "recover_time",
-      // ...getColumnSearchProps("recover_time"),
       render:(text) => {
         let date = new Date(text * 1000);
         return(
@@ -102,9 +106,8 @@ const AlarmLogC = ({
     <>
       <Modal
         visible={AlarmTablevisible}
-        onCancel={() => setAlarmTablevisible(false)}
+        onCancel={() => {setAlarmTablevisible(false); setRecord({cid:null})}}
         centered={true}
-        // width={"70%"}
         className={styles.modal}
         destroyOnClose={true}
         footer={[

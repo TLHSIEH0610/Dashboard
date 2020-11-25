@@ -7,7 +7,7 @@ import "echarts/lib/component/title";
 import "echarts/lib/component/legend";
 import { useHistory } from 'react-router-dom'
 import Context from '../../../Utility/Reduxx'
-import { Translator } from '../../../i18n/index'
+// import { Translator } from '../../../i18n/index'
 
 const PieChartC = ({ dataSource, data, name }) => {
   const history = useHistory()
@@ -18,16 +18,16 @@ const PieChartC = ({ dataSource, data, name }) => {
     const option = {
       title: {
         text: name,
-        subtext: `\n \n \n \n \n \n \n \n \n ${ dataSource ? Translator("ISMS.Sum") : 'no data'}  ${dataSource ? dataSource.reduce(function(a, b) {
+        subtext: `\n \n \n \n \n  ${dataSource ? dataSource.reduce(function(a, b) {
             return a + b
 
           ;
-      }, 0) : '' }  `,
+      }, 0) : 'no data' }  `,
         left: "center",
         padding: [10, 0],
         subtextStyle: {
           color: 'black',
-          fontSize: 15,
+          fontSize: 25,
           fontWeight:'bold'
         }
       },

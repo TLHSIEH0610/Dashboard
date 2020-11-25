@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { Map, Marker, Popup, TileLayer, Polyline } from "react-leaflet";
 import styles from "./track_map.module.scss";
 import MarkerClusterGroup from "react-leaflet-markercluster";
-import { Card } from "antd";
+// import { Card } from "antd";
 import useURLloader from "../../../hook/useURLloader";
 import { Icon } from "leaflet";
 import { Tag } from 'antd'
@@ -70,7 +70,6 @@ const OpenStreetMapC = ({ centerPosition, currentZoom, coordinates, PolylineData
               <Marker key={index} position={[item.lat, item.lng]} icon={item.health==='up'? normal : alarm}>
                 <Popup
                 >
-                  
                    <Tag color={item.health==='up'? 'green' : 'red' }>Health: {item.health}</Tag>
                   <br />
                   <br />

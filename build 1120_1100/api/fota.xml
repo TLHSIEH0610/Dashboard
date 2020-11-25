@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<firmware>
+  <information>
+    <ModelName>ICR-401</ModelName>
+    <Version>1.74</Version>
+    <force>0</force>
+    <MD5>5b5d219a8e05f4ac042e3a9b5d4eb02b</MD5>
+    <name>m330w-firmware.img</name>
+    <SoftwareMCSV>014B00000062E909</SoftwareMCSV>
+    <Transport>
+        <Protocol>ftp</Protocol>
+        <Host>60.250.198.239</Host>
+        <Port>2121</Port>
+        <Path></Path>
+        <LoginName></LoginName>
+        <PassWord></PassWord>
+    </Transport>
+  </information>  
+</firmware>

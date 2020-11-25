@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Modal, Tabs, Spin, Alert } from "antd";
+import React, { useEffect, useState, useContext } from "react";
+import { Modal, Tabs, Spin, Alert, Button } from "antd";
 import styles from "../topology.module.scss";
 import axios from "axios";
 // import useURLloader from "../../../../hook/useURLloader";
@@ -13,6 +13,7 @@ import {
 } from "./DeviceStateF";
 import { UserLogOut } from "../../../../Utility/Fetch";
 import { useHistory } from 'react-router-dom'
+import Context from "../../../../Utility/Reduxx";
 
 const { TabPane } = Tabs;
 
@@ -26,49 +27,34 @@ const DeviceStateC = ({
   const [uploading, setUploading] = useState(false);
   const [DeviceIdentity, setDeviceIdentity] = useState([]);
   const history = useHistory()
-
+  const { dispatch } = useContext(Context);
+  
   useEffect(() => {
     if (record.id) {
-      const DeviceStatusUrl = `/cmd?get={"device_status":{"filter":{"id":"${record.id}"},"nodeInf":{},"obj":{}}}`;
-      setUploading(true);
-      axios
-        .get(DeviceStatusUrl)
-        .then((res) => {
-          // console.log(res);
-          setDeviceStatus(res.data.response.device_status[0].obj);
-          setUploading(false);
-        })
-        .catch((error) => {
-          console.log(error);
-          setUploading(false);
-          if (error.response.status === 401) {
-            UserLogOut();
-            history.push("/login");
-          }
-        });
+      setUploading(true)
+      function DeviceStatusUrl() {
+        return axios.post(`/cmd?get={"device_status":{"filter":{"id":"${record.id}"},"nodeInf":{},"obj":{}}}`)
+      }
+      function DeviceIdentityUrl() {
+        return axios.post(`/cmd?get={"device_identity":{"filter":{"id":"${record.id}"},"nodeInf":{},"obj":{}}}`)
+      }
+      axios.all([DeviceStatusUrl(), DeviceIdentityUrl()])
+      .then(axios.spread((acct, perms) => {
+        setDeviceStatus(acct.data.response.device_status[0].obj);
+        setDeviceIdentity(perms.data.response.device_identity[0].obj.identity);
+        setUploading(false);
+      }))
+      .catch((error) => { 
+        console.error(error)
+        setUploading(false);
+        if (error.response.status === 401) {
+          dispatch({ type: "setLogin", payload: { IsLogin: false } });
+          UserLogOut();
+          history.push("/userlogin");
+        }
+      })
     }
-  }, [record.id]);
-
-  useEffect(() => {
-    if (record.id) {
-      const DeviceStatusUrl = `/cmd?get={"device_identity":{"filter":{"id":"${record.id}"},"nodeInf":{},"obj":{}}}`;
-      setUploading(true);
-      axios
-        .get(DeviceStatusUrl)
-        .then((res) => {
-          // console.log(res);
-          setDeviceIdentity(res.data.response.device_identity[0].obj.identity);
-          setUploading(false);
-        })
-        .catch((error) => {
-          console.log(error);
-          setUploading(false);
-          if (error.response.status === 401) {
-            UserLogOut();
-            history.push("/login");
-          }
-        });
-    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [record.id]);
 
   return (
@@ -77,16 +63,16 @@ const DeviceStateC = ({
       onCancel={() => {setDeviceStatevisible(false); setRecord({id:null})}}
       destroyOnClose={true}
       className={styles.modal}
-      footer={null}
-      // footer={[
-      //   <Button
-      //     key="confirm"
-      //     type="primary"
-      //     onClick={() => setDeviceStatevisible(false)}
-      //   >
-      //     Confirm
-      //   </Button>,
-      // ]}
+      // footer={null}
+      footer={[
+        <Button
+          key="confirm"
+          type="primary"
+          onClick={() => setDeviceStatevisible(false)}
+        >
+          Confirm
+        </Button>,
+      ]}
     >
       {DeviceStatus.status && !uploading ? (
         <Tabs defaultActiveKey="1" className={styles.Tabs}>

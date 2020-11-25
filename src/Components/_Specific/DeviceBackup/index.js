@@ -5,13 +5,14 @@ import RepositoryC from './Components/Repository'
 import styles from "./devicebackup.module.scss";
 import { Tabs } from 'antd';
 import { MdBackup, MdSettingsBackupRestore } from 'react-icons/md'
-import Fota_Input from '../Fota_Input/fota_input'
+// import Fota_Input from '../Fota_Input/fota_input'
 import { FaDatabase } from 'react-icons/fa'
 import { Translator } from '../../../i18n/index'
 
 const { TabPane } = Tabs;
 const AllinOneC = () => {
   const [uploading, setUploading] = useState(false)  
+  const [IsUpdate, setIsUpdate] = useState(false)
 
   return (
     <Fragment>
@@ -28,7 +29,7 @@ const AllinOneC = () => {
           >
             <div className={styles.wrap}>
               <BkRsUgC  uploading= {uploading} setUploading={setUploading} />
-              <ActionStatusC uploading= {uploading} setUploading={setUploading} />
+              <ActionStatusC uploading= {uploading} setUploading={setUploading} setIsUpdate={setIsUpdate} IsUpdate={IsUpdate}/>
             </div>
           </TabPane>
           <TabPane
@@ -41,7 +42,7 @@ const AllinOneC = () => {
             key="2"
           >
             <div className={styles.wrap}>
-              <RepositoryC uploading= {uploading} setUploading={setUploading}/>
+              <RepositoryC uploading= {uploading} setUploading={setUploading} setIsUpdate={setIsUpdate} IsUpdate={IsUpdate}/>
             </div>
           </TabPane>
           <TabPane
@@ -55,7 +56,7 @@ const AllinOneC = () => {
             key="3"
           >
             <div className={styles.wrap}>
-              <Fota_Input />
+              {/* <Fota_Input /> */}
             </div>
           </TabPane>
         </Tabs>

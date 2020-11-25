@@ -9,13 +9,13 @@ import { Translator } from '../../../i18n/index'
 const PieChart = () => {
   const { state } = useContext(Context) 
   const cid = localStorage.getItem('authUser.cid')
-  const url =cid==='proscend' ? `/cmd?get={"statistic":{"filter":{${state.Login.Cid}}}}`:`/cmd?get={"statistic":{"filter":{"cid":"${cid}"}}}` ;
-
-  const [loading, response] = useURLloader(url);
+  const level = localStorage.getItem('authUser.level')
+  const StatisticUrl = level==='super_super' ? `/cmd?get={"statistic":{"filter":{${state.Login.Cid}}}}`:`/cmd?get={"statistic":{"filter":{"cid":"${cid}"}}}` ;
+  const [loading, response] = useURLloader(StatisticUrl);
   const [PieData, setPieData] = useState([]);
 
   useEffect(() => {
-    if (response) {
+    if (response && response.response) {
 
       setPieData(response.response.statistic.obj);
     }
@@ -24,7 +24,7 @@ const PieChart = () => {
   return (
     <Fragment>
       <div className={styles.PieWrapper}>
-        <Card className={styles.PieCard} bodyStyle={{padding:0}}>
+        <Card className={styles.PieCard} bodyStyle={{padding:0}} > 
 
           {loading ? 
           <Spin>

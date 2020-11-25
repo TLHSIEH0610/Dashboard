@@ -16,22 +16,23 @@ import { Translator } from '../../../../i18n/index'
 
 const { Step } = Steps;
 
-const ActionStatusC = ({ uploading, setUploading }) => {
-  const { state, dispatch } = useContext(Context)  
+const ActionStatusC = ({ setIsUpdate, IsUpdate }) => {
+  const { state, dispatch } = useContext(Context) 
   const [event, setEvent] = useState([
     { name: "", action: "", key: "", model: "", state: "" },
   ]);
   const [count, setCount] = useState(0);
-  const [tableUploading, setTableUploading] = useState(false)
+  const [uploading, setUploading] = useState(false)
   // const IsActionUpdated = state.BackupRestore.IsActionUpdated
   const cid = localStorage.getItem("authUser.cid");
+  const level = localStorage.getItem("authUser.level");
 
 
   useEffect(() => {
-    setTableUploading(true)
-    const ActionStateUrl = cid==='proscend' ? `/cmd?get={"bck_rst_upg_list":{"list":{${state.Login.Cid}}}}`: `/cmd?get={"bck_rst_upg_list":{"list":{"cid":"${cid}"}}}`;     
+    setUploading(true)
+    const ActionStateUrl = level==='super_super' ? `/cmd?get={"bck_rst_upg_list":{"list":{${state.Login.Cid}}}}`: `/cmd?get={"bck_rst_upg_list":{"list":{"cid":"${cid}"}}}`;     
 
-    axios.get(ActionStateUrl).then((res) => {
+    axios.post(ActionStateUrl).then((res) => {
       let responseData = [];
       res.data.response &&(
         res.data.response.bck_rst_upg.forEach((item, index) => {
@@ -46,7 +47,7 @@ const ActionStatusC = ({ uploading, setUploading }) => {
           })
         }))
       if (JSON.stringify(responseData) === JSON.stringify(event)) {
-
+        setUploading(false)
         return;
       }
 
@@ -54,9 +55,9 @@ const ActionStatusC = ({ uploading, setUploading }) => {
 
       dispatch({type:'ActionStatusList', payload:{ActionStatusList: responseData}})
       // dispatch({type:'IsActionUpdated', payload:{IsActionUpdated: false}})
-      setTableUploading(false)
+      setUploading(false)
     }).catch(()=>{
-      setTableUploading(false)
+      setUploading(false)
     })
 
     const stateInterval = setInterval(() => {
@@ -64,8 +65,8 @@ const ActionStatusC = ({ uploading, setUploading }) => {
     }, 10000);
 
     return () => clearInterval(stateInterval);
-
-  }, [count, uploading, state.Login.Cid]);
+// eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [count, IsUpdate, state.Login.Cid]);
 
   const getColumnSearchProps = (dataIndex) => ({
     filterDropdown: ({
@@ -153,12 +154,13 @@ const ActionStatusC = ({ uploading, setUploading }) => {
 
   function clearHistory(id) {
     setUploading(true)
-    let url = `/cmd?set={"bck_rst_upg_list":{"delete":{"id":"${id}"}}}`;
-    console.log(url)
-    axios.get(url).then((res) => {
+    let ClearHistoryUrl = `/cmd?set={"bck_rst_upg_list":{"delete":{"id":"${id}"}}}`;
+    console.log(ClearHistoryUrl)
+    axios.post(ClearHistoryUrl).then((res) => {
       console.log(res)
       setCount((prevState) => prevState + 1)
       setUploading(false)
+      setIsUpdate(!IsUpdate)
       message.success('clear successfully.')
     })
     .catch((error)=>{
@@ -205,7 +207,7 @@ const ActionStatusC = ({ uploading, setUploading }) => {
               title="Sure to delete?"
               onConfirm={() => clearHistory(record.id)}
             >
-              <Button key={index}>clear</Button>
+              <Button key={index} loading={uploading}>clear</Button>
             </Popconfirm>
           }
         </Fragment>
@@ -225,7 +227,7 @@ const ActionStatusC = ({ uploading, setUploading }) => {
           dataSource={event}
           pagination={false}
           className={styles.table}
-          loading={(count===0 && tableUploading) || uploading}
+          loading={(count===0 && uploading)}
           expandable={{
             expandedRowRender: (record) => (
               <div className={styles.step}>

@@ -6,8 +6,8 @@ export default Context;
 
 //建立全局Reducer
 const iniState = {
-  Global: { innerWidth:'', innerHeight:'', IsMD: false, showNav: true, Lang:'en' },
-  Login: { IsLogin: false, LogPath: "/", User: null, Cid: "" },
+  Global: { innerWidth:'', innerHeight:'', IsMD: false, showNav: true, Lang:'en', IsUpdate:false },
+  Login: { IsLogin: true, LogPath: "/", User: null, Cid: ""},
   Topology: { id: "id", deviceStatusByID: "", health: null, strength: null, device: null },
   BackupRestore: {
     BackupReq: "",
@@ -80,6 +80,10 @@ const reducer = (state = iniState, action) => {
     case "setShowNav":
       newState = { ...state };
       newState.Global.showNav = action.payload.showNav;
+      return newState;
+    case "setIsUpdate":
+      newState = { ...state };
+      newState.Global.IsUpdate = action.payload.IsUpdate;
       return newState;
     default:
       return state;

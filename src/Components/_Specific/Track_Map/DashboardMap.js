@@ -33,14 +33,14 @@ export const normal = new Icon({
 const DashboardMap = () => {
   const { state, dispatch } = useContext(Context);
   const cid = localStorage.getItem("authUser.cid");
+  const level = localStorage.getItem("authUser.level");
   const history = useHistory();
   const StatusUrl = `/cmd?get={"device_status":{"filter":{${
-    cid === "proscend"
-      ? state.Login.Cid === ""
-        ? ""
-        : state.Login.Cid
+    level === "super_super"
+      ? state.Login.Cid
       : `"cid":"${cid}"`
   }},"nodeInf":{},"obj":{}}}`;
+  // console.log(StatusUrl)
   const [Statusloading, StatusResponse] = useURLloader(StatusUrl);
   // const [currentZoom, setCurrentZoom] = useState(13);
   const currentZoom = 8

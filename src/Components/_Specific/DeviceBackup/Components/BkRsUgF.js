@@ -58,14 +58,6 @@ const BkRsUgF = ({
         return false;
       }
 
-      // const node = NodeData.filter((item)=>{
-      //   if(item.name === device){
-      //     return item
-      //   }else {
-      //     return null
-      //   }
-      // })
-      // console.log(node)
       BRUData.push(
         `{${
           cid === "proscend"
@@ -87,7 +79,7 @@ const BkRsUgF = ({
     if(!BRUData.length){setUploading(false); return}
     console.log(BRUUrl);
     axios
-      .get(BRUUrl)
+      .post(BRUUrl)
       .then((res) => {
         console.log(res);
         message.success("action submit successfully.");
@@ -105,7 +97,7 @@ const BkRsUgF = ({
   const { Option } = Select;
 
   function tagRender(props) {
-    const { label, _, closable, onClose } = props;
+    const { label, _, closable, onClose } = props; // eslint-disable-line no-unused-vars
     return (
       <Tag
         color="black"

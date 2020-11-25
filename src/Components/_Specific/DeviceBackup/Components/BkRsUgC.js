@@ -14,10 +14,11 @@ const BkRsUgC = ({ uploading, setUploading }) => {
   const [selectedModel, setSelectedModel] = useState("");
   const [ModelList, setModelList] = useState([]);
   const cid = localStorage.getItem("authUser.cid");
-  const NodeUrl = `/cmd?get={"nodeInf":{"filter":{${cid==='proscend'?  state.Login.Cid : `"cid":"${cid}"` }},"nodeInf":{"cid":{},"gid":{},"token":{},"id":{},"model":{},"name":{}}}}`;
+  const level = localStorage.getItem("authUser.level");
+  const NodeUrl = `/cmd?get={"nodeInf":{"filter":{${level==='super_super'?  state.Login.Cid : `"cid":"${cid}"` }},"nodeInf":{"cid":{},"gid":{},"token":{},"id":{},"model":{},"name":{}}}}`;
   const [Nodeloading, Noderesponse] = useURLloader(NodeUrl, uploading);
   const [NodeData, setNodeData] = useState([]);
-  const FileRepostoryUrl = `repository?list_file={${cid==='proscend'? state.Login.Cid : `"cid":"${cid}"`}}`;
+  const FileRepostoryUrl = `repository?list_file={${level==='super_super'? state.Login.Cid : `"cid":"${cid}"`}}`;
   const [Fileloading, Filereponse] = useURLloader(FileRepostoryUrl, uploading);
   const props ={ uploading, setUploading, Nodeloading, Fileloading, form, FileRepository, userModel, NodeData, setUserModel, ModelList,  setSelectedModel, selectedModel }
 
@@ -40,6 +41,7 @@ const BkRsUgC = ({ uploading, setUploading }) => {
       form.resetFields()
       // console.log(NodeData,Allmodel)
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps  
   }, [Noderesponse]);
 
   useEffect(() => {

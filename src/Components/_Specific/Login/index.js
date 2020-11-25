@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { Form, Input, Button, Card } from "antd";
 import Swal from "sweetalert2";
 import { useHistory } from "react-router-dom";
@@ -21,16 +21,18 @@ const layout = {
 
 const LoginInput = () => {
   const { state, dispatch } = useContext(Context);
+  const [uploading, setUploading] = useState(false)
   const history = useHistory();
   const { t } = useTranslation();
   const OnFinish = (values) => {
-    console.log(values);
+    // console.log(values);
+    setUploading(true)
     const LogInUrl = `/login?user={"name":"${values.name}","password":"${values.password}"}`;
-    console.log(LogInUrl);
+    // console.log(LogInUrl);
     axios
-      .get(LogInUrl, { credentials: 'include' })
+      .post(LogInUrl, { credentials: 'include' })
       .then((res) => {
-        console.log(res.data, res.data.response.name);
+        // console.log(res.data, res.data.response.name);
         Swal.fire({
           title: t("ISMS.SignInSuccess"), 
           icon: "success",
@@ -41,8 +43,12 @@ const LoginInput = () => {
         localStorage.setItem("authUser.cid", res.data.response.cid);
         localStorage.setItem("authUser.level", res.data.response.level);
         localStorage.setItem("auth.isAuthed", true);
+        setUploading(false)
         dispatch({ type: "setUser", payload: { User: res.data.response.name } });
-        if (state.Login.LogPath) {
+        dispatch({ type: "setCid", payload: { Cid: "" } })
+        dispatch({ type: "setLogin", payload: { IsLogin: true } });
+        if (state.Login.LogPath && state.Login.LogPath!=='/login') {
+          // console.log(state.Login.LogPath)
           history.push(state.Login.LogPath);
         } else {
           history.push("/");
@@ -56,7 +62,8 @@ const LoginInput = () => {
           showConfirmButton: false,
           timer: 1200,
         })
-        history.push("/login");
+        setUploading(false)
+        history.push("/userlogin");
       });
   };
 
@@ -107,13 +114,13 @@ const LoginInput = () => {
           />
         </Form.Item>
         <Form.Item>
-          <Button type="primary" htmlType="submit">
+          <Button type="primary" htmlType="submit" loading={uploading}>
             {/* Log-in */}
             {Translator('ISMS.Login')}
           </Button>
         </Form.Item>
       </Form>
-      <div
+      {/* <div
         className={styles.registerBtn}
         onClick={() => {
           history.push("/register");
@@ -121,7 +128,7 @@ const LoginInput = () => {
       >
         <span>{Translator('ISMS.goRegister1')}</span> {Translator('ISMS.goRegister2')}
         
-      </div>
+      </div> */}
     </Card>
   );
 };

@@ -3,8 +3,8 @@ import Dashboard from '../Pages/Dashboard'
 import Topology from '../Pages/Topology'
 import Backup from '../Pages/BackupStore'
 import Management from '../Pages/Management'
-import IoT from '../Pages/IoT'
-import { FcPieChart, FcParallelTasks, FcMultipleSmartphones, FcEngineering, FcRotateToPortrait } from 'react-icons/fc'
+// import IoT from '../Pages/IoT'
+import { FcPieChart, FcParallelTasks, FcRotateToPortrait, FcEngineering } from 'react-icons/fc'
 
 
 export const NavRoutes = [
@@ -46,7 +46,7 @@ export const NavRoutes = [
         icon: <FcEngineering style={{fontSize:'1.5rem'}}/>,
         cName: 'NavText',
         auth: true,
-        super:true,
+        // super:true,
         component: Management
 
     },

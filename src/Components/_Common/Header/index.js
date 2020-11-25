@@ -1,26 +1,46 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useEffect, useContext, useState } from "react";
 import styles from "./header.module.scss";
 import { Menu, Select } from "antd";
 import { FcManager, FcList } from "react-icons/fc";
 import { FaLanguage } from "react-icons/fa";
 import Context from "../../../Utility/Reduxx";
-import { UserLogOut } from "../../../Utility/Fetch";
-import Swal from "sweetalert2";
-import { useHistory } from "react-router-dom";
+import axios from 'axios'
+// import Swal from "sweetalert2";
+// import { useHistory } from "react-router-dom";
 import i18n from 'i18next';
-import { Translator } from '../../../i18n/index'
+// import { Translator } from '../../../i18n/index'
+// import useURLloader from "../../../hook/useURLloader";
 
 const { SubMenu } = Menu;
 const { Option } = Select;
 
 const Header = () => {
   const { state, dispatch } = useContext(Context);
-  const [User, setUser] = useState(localStorage.getItem("authUser.name"));
-  const history = useHistory()
+  const User = localStorage.getItem("authUser.name")
+  // const [User, setUser] = useState(localStorage.getItem("authUser.name"));
+  // const history = useHistory()
+  const level = localStorage.getItem('authUser.level')
+  // const CustomerListUrl = `/inf_mgnt?list_inf={}`;
+  // const [CustomerListloading, CustomerListResponse] = useURLloader(CustomerListUrl, state.Login.Cid);
+  const [CustomerList, setCustomerList] = useState(null)
+  const [uploading, setUploading] = useState(false)
+  // console.log(CustomerListResponse)
+
+  // setAuth(localStorage.getItem("auth.isAuthed"));
+
 
   useEffect(() => {
-    setUser(localStorage.getItem("authUser.name"));
-  }, [state.Login.User]);
+    setUploading(true)
+    const CustomerListUrl = `/inf_mgnt?list_inf={}`;
+    axios.post(CustomerListUrl).then((res)=>{
+      setUploading(false)
+      setCustomerList(res.data)
+    })
+    .catch((error)=>{
+      setUploading(false)
+      console.log(error)
+    })
+  }, [state.Login.Cid, state.Global.IsUpdate]);
 
   function handleChange(value) {
     console.log(`selected ${value}`);
@@ -32,23 +52,6 @@ const Header = () => {
       i18n.changeLanguage(state.Global.Lang)
   };
 }, [state.Global.Lang]);
-
-  const logout = async () => {
-    console.log('logout')
-    localStorage.clear();
-    await UserLogOut();
-    // setAuth(false);
-    Swal.fire({
-      title: "Sign Out Success",
-      icon: "success",
-      showConfirmButton: false,
-      timer: 1200,
-    })
-    dispatch({ type: "setUser", payload: { User: "" } });
-    history.push("/login");
-  };
-
-
 
   return (
     <div className={styles.head}>
@@ -75,35 +78,41 @@ const Header = () => {
         <SubMenu
           key="user"
           icon={<FcManager className={styles.user} />}
-          title={User}
+          title={state.Login.IsLogin && User}
         >
-          <Menu.Item key="setting2" onClick={()=>{
-            history.push('/mysetting')
-          }}>{Translator("ISMS.Setting")}</Menu.Item>
-          <Menu.Item key="setting3" onClick={()=>logout()}>{Translator("ISMS.LogOut")}</Menu.Item>
+          {/* <Menu.Item key="setting2" onClick={()=>{
+            history.push('/management')
+          }}>{Translator("ISMS.Setting")}</Menu.Item> */}
+          {/* <Menu.Item key="setting3" onClick={()=>Logout()}>{Translator("ISMS.LogOut")}</Menu.Item> */}
         </SubMenu>
       </Menu>
 
-      {User === "super@proscend.com" && (
+      {(level === "super_super" && state.Login.IsLogin) && (
         <Menu
           mode="horizontal"
           className={styles.menu}
         >
           <Menu.Item key="s1" className={styles.superSelect}>
             <Select
-              defaultValue="Super"
-              style={{ width: 100 }}
+              defaultValue="All Customer"
+              style={{ width: 130 }}
               onChange={handleChange}
+              loading={uploading}
+              disabled={uploading}
             >
-              <Option value="">Super</Option>
-              <Option value='"cid":"proscend"'>Proscend-1</Option>
-              <Option value='"cid":"proscend-2"'>Proscend-2</Option>
-              <Option value='"cid":"proscend-3"'>Proscend-3</Option>
+              <Option value="">All Customer</Option>
+              {CustomerList &&
+                CustomerList.response.map((item, index)=>{
+                  return(
+                  <Option key={index} value={`"cid":"${item.cid}"`}>{item.inf_list.company}</Option>
+                  )
+                })
+              }
             </Select>
           </Menu.Item>
         </Menu>
       )}
-      <Menu
+      {state.Global.innerWidth > 490 && <Menu
         mode="horizontal"
         className={styles.menu}
       >
@@ -122,7 +131,7 @@ const Header = () => {
           <Menu.Item key="zh-TW">ZH 繁體中文</Menu.Item>
           <Menu.Item key="en">EN 英文</Menu.Item>
         </SubMenu>
-      </Menu>
+      </Menu>}
     </div>
   );
 };

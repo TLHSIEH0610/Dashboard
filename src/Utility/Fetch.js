@@ -22,8 +22,6 @@ export async function UserLogOut() {
     const url = "/logout"
     let response
     try{
-        const cid = localStorage.getItem('authUser.cid')
-        if(!cid){return}
         response = await fetch(url, { credentials: 'include' })
         console.log(response)
         localStorage.clear()
@@ -35,3 +33,6 @@ export async function UserLogOut() {
         return response
     }
 }
+
+
+

@@ -11,14 +11,15 @@ import {
   Tooltip,
   Popconfirm,
   Button,
-  Empty
+  Empty,
 } from "antd";
 import styles from "../topology.module.scss";
 import axios from "axios";
 import { FcSynchronize } from "react-icons/fc";
-import { useHistory, useLocation } from 'react-router-dom'
-import Context from '../../../../Utility/Reduxx'
-import {UserLogOut} from '../../../../Utility/Fetch'
+import { useHistory } from "react-router-dom";
+import Context from "../../../../Utility/Reduxx";
+import { UserLogOut } from "../../../../Utility/Fetch";
+
 
 const { TabPane } = Tabs;
 const { Option } = Select;
@@ -29,16 +30,20 @@ const layout = {
 };
 
 const TopoIoTC = ({ IoTvisible, setIoTvisible, record, setRecord }) => {
-  const { dispatch } = useContext(Context)
-  const history = useHistory()
-  const location = useLocation();
+  const { dispatch } = useContext(Context);
+  const history = useHistory();
+  // const location = useLocation();
   const [uploading, setUploading] = useState(false);
   const [form] = Form.useForm();
   const [IoTData, setIoTData] = useState(null);
   const [FourEightFiveList, setFourEightFiveList] = useState(null);
   const [Refresh, setRefresh] = useState(false);
-  const [haveContent, setHaveContent] = useState(false)
-  const [Deviceindex, setDeviceindex] = useState(0)
+  const [haveContent, setHaveContent] = useState(false);
+  const [Deviceindex, setDeviceindex] = useState(0);
+  const [Editable, setEditable] = useState(false) 
+  const [CurrentPage,setCurrentPage] =useState('1')
+  const level = localStorage.getItem('authUser.level')
+
   const onFinish = (values) => {
     console.log(values);
   };
@@ -47,11 +52,10 @@ const TopoIoTC = ({ IoTvisible, setIoTvisible, record, setRecord }) => {
     setDeviceindex(value);
   }
 
-
   useEffect(() => {
-    if(!record){
+    if (!record) {
       // console.log(record)
-      return
+      return;
     }
     if (record.id) {
       setUploading(true);
@@ -60,35 +64,41 @@ const TopoIoTC = ({ IoTvisible, setIoTvisible, record, setRecord }) => {
         : `/cmd?get={"device_iot":{"filter":{"id":"${record.id}"}}}`;
       console.log(IoTUrl);
       axios
-        .get(IoTUrl)
+        .post(IoTUrl)
         .then((res) => {
-          console.log(res.data)
-          if(res.data.response.device_iot && res.data.response.device_iot[0].obj.iot){
-            console.log('有data')
-            const IoTData = res.data.response.device_iot[0].obj.iot[Deviceindex].data;
-            setHaveContent(true)
+          console.log(res.data);
+          if (!Refresh &&
+            res.data.response.device_iot[0] &&
+            res.data.response.device_iot[0].obj.iot
+          ) {
+            console.log("有data");
+            const IoTData =
+              res.data.response.device_iot[0].obj.iot[Deviceindex].data;
+            setHaveContent(true);
             setIoTData(IoTData);
-            
-            res.data.response.device_iot[0].obj.iot.forEach((item)=>{
-              let timestamp= new Date(item.timestamp*1000)
+
+            res.data.response.device_iot[0].obj.iot.forEach((item) => {
+              let timestamp = new Date(item.timestamp * 1000);
               item.timestamp = `${timestamp.getFullYear()}-${
                 timestamp.getMonth() + 1
-              }-${timestamp.getDate()} ${timestamp.getHours()}:${timestamp.getMinutes()}`
-            })
+              }-${timestamp.getDate()} ${timestamp.getHours()}:${timestamp.getMinutes()}`;
+            });
             setFourEightFiveList(res.data.response.device_iot[0].obj.iot);
             console.log(res.data.response.device_iot[0].obj.iot);
             form.setFieldsValue({
               battery_capacity_ah: IoTData.eeprom.battery_capacity_ah,
               battery_type: IoTData.eeprom.battery_type,
               charge_limit_voltage_v: IoTData.eeprom.charge_limit_voltage_v,
-              discharge_limit_voltage_v: IoTData.eeprom.discharge_limit_voltage_v,
+              discharge_limit_voltage_v:
+                IoTData.eeprom.discharge_limit_voltage_v,
               equalizing_charge_interval_day:
                 IoTData.eeprom.equalizing_charge_interval_day,
               equalizing_charge_time_min:
                 IoTData.eeprom.equalizing_charge_time_min,
               equalizing_charge_voltage_v:
                 IoTData.eeprom.equalizing_charge_voltage_v,
-              folating_charge_voltage_v: IoTData.eeprom.folating_charge_voltage_v,
+              folating_charge_voltage_v:
+                IoTData.eeprom.folating_charge_voltage_v,
               low_voltage_warning_voltage_v:
                 IoTData.eeprom.low_voltage_warning_voltage_v,
               over_discharge_delay_s: IoTData.eeprom.over_discharge_delay_s,
@@ -104,9 +114,56 @@ const TopoIoTC = ({ IoTvisible, setIoTvisible, record, setRecord }) => {
               system_voltage_v: IoTData.eeprom.system_voltage_v,
               temperature_coefficient: IoTData.eeprom.temperature_coefficient,
             });
-          }else{
-            console.log('沒data')
-            setHaveContent(false)
+          }else if(Refresh &&
+            res.data.response.device_cfg[0] &&
+            res.data.response.device_cfg[0].obj.iot){
+              console.log("有data");
+              const IoTData =
+                res.data.response.device_cfg[0].obj.iot[Deviceindex].data;
+              setHaveContent(true);
+              setIoTData(IoTData);
+  
+              res.data.response.device_cfg[0].obj.iot.forEach((item) => {
+                let timestamp = new Date(item.timestamp * 1000);
+                item.timestamp = `${timestamp.getFullYear()}-${
+                  timestamp.getMonth() + 1
+                }-${timestamp.getDate()} ${timestamp.getHours()}:${timestamp.getMinutes()}`;
+              });
+              setFourEightFiveList(res.data.response.device_cfg[0].obj.iot);
+              console.log(res.data.response.device_cfg[0].obj.iot);
+              form.setFieldsValue({
+                battery_capacity_ah: IoTData.eeprom.battery_capacity_ah,
+                battery_type: IoTData.eeprom.battery_type,
+                charge_limit_voltage_v: IoTData.eeprom.charge_limit_voltage_v,
+                discharge_limit_voltage_v:
+                  IoTData.eeprom.discharge_limit_voltage_v,
+                equalizing_charge_interval_day:
+                  IoTData.eeprom.equalizing_charge_interval_day,
+                equalizing_charge_time_min:
+                  IoTData.eeprom.equalizing_charge_time_min,
+                equalizing_charge_voltage_v:
+                  IoTData.eeprom.equalizing_charge_voltage_v,
+                folating_charge_voltage_v:
+                  IoTData.eeprom.folating_charge_voltage_v,
+                low_voltage_warning_voltage_v:
+                  IoTData.eeprom.low_voltage_warning_voltage_v,
+                over_discharge_delay_s: IoTData.eeprom.over_discharge_delay_s,
+                over_discharge_reverse_voltage_v:
+                  IoTData.eeprom.over_discharge_reverse_voltage_v,
+                over_discharge_voltage_v: IoTData.eeprom.over_discharge_voltage_v,
+                overvoltage_voltage_v: IoTData.eeprom.overvoltage_voltage_v,
+                rasing_charge_reverse_voltage_v:
+                  IoTData.eeprom.rasing_charge_reverse_voltage_v,
+                rasing_charge_time_min: IoTData.eeprom.rasing_charge_time_min,
+                rasing_charge_voltage_v: IoTData.eeprom.rasing_charge_voltage_v,
+                recognized_voltage_v: IoTData.eeprom.recognized_voltage_v,
+                system_voltage_v: IoTData.eeprom.system_voltage_v,
+                temperature_coefficient: IoTData.eeprom.temperature_coefficient,
+              });
+          }
+          else {
+            console.log("沒data");
+            setHaveContent(false);
           }
 
           // setRefresh(false);
@@ -114,33 +171,21 @@ const TopoIoTC = ({ IoTvisible, setIoTvisible, record, setRecord }) => {
         })
         .catch((error) => {
           console.log(error);
-          // setRefresh(false);
           setUploading(false);
           if (error.response && error.response.status === 401) {
-            const isAuthed = localStorage.getItem("auth.isAuthed");
-            if (!isAuthed) {
-              return;
-            }
-            dispatch({
-              type: "LogPath",
-              payload: { LogPath: location.pathname },
-            });
+            dispatch({ type: "setLogin", payload: { IsLogin: false } });
             UserLogOut();
-            history.push("/login");                                                                         
+            history.push("/userlogin");
           } else {
             history.push("/internalerror");
           }
-
         });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [record.id, Refresh]);
 
-  // const GetIoTDataFromDevice = () => {
-  //   const IoTUrl = ;
-  // }
-
-  const callback = (key) => {
-    console.log(key);
+  const callback = (page) => {
+    setCurrentPage(page)
   };
 
   return (
@@ -150,14 +195,22 @@ const TopoIoTC = ({ IoTvisible, setIoTvisible, record, setRecord }) => {
         setIoTvisible(false);
         setIoTData(null);
         setRefresh(false);
-        setRecord({id:null})
-        setHaveContent(false)
-        
+        setRecord({ id: null });
+        setHaveContent(false);
       }}
       centered={true}
       destroyOnClose={true}
       className={styles.modal}
       footer={[
+        (level==='super_super' && CurrentPage ==='5' )&& 
+        <Button
+        key="Edit"
+        onClick={() => {
+          setEditable(!Editable)
+        }}
+      >
+        Edit
+      </Button>,
         <Button
           key="confirm"
           type="primary"
@@ -165,12 +218,12 @@ const TopoIoTC = ({ IoTvisible, setIoTvisible, record, setRecord }) => {
             setIoTvisible(false);
             setIoTData(null);
             setRefresh(false);
-            setRecord({id:null})
-            setHaveContent(false)
+            setRecord({ id: null });
+            setHaveContent(false);
           }}
         >
           Confirm
-        </Button>,
+        </Button>,      
       ]}
     >
       {IoTData && !uploading ? (
@@ -190,83 +243,100 @@ const TopoIoTC = ({ IoTvisible, setIoTvisible, record, setRecord }) => {
               })}
           </Select>
 
-            <div style={{display:"flex"}}>
+          <div style={{ display: "flex" }}>
             <p>LastUpdate: {FourEightFiveList[`${Deviceindex}`].timestamp}</p>
             <Tooltip title="Re-get data from Device">
-            <Popconfirm
-              title="Will cause extra data usage, sure to refresh?"
-              onConfirm={() => {
-                setRefresh(true);
-                setHaveContent(false)
-              }}
-            >
-              <FcSynchronize className={styles.Refresh} />
-            </Popconfirm>
-          </Tooltip>
-            </div>
-            
-          <Tabs defaultActiveKey="Today" onChange={callback}>
-            <TabPane tab="Today" key="Today" className={styles.tabpane}>
+              <Popconfirm
+                title="Will cause extra data usage, sure to refresh?"
+                onConfirm={() => {
+                  setRefresh(true);
+                  setHaveContent(false);
+                }}
+              >
+                <FcSynchronize className={styles.Refresh} />
+              </Popconfirm>
+            </Tooltip>
+          </div>
+
+          <Tabs defaultActiveKey="1" onChange={callback}>
+            <TabPane tab="Today" key="1" className={styles.tabpane}>
               <Descriptions
                 bordered
-                column={{ xxl: 2, xl: 2, lg: 2, md: 2, sm: 1, xs: 1 }}
+                column={{ xxl: 3, xl: 2, lg: 2, md: 2, sm: 1, xs: 1 }}
                 className={styles.desc}
               >
-                <Descriptions.Item label="Battery" className={styles.descItem}>
-                  Minimal Voltage:
-                  {IoTData.controller.today.battery.min_voltage_v}
-                  (V)
-                  <br />
-                  Maximum Voltage:
-                  {IoTData.controller.today.battery.max_voltage_v}
-                  (V)
-                  <br />
-                </Descriptions.Item>
-                <Descriptions.Item label="Charge" className={styles.descItem}>
-                  Maximum Current:
-                  {IoTData.controller.today.charge.max_current_a}
-                  (A)
-                  <br />
-                  AH:
-                  {IoTData.controller.today.charge.ampere_hour_ah}
-                  (A/H)
-                  <br />
-                  Watt: {IoTData.controller.today.charge.watt_w}(W)
-                  <br />
-                  Maximum Watt:
-                  {IoTData.controller.today.charge.max_watt_w}(W)
-                  <br />
-                  Total Watt:
-                  {IoTData.controller.today.charge.total_watt_w}(W)
-                  <br />
-                </Descriptions.Item>
                 <Descriptions.Item
-                  label="Discharge"
+                  label="Battery Minimal Voltage"
                   className={styles.descItem}
                 >
-                  Maximum Current:
+                  {IoTData.controller.today.battery.min_voltage_v}
+                  (V)
+                </Descriptions.Item>
+                <Descriptions.Item
+                  label="Battery Maximum Voltage"
+                  className={styles.descItem}
+                >
+                  {IoTData.controller.today.battery.max_voltage_v}
+                  (V)
+                </Descriptions.Item>
+                <Descriptions.Item
+                  label="Charge Maximum Current"
+                  className={styles.descItem}
+                >
+                  {IoTData.controller.today.charge.max_current_a}
+                  (A)
+                </Descriptions.Item>
+                <Descriptions.Item label="Charge AH" className={styles.descItem}>
+                  {IoTData.controller.today.charge.ampere_hour_ah}
+                  (A/H)
+                </Descriptions.Item>
+                <Descriptions.Item label="Charge Watt" className={styles.descItem}>
+                  {IoTData.controller.today.charge.watt_w}(W)
+                </Descriptions.Item>
+                <Descriptions.Item
+                  label="Charge Maximum Watt"
+                  className={styles.descItem}
+                >
+                  {IoTData.controller.today.charge.max_watt_w}(W)
+                </Descriptions.Item>
+                <Descriptions.Item
+                  label="Charge Total Watt"
+                  className={styles.descItem}
+                >
+                  {IoTData.controller.today.charge.total_watt_w}(W)
+                </Descriptions.Item>
+                <Descriptions.Item
+                  label="Discharge Maximum Current"
+                  className={styles.descItem}
+                >
                   {IoTData.controller.today.discharge.max_current_a}
                   (A)
-                  <br />
-                  AH:
+                </Descriptions.Item>
+                <Descriptions.Item label="Discharge AH" className={styles.descItem}>
                   {IoTData.controller.today.discharge.ampere_hour_ah}
                   (A/H)
-                  <br />
-                  Watt: {IoTData.controller.today.discharge.watt_w}
+                </Descriptions.Item>
+                <Descriptions.Item label="Discharge Watt" className={styles.descItem}>
+                  {IoTData.controller.today.discharge.watt_w}
                   (W)
-                  <br />
-                  Maximum Watt:
+                </Descriptions.Item>
+                <Descriptions.Item
+                  label="Discharge Maximum Watt"
+                  className={styles.descItem}
+                >
                   {IoTData.controller.today.discharge.max_watt_w}
                   (W)
-                  <br />
-                  Total Watt:
+                </Descriptions.Item>
+                <Descriptions.Item
+                  label="Discharge Total Watt"
+                  className={styles.descItem}
+                >
                   {IoTData.controller.today.discharge.total_watt_w}
                   (W)
-                  <br />
                 </Descriptions.Item>
               </Descriptions>
             </TabPane>
-            <TabPane tab="Solar Pannel" key="Pannel" className={styles.tabpane}>
+            <TabPane tab="Solar Pannel" key="2" className={styles.tabpane}>
               <Descriptions
                 bordered
                 className={styles.desc}
@@ -287,7 +357,7 @@ const TopoIoTC = ({ IoTvisible, setIoTvisible, record, setRecord }) => {
                 </Descriptions.Item>
               </Descriptions>
             </TabPane>
-            <TabPane tab="Battery" key="Battery" className={styles.tabpane}>
+            <TabPane tab="Battery" key="3" className={styles.tabpane}>
               <Descriptions bordered className={styles.desc}>
                 <Descriptions.Item label="Charge Current">
                   {IoTData.controller.battery.charge_current_a} (A)
@@ -316,11 +386,11 @@ const TopoIoTC = ({ IoTvisible, setIoTvisible, record, setRecord }) => {
                   {IoTData.controller.battery.voltage_v} (V)
                 </Descriptions.Item>
                 <Descriptions.Item label="Charge State">
-                  {IoTData.controller.charge_state} (W)
+                  {IoTData.controller.charge_state} 
                 </Descriptions.Item>
               </Descriptions>
             </TabPane>
-            <TabPane tab="Load" key="Load" className={styles.tabpane}>
+            <TabPane tab="Load" key="4" className={styles.tabpane}>
               <Descriptions
                 bordered
                 className={styles.desc}
@@ -344,121 +414,245 @@ const TopoIoTC = ({ IoTvisible, setIoTvisible, record, setRecord }) => {
                 </Descriptions.Item>
               </Descriptions>
             </TabPane>
-            <TabPane tab="eeprom" key="eeprom" className={styles.tabpane}>
+            <TabPane tab="eeprom" key="5" className={styles.tabpane}>
               <Form
                 {...layout}
                 name="nest-messages"
                 onFinish={onFinish}
                 form={form}
               >
-                <Form.Item
-                  name="battery_capacity_ah"
-                  label="Battery Capacity (AH)"
+                <Descriptions
+                  bordered
+                  className={styles.desc}
+                  column={{ xxl: 3, xl: 2, lg: 2, md: 2, sm: 2, xs: 1 }}
                 >
-                  <Input className={styles.IoTinput} disabled={true}/>
-                </Form.Item>
-                <Form.Item name="battery_type" label="Battery Type">
-                  <Input className={styles.IoTinput} disabled={true}/>
-                </Form.Item>
-                <Form.Item
-                  name="charge_limit_voltage_v"
-                  label="Charge limit(V)"
-                >
-                  <Input className={styles.IoTinput} disabled={true}/>
-                </Form.Item>
-                <Form.Item
-                  name="discharge_limit_voltage_v"
-                  label="Discharge limit(V)"
-                >
-                  <Input className={styles.IoTinput} disabled={true}/>
-                </Form.Item>
-                <Form.Item
-                  name="equalizing_charge_interval_day"
-                  label="Equalizing Charge Interval(day)"
-                >
-                  <Input className={styles.IoTinput} disabled={true}/>
-                </Form.Item>
-                <Form.Item
-                  name="equalizing_charge_time_min"
-                  label="Equalizing Charge time(min)"
-                >
-                  <Input className={styles.IoTinput} disabled={true}/>
-                </Form.Item>
-                <Form.Item
-                  name="equalizing_charge_voltage_v"
-                  label="Equalizing Charge(V)"
-                >
-                  <Input className={styles.IoTinput} disabled={true} />
-                </Form.Item>
-                <Form.Item
-                  name="folating_charge_voltage_v"
-                  label="Folating Charge(V)"
-                >
-                  <Input className={styles.IoTinput} disabled={true}/>
-                </Form.Item>
-                <Form.Item
-                  name="low_voltage_warning_voltage_v"
-                  label="Low Voltage warning(V)"
-                >
-                  <Input className={styles.IoTinput} disabled={true}/>
-                </Form.Item>
-                <Form.Item
-                  name="over_discharge_delay_s"
-                  label="Over Discharge delay(s)"
-                >
-                  <Input className={styles.IoTinput} disabled={true}/>
-                </Form.Item>
-                <Form.Item
-                  name="over_discharge_reverse_voltage_v"
-                  label="Over Discharge reverse(V)"
-                >
-                  <Input className={styles.IoTinput} disabled={true}/>
-                </Form.Item>
-                <Form.Item
-                  name="over_discharge_voltage_v"
-                  label="Over Discharge(V)"
-                >
-                  <Input className={styles.IoTinput} disabled={true}/>
-                </Form.Item>
-                <Form.Item name="overvoltage_voltage_v" label="Overvoltage(V)">
-                  <Input className={styles.IoTinput} disabled={true}/>
-                </Form.Item>
-                <Form.Item
-                  name="rasing_charge_reverse_voltage_v"
-                  label="Rasing Charge Reverse Voltage(V)"
-                >
-                  <Input className={styles.IoTinput} disabled={true}/>
-                </Form.Item>
-                <Form.Item
-                  name="rasing_charge_time_min"
-                  label="Rasing charge time min"
-                >
-                  <Input className={styles.IoTinput} disabled={true}/>
-                </Form.Item>
-                <Form.Item
-                  name="rasing_charge_voltage_v"
-                  label="Rasing charge(V)"
-                >
-                  <Input className={styles.IoTinput} disabled={true}/>
-                </Form.Item>
-                <Form.Item
-                  name="recognized_voltage_v"
-                  label="Recognized Voltage(V)"
-                >
-                  <Input className={styles.IoTinput} disabled={true}/>
-                </Form.Item>
-                <Form.Item name="system_voltage_v" label="System Voltage(V)">
-                  <Input className={styles.IoTinput} disabled={true}/>
-                </Form.Item>
-                <Form.Item
-                  name="temperature_coefficient"
-                  label="Temp Coefficient"
-                >
-                  <Input className={styles.IoTinput} disabled={true}/>
-                </Form.Item>
+                  <Descriptions.Item label="Battery Capacity">
+                    {Editable ? (
+                      <Form.Item
+                        name="battery_capacity_ah"
+                      >
+                        <Input className={styles.IoTinput} disabled={true} />
+                      </Form.Item>
+                    ) : (
+                      IoTData.eeprom.battery_capacity_ah
+                    )} (AH)
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Battery Type">
+                    {Editable ? (
+                      <Form.Item name="battery_type">
+                        <Input className={styles.IoTinput} disabled={true} />
+                      </Form.Item>
+                    ) : (
+                      IoTData.eeprom.battery_type
+                    )}
+                  </Descriptions.Item>
+
+                  <Descriptions.Item label="Charge limit">
+                    {Editable ? (
+                      <Form.Item
+                        name="charge_limit_voltage_v"
+                      >
+                        <Input className={styles.IoTinput} disabled={true} />
+                      </Form.Item>
+                    ) : (
+                      IoTData.eeprom.charge_limit_voltage_v
+                    )} (V)
+                  </Descriptions.Item>
+
+                  <Descriptions.Item label="Discharge limit">
+                    {Editable ? (
+                      <Form.Item
+                        name="discharge_limit_voltage_v"
+                      >
+                        <Input className={styles.IoTinput} disabled={true} />
+                      </Form.Item>
+                    ) : (
+                      IoTData.eeprom.discharge_limit_voltage_v
+                    )} (V)
+                  </Descriptions.Item>
+
+                  <Descriptions.Item label="Equalizing Charge Interval">
+                    {Editable ? (
+                      <Form.Item
+                        name="equalizing_charge_interval_day"
+                      >
+                        <Input className={styles.IoTinput} disabled={true} />
+                      </Form.Item>
+                    ) : (
+                      IoTData.eeprom.equalizing_charge_interval_day
+                    )} (day)
+                  </Descriptions.Item>
+
+                  <Descriptions.Item label="Equalizing Charge time">
+                    {Editable ? (
+                      <Form.Item
+                        name="equalizing_charge_time_min"
+                      >
+                        <Input className={styles.IoTinput} disabled={true} />
+                      </Form.Item>
+                    ) : (
+                      IoTData.eeprom.equalizing_charge_time_min 
+                    )} (min)
+                  </Descriptions.Item>
+
+                  <Descriptions.Item label="Equalizing Charge">
+                    {Editable ? (
+                      <Form.Item
+                        name="equalizing_charge_voltage_v"
+                      >
+                        <Input className={styles.IoTinput} disabled={true} />
+                      </Form.Item>
+                    ) : (
+                      IoTData.eeprom.equalizing_charge_voltage_v
+                    )} (V)
+                  </Descriptions.Item>
+
+                  <Descriptions.Item label="Folating Charge">
+                    {Editable ? (
+                      <Form.Item
+                        name="folating_charge_voltage_v"
+                      >
+                        <Input className={styles.IoTinput} disabled={true} />
+                      </Form.Item>
+                    ) : (
+                      IoTData.eeprom.folating_charge_voltage_v
+                    )} (V)
+                  </Descriptions.Item>
+
+                  <Descriptions.Item label="Low Voltage warning">
+                    {Editable ? (
+                      <Form.Item
+                        name="low_voltage_warning_voltage_v"
+                      >
+                        <Input className={styles.IoTinput} disabled={true} />
+                      </Form.Item>
+                    ) : (
+                      IoTData.eeprom.low_voltage_warning_voltage_v
+                    )} (V)
+                  </Descriptions.Item>
+
+                  <Descriptions.Item label="Over Discharge delay">
+                    {Editable ? (
+                      <Form.Item
+                        name="over_discharge_delay_s"
+                      >
+                        <Input className={styles.IoTinput} disabled={true} />
+                      </Form.Item>
+                    ) : (
+                      IoTData.eeprom.over_discharge_delay_s
+                    )} (s)
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Over Discharge reverse">
+                    {Editable ? (
+                      <Form.Item
+                        name="over_discharge_reverse_voltage_v"
+                      >
+                        <Input className={styles.IoTinput} disabled={true} />
+                      </Form.Item>
+                    ) : (
+                      IoTData.eeprom.over_discharge_reverse_voltage_v
+                    )} (V)
+                  </Descriptions.Item>
+
+                  <Descriptions.Item label="Over Discharge">
+                    {Editable ? (
+                      <Form.Item
+                        name="over_discharge_voltage_v"
+                      >
+                        <Input className={styles.IoTinput} disabled={true} />
+                      </Form.Item>
+                    ) : (
+                      IoTData.eeprom.over_discharge_voltage_v
+                    )} (V)
+                  </Descriptions.Item>
+
+                  <Descriptions.Item label="Overvoltage">
+                    {Editable ? (
+                      <Form.Item
+                        name="overvoltage_voltage_v"
+                      >
+                        <Input className={styles.IoTinput} disabled={true} />
+                      </Form.Item>
+                    ) : (
+                      IoTData.eeprom.overvoltage_voltage_v
+                    )} (V)
+                  </Descriptions.Item>
+
+                  <Descriptions.Item label="Rasing Charge Reverse Voltage">
+                    {Editable ? (
+                      <Form.Item
+                        name="rasing_charge_reverse_voltage_v"
+                      >
+                        <Input className={styles.IoTinput} disabled={true} />
+                      </Form.Item>
+                    ) : (
+                      IoTData.eeprom.rasing_charge_reverse_voltage_v
+                    )} (V)
+                  </Descriptions.Item>
+
+                  <Descriptions.Item label="Rasing charge time">
+                    {Editable ? (
+                      <Form.Item
+                        name="rasing_charge_time_min"
+                      >
+                        <Input className={styles.IoTinput} disabled={true} />
+                      </Form.Item>
+                    ) : (
+                      IoTData.eeprom.rasing_charge_time_min
+                    )} (min)
+                  </Descriptions.Item>
+
+                  <Descriptions.Item label="Rasing charge">
+                    {Editable ? (
+                      <Form.Item
+                        name="rasing_charge_voltage_v"
+                      >
+                        <Input className={styles.IoTinput} disabled={true} />
+                      </Form.Item>
+                    ) : (
+                      IoTData.eeprom.rasing_charge_voltage_v
+                    )} (V)
+                  </Descriptions.Item>
+
+                  <Descriptions.Item label="Recognized Voltage">
+                    {Editable ? (
+                      <Form.Item
+                        name="recognized_voltage_v"
+                      >
+                        <Input className={styles.IoTinput} disabled={true} />
+                      </Form.Item>
+                    ) : (
+                      IoTData.eeprom.recognized_voltage_v
+                    )} (V)
+                  </Descriptions.Item>
+
+                  <Descriptions.Item label="System Voltage">
+                    {Editable ? (
+                      <Form.Item
+                        name="system_voltage_v"
+                      >
+                        <Input className={styles.IoTinput} disabled={true} />
+                      </Form.Item>
+                    ) : (
+                      IoTData.eeprom.system_voltage_v
+                    )} (V)
+                  </Descriptions.Item>
+
+                  <Descriptions.Item label="Temp Coefficient">
+                    {Editable ? (
+                      <Form.Item
+                        name="temperature_coefficient"
+                      >
+                        <Input className={styles.IoTinput} disabled={true} />
+                      </Form.Item>
+                    ) : (
+                      IoTData.eeprom.temperature_coefficient
+                    )}
+                  </Descriptions.Item>
+                </Descriptions>
               </Form>
             </TabPane>
-            <TabPane tab="system" key="system" className={styles.tabpane}>
+            <TabPane tab="system" key="6" className={styles.tabpane}>
               <Descriptions
                 bordered
                 className={styles.desc}
@@ -486,19 +680,15 @@ const TopoIoTC = ({ IoTvisible, setIoTvisible, record, setRecord }) => {
             </TabPane>
           </Tabs>
         </Fragment>
-      ) : (
-        !haveContent && uploading ?  
+      ) : !haveContent && uploading ? (
         <Spin tip="Loading...">
           <Alert
             message="Getting Data"
             description="We are now getting data from server, please wait for a few seconds"
           />
         </Spin>
-        :<Empty description={
-          <span>
-            No Data
-          </span>
-        }/> 
+      ) : (
+        <Empty description={<span>No Data</span>} />
       )}
     </Modal>
   );

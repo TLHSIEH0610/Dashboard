@@ -10,7 +10,7 @@ import { Provider } from "./Utility/Reduxx";
 import { NavRoutes } from "./Routes/NavbarRoutes";
 import WrongPage from "./Pages/WrongPage";
 import InternalError from "./Pages/WrongPage/InternalFail";
-import ManagOnNav from './Pages/Management/ManagOnNav'
+// import Management from './Pages/Management'
 import "antd/dist/antd.css";
 
 
@@ -29,8 +29,15 @@ const App = () => {
             <div className="content">
               <Switch>
            
-                <Route path="/mysetting" exact component={ManagOnNav}></Route>
-                <Route path="/login" exact component={Login}></Route>
+                {/* <Route path="/management" exact component={Management}></Route> */}
+                {/* <Route path="/management" exact render={() =>
+                        localStorage.getItem("auth.isAuthed") ? (
+                          <Management />
+                        ) : (
+                          <Redirect to="/login" />
+                        )
+                      }></Route> */}
+                <Route path="/userlogin" exact component={Login}></Route>
                 <Route path="/register" exact component={Register}></Route>
                 <Route path="/internalerror" exact component={InternalError}></Route>
                 {NavRoutes.map((item, index) => {
@@ -43,7 +50,7 @@ const App = () => {
                         localStorage.getItem("auth.isAuthed") ? (
                           <item.component />
                         ) : (
-                          <Redirect to="/login" />
+                          <Redirect to="/userlogin" />
                         )
                       }
                     />

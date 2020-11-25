@@ -29,9 +29,10 @@ import md5 from "blueimp-md5";
 import { Translator } from '../../../../i18n/index'
 
 
-const RepositoryC = ({uploading, setUploading}) => {
+const RepositoryC = ({ setIsUpdate, IsUpdate }) => {
 
   const [form] = Form.useForm();
+  const [uploading, setUploading]= useState(false)
   const CompanyPD = [
     "M300",
     "M301",
@@ -47,13 +48,12 @@ const RepositoryC = ({uploading, setUploading}) => {
     { key: "", name: "", type: "", date: "", model: "", size: "" },
   ]);
   const { state } = useContext(Context)
-  // const [loading, setLoading] = useState(false);
   const [fileList, setFileList] = useState([]);
   const [visible, setVisible] = useState(false);
   const [cMD5, setCMD5] = useState("");
-  // const IsActionUpdated = state.BackupRestore.IsActionUpdated
   const EditableContext = React.createContext();
   const cid = localStorage.getItem("authUser.cid");
+  const level = localStorage.getItem("authUser.level");
 
   const EditableRow = ({ index, ...props }) => {
     const [form] = Form.useForm();
@@ -97,7 +97,7 @@ const RepositoryC = ({uploading, setUploading}) => {
         if(record.name===values.name){return}
         const RenameUrl = `/repository?rename_file={"cid":"${record.cid}","old_name":"${record.name}","new_name":"${values.name}","type":"${record.type}"}`
         setUploading(true)
-        axios.get(RenameUrl).then((res)=>{
+        axios.post(RenameUrl).then((res)=>{
           setUploading(false)
           console.log(res)
           message.success('rename successfully.')
@@ -164,7 +164,7 @@ const RepositoryC = ({uploading, setUploading}) => {
   };
 
   const [allFileList, setAllFileList] = useState([])
-  const FileRepostoryUrl =  cid==='proscend' ?  `/repository?list_file={${state.Login.Cid}}` : `/repository?list_file={"cid":"${cid}"}`;
+  const FileRepostoryUrl =  level==='super_super' ?  `/repository?list_file={${state.Login.Cid}}` : `/repository?list_file={"cid":"${cid}"}`;
   const [ReposLoading, ReposResponse] = useURLloader(FileRepostoryUrl, uploading)
   // console.log(FileRepostoryUrl)
   useEffect(() => {
@@ -203,10 +203,11 @@ const RepositoryC = ({uploading, setUploading}) => {
     let url = `/repository?delete_file={"cid":"${key.cid}","name":"${key.name}","type":"${key.type}"}` ;
     console.log(url);
     axios
-      .get(url)
+      .post(url)
       .then((res) => {
         console.log(res);
         setUploading(false);
+        setIsUpdate(!IsUpdate)
         message.success("delete successfully.");
       })
       .catch((error) => {
@@ -224,15 +225,16 @@ const RepositoryC = ({uploading, setUploading}) => {
       responseType: "blob",
     };
     axios
-      .get(url, opt)
+      .post(url, opt)
       .then((response) => {
-        setUploading(false);
         const url = window.URL.createObjectURL(new Blob([response.data]));
         const link = document.createElement("a");
         link.href = url;
         link.setAttribute("download", `${key.name}`);
         document.body.appendChild(link);
         link.click();
+        setUploading(false);
+        setIsUpdate(!IsUpdate)
       })
       .catch((err) => {
         console.log(err);
@@ -353,7 +355,7 @@ const RepositoryC = ({uploading, setUploading}) => {
     const formData = new FormData();
     formData.append("file", values.upload.fileList[0].originFileObj);
     console.log(values)
-    const UploadUrl = `/repository?upload_file={${cid==="proscend" ? (state.Login.Cid===''? `"cid":"proscend"` : state.Login.Cid ) : `"cid": "${cid}"`},"name":"${values.filename || values.upload.file.name}","type":"${values.type}","inf": {"MD5":"${values.MD5 === undefined ? "123" : values.MD5}","model": "${values.model}"}}`;
+    const UploadUrl = `/repository?upload_file={${level==="super_super" ? (state.Login.Cid===''? `"cid":"${cid}"` : state.Login.Cid ) : `"cid": "${cid}"`},"name":"${values.filename || values.upload.file.name}","type":"${values.type}","inf": {"MD5":"${values.MD5 === undefined ? "123" : values.MD5}","model": "${values.model}"}}`;
     console.log(UploadUrl);
     // console.log(allFileList, values.filename, values.upload.file.name)
     if(values.filename? allFileList.includes(values.filename) : allFileList.includes(values.upload.file.name) ){
@@ -370,6 +372,7 @@ const RepositoryC = ({uploading, setUploading}) => {
         setUploading(false);
         form.resetFields()
         setUploadFileType("")
+        setIsUpdate(!IsUpdate)
       })
       .catch((err) => {
         console.log(err);
@@ -492,32 +495,34 @@ const RepositoryC = ({uploading, setUploading}) => {
       <Modal
         title="Upload"
         visible={visible}
-        onOk={() => setVisible(false)}
-        onCancel={() => {setVisible(false); form.resetFields(); props.onRemove()}}
-        okButtonProps={{
-          form: "FileUpload",
-          key: "submit",
-          htmlType: "submit",
-          disabled: fileList.length === 0,
-          loading: uploading,
-        }}
-        okText={uploading ? "Uploading" : "Start Upload"}
-        cancelText="Cancel"
-        // footer={[
-        //   <Button
-        //     key="submit"
-        //     type="primary"
-        //     loading={Schemeloading}
-        //     onClick={() => {
-        //       setSchemeModalvisible(false);
-        //     }}
-        //   >
-        //     Confirm
-        //   </Button>,
-        // ]}
+        // onOk={() => setVisible(false)}
+        onCancel={() => {setVisible(false); form.resetFields(); props.onRemove(); setUploadFileType(null)}}
+        // okButtonProps={{
+        //   form: "FileUpload",
+        //   key: "submit",
+        //   htmlType: "submit",
+        //   disabled: fileList.length === 0,
+        //   loading: uploading,
+        // }}
+        // okText={uploading ? "Uploading" : "Start Upload"}
+        // cancelText="Cancel"
+        footer={[
+          <Button
+            key="submit"
+            type="primary"
+            disabled= {fileList.length === 0}
+            loading={uploading}
+            onClick={() => {
+              // setSchemeModalvisible(false);
+              form.submit()
+            }}
+          >
+            {uploading ? "Uploading" : "Start Upload"}
+          </Button>,
+        ]}
       >
         <Form
-          id={"FileUpload"}
+          // id={"FileUpload"}
           name="dynamic_form_nest_item"
           onFinish={onFinish}
           autoComplete="off"

@@ -1,5 +1,12 @@
 .Logo{
   height:80px;
+  width:118.5px;
+}
+.LogoProscend{
+  width: 160px;
+  // margin-top:-10px;
+  margin-left:10px;
+  margin-bottom: 10px;
 }
 .LogoSmall{
   height: 25px;
@@ -28,7 +35,7 @@
   padding:0 20px;
   justify-content: flex-start;
   align-items: center;
-  background: #001529;
+  background: rgb(4,43,87);
   position: relative;
   &.MDshowNav{
     min-width: 230px;
@@ -61,7 +68,7 @@
       
     }
     li.title {
-      background: #001529;
+      background: rgb(4,43,87);
       padding: 25px 15px;
       line-height: 23px;
       display: flex;
@@ -69,6 +76,7 @@
       align-items: center;
       font-size: 28px;
       position: relative;
+      margin-right: 15px;
       h2 {
         margin-bottom: 0px;
         line-height: 23px;

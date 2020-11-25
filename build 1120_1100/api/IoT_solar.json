@@ -1,0 +1,174 @@
+[{
+  "id":"015FV1aGQLNiM9N2HBDMAAFp"
+  ,"Time":"2020-10-08 06:00 test"
+  ,"system": {
+    "max_voltage_v": 48,
+    "charge_current_a": 60,
+    "discharge_current_a": 48,
+    "software_version": "V5.1.7",
+    "hardware_version": "V0.0.4",
+    "serial_number": 1810
+  },
+  "controller": {
+    "battery": {
+      "soc_percentage": 100,
+      "voltage_v": 12.1,
+      "charge_current_a": 0.0,
+      "temperature_c": 25,
+      "over_discharged_time": 0,
+      "full_charged_time": 0,
+      "total_charge_ah": 0,
+      "total_discharge_ah": 0
+    },
+    "temperature_c": 25,
+    "load": { "voltage_v": 0.0, "current_a": 0.0, "watt_w": 0 },
+    "solar_pannel": { "voltage_v": 0.0, "current_a": 0.0, "watt_w": 0 },
+    "load_on_off": 0,
+    "today": {
+      "battery": { "min_voltage_v": 12.1, "max_voltage_v": 12.2 },
+      "charge": {
+        "max_current_a": 0.0,
+        "max_watt_w": 0,
+        "ampere_hour_ah": 0,
+        "watt_w": 0,
+        "total_watt_w": 0
+      },
+      "discharge": {
+        "max_current_a": 0.0,
+        "max_watt_w": 0,
+        "ampere_hour_ah": 0,
+        "watt_w": 0,
+        "total_watt_w": 0
+      }
+    },
+    "uptime_day": 0,
+    "load_light_percentage": 0,
+    "charge_state": 0,
+    "error": {
+      "B31": 0,
+      "B30": 0,
+      "B29": 0,
+      "B28": 0,
+      "B27": 0,
+      "B26": 0,
+      "B25": 0,
+      "B24": 0,
+      "B23": 0,
+      "B22": 0,
+      "B21": 0,
+      "B20": 0,
+      "B19": 0,
+      "B18": 0,
+      "B17": 0,
+      "B16": 0
+    }
+  },
+  "eeprom": {
+    "battery_capacity_ah": 200,
+    "system_voltage_v": 48,
+    "recognized_voltage_v": 48,
+    "battery_type": 4,
+    "overvoltage_voltage_v": 11.0,
+    "charge_limit_voltage_v": 10.1,
+    "equalizing_charge_voltage_v": 9.0,
+    "rasing_charge_voltage_v": 9.0,
+    "folating_charge_voltage_v": 9.0,
+    "rasing_charge_reverse_voltage_v": 7.8,
+    "over_discharge_reverse_voltage_v": 12.8,
+    "low_voltage_warning_voltage_v": 13.400001,
+    "over_discharge_voltage_v": 12.400001,
+    "discharge_limit_voltage_v": 11.900001,
+    "over_discharge_delay_s": 5,
+    "equalizing_charge_time_min": 0,
+    "rasing_charge_time_min": 0,
+    "equalizing_charge_interval_day": 0,
+    "temperature_coefficient": 0
+  }
+},
+{
+  "id":"015FV1aGQLNiM9N2HBDMAAFp"
+  ,"Time":"2020-10-08 06:00"
+  ,"system": {
+    "max_voltage_v": 44,
+    "charge_current_a": 60,
+    "discharge_current_a": 48,
+    "software_version": "V5.1.7",
+    "hardware_version": "V0.0.4",
+    "serial_number": 1810
+  },
+  "controller": {
+    "battery": {
+      "soc_percentage": 100,
+      "voltage_v": 12.1,
+      "charge_current_a": 0.0,
+      "temperature_c": 25,
+      "over_discharged_time": 0,
+      "full_charged_time": 0,
+      "total_charge_ah": 0,
+      "total_discharge_ah": 0
+    },
+    "temperature_c": 25,
+    "load": { "voltage_v": 0.0, "current_a": 0.0, "watt_w": 0 },
+    "solar_pannel": { "voltage_v": 0.0, "current_a": 0.0, "watt_w": 0 },
+    "load_on_off": 0,
+    "today": {
+      "battery": { "min_voltage_v": 13.1, "max_voltage_v": 12.7 },
+      "charge": {
+        "max_current_a": 0.2,
+        "max_watt_w": 6,
+        "ampere_hour_ah": 3,
+        "watt_w": 333,
+        "total_watt_w": 122
+      },
+      "discharge": {
+        "max_current_a": 0.3,
+        "max_watt_w": 44,
+        "ampere_hour_ah": 0,
+        "watt_w": 6,
+        "total_watt_w": 4
+      }
+    },
+    "uptime_day": 0,
+    "load_light_percentage": 0,
+    "charge_state": 0,
+    "error": {
+      "B31": 0,
+      "B30": 0,
+      "B29": 0,
+      "B28": 0,
+      "B27": 0,
+      "B26": 0,
+      "B25": 0,
+      "B24": 0,
+      "B23": 0,
+      "B22": 0,
+      "B21": 0,
+      "B20": 0,
+      "B19": 0,
+      "B18": 0,
+      "B17": 0,
+      "B16": 0
+    }
+  },
+  "eeprom": {
+    "battery_capacity_ah": 220,
+    "system_voltage_v": 48,
+    "recognized_voltage_v": 44,
+    "battery_type": 4,
+    "overvoltage_voltage_v": 11.0,
+    "charge_limit_voltage_v": 10.1,
+    "equalizing_charge_voltage_v": 9.0,
+    "rasing_charge_voltage_v": 9.0,
+    "folating_charge_voltage_v": 9.0,
+    "rasing_charge_reverse_voltage_v": 7.8,
+    "over_discharge_reverse_voltage_v": 12.8,
+    "low_voltage_warning_voltage_v": 13.4003331,
+    "over_discharge_voltage_v": 12.4044001,
+    "discharge_limit_voltage_v": 11.905501,
+    "over_discharge_delay_s": 33,
+    "equalizing_charge_time_min": 0,
+    "rasing_charge_time_min": 3,
+    "equalizing_charge_interval_day": 5,
+    "temperature_coefficient": 10
+  }
+}]

@@ -10,7 +10,6 @@ import {
   Input,
   Card,
   Table,
-  Modal,
   Tooltip,
   message,
   Popconfirm,
@@ -39,8 +38,9 @@ const TopologyC = () => {
   const { state } = useContext(Context);
   const [uploading, setUploading] = useState(false);
   const cid = localStorage.getItem("authUser.cid");
+  const level = localStorage.getItem("authUser.level");
   const NodeInfoUrl =
-    cid === "proscend"
+  level === "super_super"
       ? `/cmd?get={"nodeInf":{"filter":{${state.Login.Cid}}}}`
       : `/cmd?get={"nodeInf":{"filter":{"cid":"${cid}"}}}`;
   const [NodeInfoLoading, NodeInfoResponse] = useURLloader(
@@ -116,7 +116,7 @@ const TopologyC = () => {
         // const cid = localStorage.getItem("authUser.cid");
         const RenameUrl = `/cmd?set={"node_name":{"filter":{"cid":"${record.cid}"},"list":[{"id":"${record.id}","name":"${values.name}"}]}}`;
         axios
-          .get(RenameUrl)
+          .post(RenameUrl)
           .then((res) => {
             handleSave({ ...record, ...values });
             console.log(res);
@@ -183,7 +183,7 @@ const TopologyC = () => {
   };
 
   useEffect(() => {
-    if (NodeInfoResponse) {
+    if (NodeInfoResponse && NodeInfoResponse.response) {
       let NodeInfo = [];
       // console.log(responseData);
       NodeInfoResponse.response.nodeInf.forEach((item, index) => {
@@ -359,7 +359,6 @@ const TopologyC = () => {
     if (!col.editable) {
       return col;
     }
-
     return {
       ...col,
       onCell: (record) => ({
@@ -375,6 +374,7 @@ const TopologyC = () => {
   return (
     <Fragment>
       <AlarmLogMC
+        setRecord={setAlarmRecord}
         record={AlarmRecord}
         AlarmTablevisible={AlarmTablevisible}
         setAlarmTablevisible={setAlarmTablevisible}
@@ -397,24 +397,16 @@ const TopologyC = () => {
         />
 
 
-      <Modal
-        visible={Mapvisible}
-        onCancel={() => {
-          setMapvisible(false);
-          // setDrawerVisible(false);
-        }}
-        centered={false}
-        width={"80%"}
-        title="Location"
-        footer = {null}
-        className={styles.modal}
-      >
+
         <TrackMap
           // drawerVisible={drawerVisible}
           // setDrawerVisible={setDrawerVisible}
+          setMapvisible={setMapvisible}
+          Mapvisible={Mapvisible}
           record={MapRecord}
+          setRecord={setMapRecord}
         />
-      </Modal>
+      
 
       <DeviceSettingMC
         DeviceSettingvisible={DeviceSettingvisible}

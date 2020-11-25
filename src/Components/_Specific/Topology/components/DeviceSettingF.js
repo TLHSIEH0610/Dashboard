@@ -1,7 +1,10 @@
-import React, { useEffect } from "react";
-import styles from "../topology.module.scss";
-import { Form, Input, Switch, Radio, Descriptions, Button, message } from "antd";
+import React, { useEffect, useContext } from "react";
+// import styles from "../topology.module.scss";
+import { Form, Input, Switch, Radio, Row, message, Col } from "antd";
 import axios from "axios";
+import { UserLogOut } from '../../../../Utility/Fetch'
+import { useHistory } from 'react-router-dom'
+import Context from "../../../../Utility/Reduxx";
 
 const layout = {
   labelCol: {
@@ -12,31 +15,45 @@ const layout = {
   },
 };
 
-
-
-const LanSetting = ({ DeviceConfig, id, setUploading, uploading }) => {
-  const [form] = Form.useForm();
+const LanSetting = ({
+  DeviceConfig,
+  id,
+  setIsUpdate,
+  IsUpdate,
+  form,
+  setUploading,
+}) => {
+  const history = useHistory()
   const lan = DeviceConfig.lan;
+  const { dispatch } = useContext(Context);
+
   const onFinish = (values) => {
-    setUploading(true)
-    const LanSetUrl = `/cmd?get={"device_cfg":{"filter":{"id":"${id}"},"nodeInf":{},"obj":{"lan":{"ipv4":{"address":"${values.ipv4_address}","netmask":"${values.ipv4_netmask}","dhcp":{"mode":"${values.ipv4_dhcpmode}","pool":[{"start":"${values.ipv4_dhcp_start}","end":"${values.ipv4_dhcp_end}","fixed_ip":[]}]}},"ipv6":{"type":"${values.ipv6_type}","static":{"address":"${values.ipv6_adress}"},"dhcp":{"assigment":"${values.ipv6_assignment}"}}}}}}`;
+    setUploading(true);
+    const LanSetUrl = `/cmd?set={"device_cfg":{"filter":{"id":"${id}"},"nodeInf":{},"obj":{"lan":{"ipv4":{"address":"${values.ipv4_address}","netmask":"${values.ipv4_netmask}","dhcp":{"mode":"${values.ipv4_dhcpmode}","pool":[{"start":"${values.ipv4_dhcp_start}","end":"${values.ipv4_dhcp_end}","fixed_ip":[]}]}},"ipv6":{"type":"${values.ipv6_type}","static":{"address":"${values.ipv6_adress}"},"dhcp":{"assigment":"${values.ipv6_assignment}"}}}}}}`;
+    console.log(LanSetUrl);
     axios
-      .get(LanSetUrl)
+      .post(LanSetUrl)
       .then((res) => {
         console.log(res);
-        setUploading(false)
+        setUploading(false);
+        setIsUpdate(!IsUpdate);
         message.success("update successfully.");
       })
       .catch((error) => {
         console.log(error);
-        setUploading(false)
+        setUploading(false);
         message.error("update fail.");
+        if (error.response && error.response.status === 401) {
+          dispatch({ type: "setLogin", payload: { IsLogin: false } });
+          UserLogOut();
+          history.push("/userlogin");                                                                         
+        } 
       });
   };
 
   useEffect(() => {
     if (lan.ipv4) {
-      console.log(DeviceConfig)
+      console.log(DeviceConfig);
       form.setFieldsValue({
         ipv4_address: lan.ipv4.address,
         ipv4_netmask: lan.ipv4.netmask,
@@ -48,6 +65,7 @@ const LanSetting = ({ DeviceConfig, id, setUploading, uploading }) => {
         ipv6_assignment: lan.ipv6.dhcp.assigment,
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lan.ipv4]);
 
   return (
@@ -149,7 +167,7 @@ const LanSetting = ({ DeviceConfig, id, setUploading, uploading }) => {
           <Radio value="stateless">stateless</Radio>
         </Radio.Group>
       </Form.Item>
-      <Form.Item wrapperCol={{ span: 6, offset: 18 }}>
+      {/* <Form.Item wrapperCol={{ span: 6, offset: 18 }}>
         <Button
           type="primary"
           htmlType="submit"
@@ -158,31 +176,46 @@ const LanSetting = ({ DeviceConfig, id, setUploading, uploading }) => {
         >
           Submit
         </Button>
-      </Form.Item>
+      </Form.Item> */}
     </Form>
   );
 };
 
-
-
 export const LanSettingMF = React.memo(LanSetting);
 
-const WanSetting = ({ DeviceConfig, id, setUploading, uploading }) => {
-  const [form] = Form.useForm();
+const WanSetting = ({
+  DeviceConfig,
+  id,
+  setIsUpdate,
+  IsUpdate,
+  form,
+  setUploading,
+}) => {
+  const { dispatch } = useContext(Context);
+  const history = useHistory()
   const wan = DeviceConfig.wan;
   const onFinish = (values) => {
-    setUploading(true)
+    setUploading(true);
     const WanSetUrl = `/cmd?set={"device_cfg":{"filter":{"id":"${id}"},"nodeInf":{},"obj":{"wan":{"priority":{"order":["${values.priority_1}","${values.priority_2}","${values.priority_3}"],"lte":{"mode":"${values.lte_mode}"}},"ethernet":{"type":"${values.ethernet_type}","dhcp":{"dns":{"ipv4":[{"type":"${values.ipv4_type_1}","address":"${values.ipv4_address_1}"},{"type":"${values.ipv4_type_2}","address":"${values.ipv4_address_3}"},{"type":"${values.ipv4_type_3}","address":"${values.ipv4_address_2}"}]}},"pppoe":{"username":"${values.username}","password":"********","service_name":"${values.service_name}"},"static":{"ipv4":{"address":"${values.static_ipv4_address}","netmask":"${values.static_netmask}","gateway":"${values.static_gateway}","dns":[{"address":"${values.static_ipv4_dns_address1}"},{"address":"${values.static_ipv4_dns_address2}"},{"address":"${values.static_ipv4_dns_address3}"}]}}}}}}}`;
-    axios.get(WanSetUrl).then((res)=>{
-      console.log(res)
-      setUploading(false)
-      message.success("update successfully.");
-    })
-    .catch((error)=>{
-      console.log(error)
-      setUploading(false)
-      message.error("update fail.");
-    })
+    console.log(WanSetUrl);
+    axios
+      .post(WanSetUrl)
+      .then((res) => {
+        console.log(res);
+        setUploading(false);
+        setIsUpdate(!IsUpdate);
+        message.success("update successfully.");
+      })
+      .catch((error) => {
+        console.log(error);
+        if (error.response && error.response.status === 401) {
+          dispatch({ type: "setLogin", payload: { IsLogin: false } });
+          UserLogOut();
+          history.push("/userlogin");                                                                         
+        } 
+        setUploading(false);
+        message.error("update fail.");
+      });
   };
 
   useEffect(() => {
@@ -210,6 +243,7 @@ const WanSetting = ({ DeviceConfig, id, setUploading, uploading }) => {
         static_netmask: wan.ethernet.static.ipv4.netmask,
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [wan.ethernet]);
 
   return (
@@ -253,13 +287,13 @@ const WanSetting = ({ DeviceConfig, id, setUploading, uploading }) => {
         </Input.Group>
       </Form.Item>
       <Form.Item name="username" label="username">
-            <Input placeholder="Input username" />
+        <Input placeholder="Input username" />
       </Form.Item>
       <Form.Item name="password" label="password">
-            <Input placeholder="Input password" />
+        <Input placeholder="Input password" />
       </Form.Item>
       <Form.Item name="service_name" label="service_name">
-            <Input placeholder="Input service_name" />
+        <Input placeholder="Input service_name" />
       </Form.Item>
       <Form.Item label="Priority Order">
         <Input.Group compact>
@@ -333,7 +367,7 @@ const WanSetting = ({ DeviceConfig, id, setUploading, uploading }) => {
         <Input placeholder="Input netmask" />
       </Form.Item>
 
-      <Form.Item wrapperCol={{ span: 6, offset: 18 }}>
+      {/* <Form.Item wrapperCol={{ span: 6, offset: 18 }}>
         <Button
           type="primary"
           htmlType="submit"
@@ -342,15 +376,23 @@ const WanSetting = ({ DeviceConfig, id, setUploading, uploading }) => {
         >
           Submit
         </Button>
-      </Form.Item>
+      </Form.Item> */}
     </Form>
   );
 };
 
 export const WanSettingMF = React.memo(WanSetting);
 
-const LteSetting = ({ DeviceConfig, id, setUploading, uploading  }) => {
-  const [form] = Form.useForm();
+const LteSetting = ({
+  DeviceConfig,
+  id,
+  setIsUpdate,
+  IsUpdate,
+  form,
+  setUploading,
+}) => {
+  const { dispatch } = useContext(Context);
+  const history = useHistory()
   const lte = DeviceConfig.lte;
   useEffect(() => {
     if (lte) {
@@ -377,23 +419,32 @@ const LteSetting = ({ DeviceConfig, id, setUploading, uploading  }) => {
         recovery_apn_action: lte.policy.recovery.recover_apn.action,
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lte]);
 
   const onFinish = (values) => {
-    setUploading(true)
+    setUploading(true);
     const LteSetUrl = `/cmd?set={"device_cfg":{"filter":{"id":"${id}"},"nodeInf":{},"obj":{"lte":{"config":{"mode":"${values.mode}","mtu":${values.mtu}},"sim":[{"pin":"${values.pin}","puk":"${values.puk}","pin_enabled":${values.pin_enabled},"apn":[{"apn":"${values.apn}","ipv6_enabled":${values.ipv6_enabled},"auth":{"type":"${values.auth}","username":"${values.username}","password":"${values.password}"}}]}],"limit":[{"enabled":${values.limit_enabled},"limit_mbyte":${values.limit_mbyte},"reset":{"day":${values.reset_day},"hour":${values.reset_hour},"minute":${values.reset_minute},"second":${values.reset_second}}}],"policy":{"roaming":${values.roaming},"recovery":{"down_times":${values.recovery_down_time},"recover_apn":{"enabled":${values.recovery_apn_enabled},"action":"${values.recovery_apn_action}"}}}}}}}`;
-    console.log(LteSetUrl)
-    axios.get(LteSetUrl).then((res)=>{
-      console.log(res)
-      setUploading(false)
-      message.success("update successfully.");
-    })
-    .catch((error)=>{
-      console.log(error)
-      setUploading(false)
-      message.error("update fail.");
-    })
-  }
+    console.log(LteSetUrl);
+    axios
+      .post(LteSetUrl)
+      .then((res) => {
+        console.log(res);
+        setUploading(false);
+        setIsUpdate(!IsUpdate);
+        message.success("update successfully.");
+      })
+      .catch((error) => {
+        console.log(error);
+        if (error.response && error.response.status === 401) {
+          dispatch({ type: "setLogin", payload: { IsLogin: false } });
+          UserLogOut();
+          history.push("/userlogin");                                                                         
+        } 
+        setUploading(false);
+        message.error("update fail.");
+      });
+  };
 
   function pinonChange(checked) {
     console.log(`switch to ${checked}`);
@@ -410,6 +461,8 @@ const LteSetting = ({ DeviceConfig, id, setUploading, uploading  }) => {
 
   return (
     <Form {...layout} onFinish={onFinish} form={form}>
+      {/* <Row gutter={24} > */}
+      {/* <Col xs={24} sm={24} md={24} lg={24} xl={24}> */}
       <Form.Item name="mode" label="Mode">
         <Radio.Group>
           <Radio value="auto">Auto</Radio>
@@ -418,15 +471,23 @@ const LteSetting = ({ DeviceConfig, id, setUploading, uploading  }) => {
           <Radio value="4G-only">4G-only</Radio>
         </Radio.Group>
       </Form.Item>
+      {/* </Col> */}
+      {/* <Col xs={20} sm={20} md={12} lg={12} xl={12}> */}
       <Form.Item name={"mtu"} label="mtu">
         <Input />
       </Form.Item>
+      {/* </Col> */}
+      {/* <Col xs={20} sm={20} md={12} lg={12} xl={12}> */}
       <Form.Item name={"pin"} label="pin">
         <Input />
       </Form.Item>
+      {/* </Col> */}
+      {/* <Col xs={20} sm={20} md={12} lg={12} xl={12}> */}
       <Form.Item name={"puk"} label="puk">
         <Input />
       </Form.Item>
+      {/* </Col> */}
+      {/* <Col xs={20} sm={20} md={12} lg={12} xl={12}> */}
       <Form.Item
         valuePropName="checked"
         name={"pin_enabled"}
@@ -434,9 +495,13 @@ const LteSetting = ({ DeviceConfig, id, setUploading, uploading  }) => {
       >
         <Switch defaultChecked onChange={pinonChange} />
       </Form.Item>
+      {/* </Col> */}
+      {/* <Col xs={20} sm={20} md={12} lg={12} xl={12}> */}
       <Form.Item name={"apn"} label="apn">
         <Input />
       </Form.Item>
+      {/* </Col> */}
+      {/* <Col xs={20} sm={20} md={12} lg={12} xl={12}> */}
       <Form.Item
         valuePropName="checked"
         name={"ipv6_enabled"}
@@ -444,6 +509,8 @@ const LteSetting = ({ DeviceConfig, id, setUploading, uploading  }) => {
       >
         <Switch defaultChecked onChange={ipv6onChange} />
       </Form.Item>
+      {/* </Col> */}
+      {/* <Col xs={20} sm={20} md={12} lg={12} xl={12}> */}
       <Form.Item name="auth" label="Auth Type">
         <Radio.Group>
           <Radio value="none">none</Radio>
@@ -451,12 +518,18 @@ const LteSetting = ({ DeviceConfig, id, setUploading, uploading  }) => {
           <Radio value="chap">chap</Radio>
         </Radio.Group>
       </Form.Item>
+      {/* </Col> */}
+      {/* <Col xs={20} sm={20} md={12} lg={12} xl={12}> */}
       <Form.Item name={"username"} label="Auth_UserName">
         <Input />
       </Form.Item>
+      {/* </Col> */}
+      {/* <Col xs={20} sm={20} md={12} lg={12} xl={12}> */}
       <Form.Item name={"password"} label="Auth_Password">
         <Input />
       </Form.Item>
+      {/* </Col> */}
+      {/* <Col xs={20} sm={20} md={12} lg={12} xl={12}> */}
       <Form.Item
         valuePropName="checked"
         name={"limit_enabled"}
@@ -464,27 +537,43 @@ const LteSetting = ({ DeviceConfig, id, setUploading, uploading  }) => {
       >
         <Switch onChange={ipv6onChange} />
       </Form.Item>
+      {/* </Col> */}
+      {/* <Col xs={20} sm={20} md={12} lg={12} xl={12}> */}
       <Form.Item name={"limit_mbyte"} label="Mbyte">
         <Input />
       </Form.Item>
+      {/* </Col> */}
+      {/* <Col xs={20} sm={20} md={12} lg={12} xl={12}> */}
       <Form.Item name={"reset_day"} label="Reset Day">
         <Input />
       </Form.Item>
+      {/* </Col> */}
+      {/* <Col xs={20} sm={20} md={12} lg={12} xl={12}> */}
       <Form.Item name={"reset_hour"} label="Reset Hour">
         <Input />
       </Form.Item>
+      {/* </Col> */}
+      {/* <Col xs={20} sm={20} md={12} lg={12} xl={12}> */}
       <Form.Item name={"reset_minute"} label="Reset Minute">
         <Input />
       </Form.Item>
+      {/* </Col> */}
+      {/* <Col xs={20} sm={20} md={12} lg={12} xl={12}> */}
       <Form.Item name={"reset_second"} label="Reset Second">
         <Input />
       </Form.Item>
+      {/* </Col> */}
+      {/* <Col xs={20} sm={20} md={12} lg={12} xl={12}> */}
       <Form.Item valuePropName="checked" name={"roaming"} label="Roaming">
         <Switch onChange={roamingonChange} />
       </Form.Item>
+      {/* </Col> */}
+      {/* <Col xs={20} sm={20} md={12} lg={12} xl={12}> */}
       <Form.Item name={"recovery_down_time"} label="Recovery DownTimes">
         <Input />
       </Form.Item>
+      {/* </Col> */}
+      {/* <Col xs={20} sm={20} md={12} lg={12} xl={12}> */}
       <Form.Item
         valuePropName="checked"
         name={"recovery_apn_enabled"}
@@ -492,6 +581,8 @@ const LteSetting = ({ DeviceConfig, id, setUploading, uploading  }) => {
       >
         <Switch onChange={apnonChange} />
       </Form.Item>
+      {/* </Col> */}
+      {/* <Col xs={20} sm={20} md={12} lg={12} xl={12}> */}
       <Form.Item name="recovery_apn_action" label="Recovery apn action">
         <Radio.Group>
           <Radio value="reboot">reboot</Radio>
@@ -499,29 +590,27 @@ const LteSetting = ({ DeviceConfig, id, setUploading, uploading  }) => {
           <Radio value="previous-apn">previous-apn</Radio>
         </Radio.Group>
       </Form.Item>
-      <Form.Item  wrapperCol={{ span: 6, offset: 18 }}>
-        <Button
-          type="primary"
-          htmlType="submit"
-          loading={uploading}
-        >
-          Submit
-        </Button>
-      </Form.Item>
+      {/* </Col> */}
+      {/* </Row> */}
     </Form>
   );
 };
 
 export const LteSettingMF = React.memo(LteSetting);
 
-
-
-const PeriodSetting = ({ DeviceConfig, id, setUploading, uploading  }) => {
-  const [form] = Form.useForm();
+const PeriodSetting = ({
+  DeviceConfig,
+  id,
+  setIsUpdate,
+  IsUpdate,
+  form,
+  setUploading,
+}) => {
+  const { dispatch } = useContext(Context);
+  const history = useHistory()
   const Period = DeviceConfig.report_period;
 
   useEffect(() => {
-
     if (Period) {
       form.setFieldsValue({
         alive: Period.alive,
@@ -531,44 +620,63 @@ const PeriodSetting = ({ DeviceConfig, id, setUploading, uploading  }) => {
         timeout: Period.timeout,
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [Period]);
 
   const onFinish = (values) => {
-    setUploading(true)
+    setUploading(true);
     const SetPeriodUrl = `/cmd?set={"device_cfg":{"filter":{"id":"${id}"},"obj":{"report_period":{"alive":${values.alive},"timeout":${values.timeout},
     "status":${values.status},"iot":${values.iot},"gps":${values.gps}}}}}`;
-    console.log(SetPeriodUrl)
-    axios.get(SetPeriodUrl).then((res)=>{
-      console.log(res)
-      setUploading(false)
-      message.success("update successfully.");
-    })
-    .catch((error)=>{
-      console.log(error)
-      setUploading(false)
-      message.error("update fail.");
-    })
-  }
-
+    console.log(SetPeriodUrl);
+    axios
+      .post(SetPeriodUrl)
+      .then((res) => {
+        console.log(res);
+        setUploading(false);
+        setIsUpdate(!IsUpdate);
+        message.success("update successfully.");
+      })
+      .catch((error) => {
+        if (error.response && error.response.status === 401) {
+          dispatch({ type: "setLogin", payload: { IsLogin: false } });
+          UserLogOut();
+          history.push("/userlogin");                                                                         
+        } 
+        console.log(error);
+        setUploading(false);
+        message.error("update fail.");
+      });
+  };
 
   return (
     <Form {...layout} onFinish={onFinish} form={form}>
-      <Form.Item name={"alive"} label="Alive">
-        <Input />
-      </Form.Item>
-      <Form.Item name={"status"} label="Status">
-        <Input />
-      </Form.Item>
-      <Form.Item name={"iot"} label="IoT">
-        <Input />
-      </Form.Item>
-      <Form.Item name={"gps"} label="GPS">
-        <Input />
-      </Form.Item>
-      <Form.Item name={"timeout"} label="Timeout">
-        <Input />
-      </Form.Item>
-      <Form.Item  wrapperCol={{ span: 6, offset: 18 }}>
+      <Row gutter={24} >
+        <Col xs={10} sm={10} md={10} lg={8} xl={8}>
+          <Form.Item name={"alive"} label="Alive">
+            <Input />
+          </Form.Item>
+        </Col>
+        <Col xs={10} sm={10} md={10} lg={8} xl={8}>
+          <Form.Item name={"status"} label="Status">
+            <Input />
+          </Form.Item>
+        </Col>
+        <Col xs={10} sm={10} md={10} lg={8} xl={8}>
+          <Form.Item name={"iot"} label="IoT">
+            <Input />
+          </Form.Item>
+        </Col>
+        <Col xs={10} sm={10} md={10} lg={8} xl={8}>
+          <Form.Item name={"gps"} label="GPS">
+            <Input />
+          </Form.Item>
+        </Col>
+        <Col xs={10} sm={10} md={10} lg={8} xl={8}>
+          <Form.Item name={"timeout"} label="Timeout">
+            <Input />
+          </Form.Item>
+        </Col>
+        {/* <Form.Item  wrapperCol={{ span: 6, offset: 18 }}>
         <Button
           type="primary"
           htmlType="submit"
@@ -576,7 +684,8 @@ const PeriodSetting = ({ DeviceConfig, id, setUploading, uploading  }) => {
         >
           Submit
         </Button>
-      </Form.Item>
+      </Form.Item> */}
+      </Row>
     </Form>
   );
 };
