@@ -38,10 +38,14 @@ const DeviceSettingC = ({
       // console.log(record)
       setHaveContent(false);
       setLoading(true);
-      const DeviceCfgUrl = `/cmd?get={"device_cfg":{"filter":{"id":"${record.id}"},"nodeInf":{},"obj":{"report_period":{},"lan":{},"wan":{},"lte":{}}}}`;
-
-      axios
-        .post(DeviceCfgUrl)
+      // const DeviceCfgUrl = `/cmd?get={"device_cfg":{"filter":{"id":"${record.id}"},"nodeInf":{},"obj":{"report_period":{},"lan":{},"wan":{},"lte":{}}}}`;
+      const config = {
+        method: 'post',
+        headers: { 'Content-Type': 'application/json' },
+        url: '/cmd',
+        data: JSON.parse(`{"get":{"device_cfg":{"filter":{"id":"${record.id}"},"nodeInf":{},"obj":{"report_period":{},"lan":{},"wan":{},"lte":{}}}}}`),
+      }
+      axios(config)
         .then((res) => {
           // console.log(loading, haveContent)
           if (res.data.response.device_cfg[0].obj !== "No Response!") {

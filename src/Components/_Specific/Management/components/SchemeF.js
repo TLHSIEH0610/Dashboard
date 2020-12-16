@@ -12,7 +12,7 @@ import axios from "axios";
 import styles from "../management.module.scss";
 import useURLloader from "../../../../hook/useURLloader";
 import { UserLogOut } from '../../../../Utility/Fetch'
-import { useHistory } from 'react-router-dom'
+import { useHistory } from '../../Dashboard/node_modules/react-router-dom'
 import Context from "../../../../Utility/Reduxx";
 
 const layout = {
@@ -37,9 +37,14 @@ const CreateSchemeF = ({CreateSchemevisible, setCreateSchemevisible, uploading, 
   const CreateSchemeOnFinish = (values) =>{
       setUploading(true)
 
-      const CreateSchemeUrl = `scheme_mgnt?create_scheme={"cid":"${values.cid}", "scheme_list":{"user":${values.user},"group":${values.group},"device":${values.device},"expire":${values.expire._d.getTime()},"tracking":${values.tracking},"tracking_pool":${values.tracking_pool},"iot":${values.iot},"iot_poor":${values.iot_poor},"period_status":${values.period_status},"period_gps":${values.period_gps},"period_alive":${values.period_alive},"period_iot":${values.period_iot},"alive_timeout":${values.alive_timeout}}}`
-
-      axios.post(CreateSchemeUrl).then((res)=>{
+      // const CreateSchemeUrl = `scheme_mgnt?create_scheme={"cid":"${values.cid}", "scheme_list":{"user":${values.user},"group":${values.group},"device":${values.device},"expire":${values.expire._d.getTime()},"tracking":${values.tracking},"tracking_pool":${values.tracking_pool},"iot":${values.iot},"iot_poor":${values.iot_poor},"period_status":${values.period_status},"period_gps":${values.period_gps},"period_alive":${values.period_alive},"period_iot":${values.period_iot},"alive_timeout":${values.alive_timeout}}}`
+      const config = {
+        method: 'post',
+        headers: { 'Content-Type': 'application/json' },
+        url: '/scheme_mgnt',
+        data: JSON.parse(`{"create_scheme":{"cid":"${values.cid}", "scheme_list":{"user":${values.user},"group":${values.group},"device":${values.device},"expire":${values.expire._d.getTime()},"tracking":${values.tracking},"tracking_pool":${values.tracking_pool},"iot":${values.iot},"iot_poor":${values.iot_poor},"period_status":${values.period_status},"period_gps":${values.period_gps},"period_alive":${values.period_alive},"period_iot":${values.period_iot},"alive_timeout":${values.alive_timeout}}}}`),
+      }
+      axios(config).then((res)=>{
         console.log(res.data)
         setUploading(false)
         message.success("create successfully.");

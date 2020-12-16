@@ -133,11 +133,11 @@ const Nav = () => {
                   src={require("../../../image/Logo-Proscend-White-300.png")}
                   className={styles.LogoProscend}
                 />
-                <img
+                {/* <img
                   alt=""
                   src={require("../../../image/ISMS.png")}
                   className={styles.Logo}
-                />
+                /> */}
               </div>
             ) : null}
             <Link to="#" className={styles.cross} onClick={ShowBar}>
@@ -255,6 +255,7 @@ const Nav = () => {
           // </Tooltip>
         }
       </div>
+      <p className={styles.version}>Ver.120317</p>
     </div>
   );
 };

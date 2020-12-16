@@ -4,13 +4,14 @@
 //     // background: lightgray ;
 // }
 .head{
+    position: relative;
     background: white;
     height: 52.4px;
     width: 100%;
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    box-shadow: 3px 3px 5px black;
+    box-shadow: 3px 3px 5px lightgray;
     padding: 0 20px;
     .Reverse{
         margin-right: auto;
@@ -42,10 +43,32 @@
         font-size: 40px;
         color: #8FBC8F;
     }
+    .NotiIcon{
+        font-size: 1.6rem;
+        background: lightgray;
+        border-radius: 50%;
+        padding:3px;
+        margin-right: -15px;
+
+    }
+    .NotiTag{
+        position: absolute;
+        right:9%;
+        margin-top:2px;
+    }
 }
 .superSelect{
-    // li{
         margin: 0 3px 0 -15px !important;
-    // }
 
+}
+.critical{
+    color:gold;
+    margin-right: 4%;
+    font-size: 1.4rem;
+} 
+
+.warning{
+    color:red;
+    margin-right: 4%;
+    font-size: 1.4rem;
 }

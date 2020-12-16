@@ -28,7 +28,7 @@ const AllinOneC = () => {
             key="1"
           >
             <div className={styles.wrap}>
-              <BkRsUgC  uploading= {uploading} setUploading={setUploading} />
+              <BkRsUgC  uploading= {uploading} setUploading={setUploading} setIsUpdate={setIsUpdate} IsUpdate={IsUpdate}/>
               <ActionStatusC uploading= {uploading} setUploading={setUploading} setIsUpdate={setIsUpdate} IsUpdate={IsUpdate}/>
             </div>
           </TabPane>

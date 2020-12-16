@@ -6,7 +6,7 @@ import Context from "../../../../Utility/Reduxx";
 import BkRsUgF from './BkRsUgF'
 import { Translator } from '../../../../i18n/index'
 
-const BkRsUgC = ({ uploading, setUploading }) => {
+const BkRsUgC = ({ uploading, setUploading, IsUpdate }) => {
   const { state } = useContext(Context);
   const [form] = Form.useForm();
   const [FileRepository, setFileRepository] = useState([]);
@@ -15,11 +15,20 @@ const BkRsUgC = ({ uploading, setUploading }) => {
   const [ModelList, setModelList] = useState([]);
   const cid = localStorage.getItem("authUser.cid");
   const level = localStorage.getItem("authUser.level");
-  const NodeUrl = `/cmd?get={"nodeInf":{"filter":{${level==='super_super'?  state.Login.Cid : `"cid":"${cid}"` }},"nodeInf":{"cid":{},"gid":{},"token":{},"id":{},"model":{},"name":{}}}}`;
-  const [Nodeloading, Noderesponse] = useURLloader(NodeUrl, uploading);
+  const NodeUrl= '/cmd'
+  const NodeUrldata= `{"get":{"nodeInf":{"filter":{${level==='super_super'?  state.Login.Cid : `"cid":"${cid}"` }},"nodeInf":{"cid":{},"gid":{},"token":{},"id":{},"model":{},"name":{}}}}}`
+
+
+  // const NodeUrl = `/cmd?get={"nodeInf":{"filter":{${level==='super_super'?  state.Login.Cid : `"cid":"${cid}"` }},"nodeInf":{"cid":{},"gid":{},"token":{},"id":{},"model":{},"name":{}}}}`;
+  const [Nodeloading, Noderesponse] = useURLloader(NodeUrl, NodeUrldata, IsUpdate);
   const [NodeData, setNodeData] = useState([]);
-  const FileRepostoryUrl = `repository?list_file={${level==='super_super'? state.Login.Cid : `"cid":"${cid}"`}}`;
-  const [Fileloading, Filereponse] = useURLloader(FileRepostoryUrl, uploading);
+
+  const FileRepostoryUrl= '/repository'
+  const FileRepostoryUrldata= `{"list_file":{${level==='super_super'? state.Login.Cid : `"cid":"${cid}"`}}}`
+
+
+  // const FileRepostoryUrl = `repository?list_file={${level==='super_super'? state.Login.Cid : `"cid":"${cid}"`}}`;
+  const [Fileloading, Filereponse] = useURLloader(FileRepostoryUrl, FileRepostoryUrldata, IsUpdate);
   const props ={ uploading, setUploading, Nodeloading, Fileloading, form, FileRepository, userModel, NodeData, setUserModel, ModelList,  setSelectedModel, selectedModel }
 
   useEffect(() => {

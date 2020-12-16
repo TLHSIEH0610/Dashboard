@@ -23,11 +23,23 @@ const AlarmLogC = ({
   useEffect(() => {
     if(record.id){
       setUploading(true);
+      const config1 = {
+        method: 'post',
+        headers: { 'Content-Type': 'application/json' },
+        url: '/cmd',
+        data: JSON.parse(`{"get":{"alarm_log":{"filter":{"id":"${record.id}"}}}}`),
+      }
+      const config2 = {
+        method: 'post',
+        headers: { 'Content-Type': 'application/json' },
+        url: '/cmd',
+        data: JSON.parse(`{"get":{"current_alarm":{"filter":{"id": "${record.id}"}}}}`),
+      }
     function AlarmLogUrl() {
-      return axios.post(`/cmd?get={"alarm_log":{"filter":{"id":"${record.id}"}}}`)
+      return axios(config1)
     }
     function CurrentAlarmUrl() {
-      return axios.post(`/cmd?get={"current_alarm":{"filter":{"id": "${record.id}"}}}`)
+      return axios(config2)
     }
     axios.all([AlarmLogUrl(), CurrentAlarmUrl()])
     .then(axios.spread((acct, perms) => {
@@ -79,6 +91,10 @@ const AlarmLogC = ({
       title: "TrigerTime",
       dataIndex: "trigger_time",
       key: "trigger_time",
+      sorter:(a,b) =>{
+        // console.log(a,b)
+        return a.trigger_time - b.trigger_time
+    },
       render:(text) => {
         let date = new Date(text * 1000);
         return(

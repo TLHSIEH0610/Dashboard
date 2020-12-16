@@ -2,7 +2,7 @@
   "name": "web",
   "version": "0.1.0",
   "private": true,
-  "proxy": "https://e3b4a427ad18.ngrok.io",
+  "proxy": "https://457811060370.ngrok.io",
   "homepage": "./",
   "dependencies": {
     "@ant-design/charts": "^0.9.13",

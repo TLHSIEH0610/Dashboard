@@ -95,11 +95,18 @@ const RepositoryC = ({ setIsUpdate, IsUpdate }) => {
         const values = await form.validateFields();
         toggleEdit();
         if(record.name===values.name){return}
-        const RenameUrl = `/repository?rename_file={"cid":"${record.cid}","old_name":"${record.name}","new_name":"${values.name}","type":"${record.type}"}`
+        // const RenameUrl = `/repository?rename_file={"cid":"${record.cid}","old_name":"${record.name}","new_name":"${values.name}","type":"${record.type}"}`
         setUploading(true)
-        axios.post(RenameUrl).then((res)=>{
+        const config = {
+          method: 'post',
+          headers: { 'Content-Type': 'application/json' },
+          url: '/repository',
+          data: JSON.parse(`{"rename_file":{"cid":"${record.cid}","old_name":"${record.name}","new_name":"${values.name}","type":"${record.type}"}}`)
+        }
+        axios(config).then((res)=>{
           setUploading(false)
           console.log(res)
+          setIsUpdate(!IsUpdate)
           message.success('rename successfully.')
         })
         .catch((erro)=>{
@@ -164,8 +171,11 @@ const RepositoryC = ({ setIsUpdate, IsUpdate }) => {
   };
 
   const [allFileList, setAllFileList] = useState([])
-  const FileRepostoryUrl =  level==='super_super' ?  `/repository?list_file={${state.Login.Cid}}` : `/repository?list_file={"cid":"${cid}"}`;
-  const [ReposLoading, ReposResponse] = useURLloader(FileRepostoryUrl, uploading)
+  const FileRepostoryUrl= '/repository'
+  const FileRepostoryUrldata= `{"list_file":{${level==='super_super'? state.Login.Cid : `"cid":"${cid}"`}}}`
+
+  // const FileRepostoryUrl =  level==='super_super' ?  `/repository?list_file={${state.Login.Cid}}` : `/repository?list_file={"cid":"${cid}"}`;
+  const [ReposLoading, ReposResponse] = useURLloader(FileRepostoryUrl, FileRepostoryUrldata, uploading)
   // console.log(FileRepostoryUrl)
   useEffect(() => {
       if(ReposResponse && ReposResponse.response.repository.length){
@@ -200,10 +210,15 @@ const RepositoryC = ({ setIsUpdate, IsUpdate }) => {
 
   const deleteItem = (key) => {
     setUploading(true);
-    let url = `/repository?delete_file={"cid":"${key.cid}","name":"${key.name}","type":"${key.type}"}` ;
-    console.log(url);
+    // let url = `/repository?delete_file={"cid":"${key.cid}","name":"${key.name}","type":"${key.type}"}` ;
+    const config = {
+      method: 'post',
+      headers: { 'Content-Type': 'application/json' },
+      url: '/repository',
+      data: JSON.parse(`{"delete_file":{"cid":"${key.cid}","name":"${key.name}","type":"${key.type}"}}`)
+    }
     axios
-      .post(url)
+      (config)
       .then((res) => {
         console.log(res);
         setUploading(false);
@@ -219,13 +234,19 @@ const RepositoryC = ({ setIsUpdate, IsUpdate }) => {
 
   const DownloadConfig = (key) => {
     setUploading(true);
-    let url = `/repository?download_file={"cid":"${key.cid}","name":"${key.name}","type":"${key.type}"}` 
-    console.log(url);
-    const opt = {
-      responseType: "blob",
-    };
-    axios
-      .post(url, opt)
+    // let url = `/repository?download_file={"cid":"${key.cid}","name":"${key.name}","type":"${key.type}"}` 
+    // console.log(url);
+    // const opt = {
+    //   responseType: "blob",
+    // };
+    const config = {
+      method: 'post',
+      headers: { 'Content-Type': 'application/json' },
+      url: '/repository',
+      data: JSON.parse(`{"download_file":{"cid":"${key.cid}","name":"${key.name}","type":"${key.type}"}}`),
+      responseType: "blob"
+    }
+    axios(config)
       .then((response) => {
         const url = window.URL.createObjectURL(new Blob([response.data]));
         const link = document.createElement("a");
@@ -234,7 +255,6 @@ const RepositoryC = ({ setIsUpdate, IsUpdate }) => {
         document.body.appendChild(link);
         link.click();
         setUploading(false);
-        setIsUpdate(!IsUpdate)
       })
       .catch((err) => {
         console.log(err);

@@ -36,22 +36,32 @@ const BkRsUgF = ({
     ActionStateList.forEach((item) => ActionStateID.push(item.id));
     let BRUData = [];
 
-    // const deviceID = NodeData.filter((item)=>{
-    //   if(values.Device_ID.includes(item))
-    // })
-    const CheckIDorName = NodeData.filter((item) => {
-      return (
-        values.Device_ID.includes(item.id) ||
-        values.Device_ID.includes(item.name)
-      );
-    });
-    console.log(
-      ActionStateList,
-      values,
-      NodeData,
-      CheckIDorName,
-      ActionStateID
-    );
+    // const CheckIDorName = NodeData.filter((item) => {
+    //   return (
+    //     values.Device_ID.includes(item.id) ||
+    //     values.Device_ID.includes(item.name)
+    //   );
+    // });
+
+    let CheckIDorName
+    if(values.Device_ID.includes('All')){
+      CheckIDorName = options
+    }else{
+      CheckIDorName = NodeData.filter((item) => {
+        return (
+          values.Device_ID.includes(item.id) ||
+          values.Device_ID.includes(item.name)
+        );
+      });
+    }
+
+    // console.log(
+    //   ActionStateList,
+    //   // values,
+    //   NodeData,
+    //   CheckIDorName,
+    //   ActionStateID
+    // );
     CheckIDorName.some((device) => {
       if (ActionStateID.length && ActionStateID.includes(device.id)) {
         message.error(`${device.id} is duplicated in action list!`);
@@ -59,13 +69,7 @@ const BkRsUgF = ({
       }
 
       BRUData.push(
-        `{${
-          cid === "proscend"
-            ? state.Login.Cid === ""
-              ? `"cid":"proscend"`
-              : state.Login.Cid
-            : `"cid":"${cid}"`
-        },"id":"${device.id}","type":"${
+        `{${cid === "proscend" ? state.Login.Cid === "" ? `"cid":"proscend"` : state.Login.Cid : `"cid":"${cid}"`},"id":"${device.id}","type":"${
           values.Action === "upgrade" ? "fw" : "cfg"
         }","name":"${
           values.Action === "backup"
@@ -73,13 +77,29 @@ const BkRsUgF = ({
             : values.Repostiry
         }","inf":{"model":"${values.Model}"}}`
       );
-    });
+     
 
-    const BRUUrl = `/cmd?set={"${values.Action}":[${BRUData}]}`;
-    if(!BRUData.length){setUploading(false); return}
+    });
+    console.log(BRUData)
+    // const BRUUrl = `/cmd?set={"${values.Action}":[${BRUData}]}`;
+    const BRUUrl = `/cmd`
+    const BRUBody = `{"set":{"${values.Action}":[${BRUData}]}}`
+    console.log(BRUBody)
+    console.log(JSON.parse(BRUBody))
+    // const BRUBody = {set:{restore:[{cid:"proscend",id:"015FqciQvWxz1Nz148AeAAGa",name:"",type:"cfg",inf:{}}]}}
+    const config = {
+      method: 'post',
+      headers: { 'Content-Type': 'application/json' },
+      url: BRUUrl,
+      data: JSON.parse(BRUBody),
+    }
+    console.log(BRUData.length)
+    if (!BRUData.length) {
+      setUploading(false);
+      return;
+    }
     console.log(BRUUrl);
-    axios
-      .post(BRUUrl)
+    axios(config)
       .then((res) => {
         console.log(res);
         message.success("action submit successfully.");
@@ -136,6 +156,7 @@ const BkRsUgF = ({
               onChange={(value) => {
                 form.resetFields([["Device_ID"]]);
                 let DevicebyModel = [];
+                DevicebyModel.push('All')
                 NodeData.forEach((item) => {
                   if (item.model === value && item.name === "") {
                     DevicebyModel.push(item.id);
@@ -179,6 +200,7 @@ const BkRsUgF = ({
               className={styles.deviceinput}
               onFocus={() => {}}
             >
+              
               {options.map((item, index) => {
                 return (
                   <Option key={index} value={item}>

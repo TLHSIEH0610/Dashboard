@@ -51,13 +51,23 @@ const UserForm = ({
     if (record.cid) {
       console.log("有執行");
       setUploading(true);
+      const config1 = {
+        method: 'post',
+        headers: { 'Content-Type': 'application/json' },
+        url: '/user_mgnt',
+        data: JSON.parse(`{"list_user":{"cid":"${record.cid}"}}`),
+      }
+      const config2 = {
+        method: 'post',
+        headers: { 'Content-Type': 'application/json' },
+        url: '/device_mgnt/group',
+        data: JSON.parse(`{"list_group":{"cid":"${record.cid}"}}`),
+      }
       function UserListUrl() {
-        return axios.post(`/user_mgnt?list_user={"cid":"${record.cid}"}`);
+        return axios(config1);
       }
       function getGroupUrl() {
-        return axios.post(
-          `/device_mgnt/group?list_group={"cid":"${record.cid}"}`
-        );
+        return axios(config2);
       }
       axios
         .all([UserListUrl(), getGroupUrl()])
@@ -112,10 +122,15 @@ const UserForm = ({
 
   const deleteUser = (Deleterecord) =>{
     setUploading(true);
-    const deleteUserUrl = `/user_mgnt?delete_user={"cid":"${record.cid}", "user_list":[{"name":"${Deleterecord.name}"}]}`
-    console.log(deleteUserUrl)
-    axios
-    .post(deleteUserUrl)
+    // const deleteUserUrl = `/user_mgnt?delete_user={"cid":"${record.cid}", "user_list":[{"name":"${Deleterecord.name}"}]}`
+    // console.log(deleteUserUrl)
+    const config = {
+      method: 'post',
+      headers: { 'Content-Type': 'application/json' },
+      url: '/user_mgnt',
+      data: JSON.parse(`{"delete_user":{"cid":"${record.cid}", "user_list":[{"name":"${Deleterecord.name}"}]}}`),
+    }
+    axios(config)
     .then((res) => {
       setUploading(false);
       message.success("Delete successfully.");
@@ -136,13 +151,20 @@ const UserForm = ({
     console.log("Received values of form:", values);
     setUploading(true);
     // setBtnloading(true);
-    console.log(values);
-    const url = `/user_mgnt?create_user={"cid":"${
-      values.cid
-    }", "user_list":${JSON.stringify(values.users)}}`;
-    console.log(values, url);
-    axios
-      .post(url)
+    // console.log(values);
+    // const url = `/user_mgnt?create_user={"cid":"${
+    //   values.cid
+    // }", "user_list":${JSON.stringify(values.users)}}`;
+    // console.log(values, url);
+    const config = {
+      method: 'post',
+      headers: { 'Content-Type': 'application/json' },
+      url: '/user_mgnt',
+      data: JSON.parse(`{"create_user":{"cid":"${
+        record.cid
+      }", "user_list":${JSON.stringify(values.users)}}}`),
+    }
+    axios(config)
       .then((res) => {
         setUploading(false);
         message.success("Create successfully.");
@@ -173,12 +195,19 @@ const UserForm = ({
       }
     });
 
-    const EditUserUrl = `/user_mgnt?modify_user={"cid":"${
-      record.cid
-    }", "user_list":${JSON.stringify(values.EditUser)}}`;
-    console.log(EditUserUrl);
-    axios
-      .post(EditUserUrl)
+    // const EditUserUrl = `/user_mgnt?modify_user={"cid":"${
+    //   record.cid
+    // }", "user_list":${JSON.stringify(values.EditUser)}}`;
+    // console.log(EditUserUrl);
+    const config = {
+      method: 'post',
+      headers: { 'Content-Type': 'application/json' },
+      url: '/user_mgnt',
+      data: JSON.parse(`{"modify_user":{"cid":"${
+        record.cid
+      }", "user_list":${JSON.stringify(values.EditUser)}}}`),
+    }
+    axios(config)
       .then((res) => {
         setUploading(false);
         message.success("Edit successfully.");
@@ -546,19 +575,35 @@ const CreateInfoForm = ({
   const CreateInfoonFinish = async (values) => {
     console.log("Received values of form:", values);
     setUploading(true);
-    const CreateUserTokenUrl = `/user_mgnt?generate_token={}`;
+    // const CreateUserTokenUrl = `/user_mgnt?generate_token={}`;
+    const config1 = {
+      method: 'post',
+      headers: { 'Content-Type': 'application/json' },
+      url: '/user_mgnt',
+      data: JSON.parse(`{"generate_token":{}}`),
+    }
+
     let UserToken;
-    await axios.post(CreateUserTokenUrl).then((res) => {
+    await axios(config1).then((res) => {
       UserToken = res.data.response.token;
     });
-    const CreateInfo = ` /inf_mgnt?create_inf={"cid":"${UserToken}","inf_list":{"company":"${
-      values.company ? values.company : ""
-    }", "contact":"${values.contact ? values.contact : ""}", "mail":"${
-      values.mail ? values.mail : ""
-    }", "phone":"${values.phone ? values.phone : ""}"}}`;
-    console.log(CreateInfo);
-    axios
-      .post(CreateInfo)
+    // const CreateInfo = ` /inf_mgnt?create_inf={"cid":"${UserToken}","inf_list":{"company":"${
+    //   values.company ? values.company : ""
+    // }", "contact":"${values.contact ? values.contact : ""}", "mail":"${
+    //   values.mail ? values.mail : ""
+    // }", "phone":"${values.phone ? values.phone : ""}"}}`;
+    // console.log(CreateInfo);
+    const config2 = {
+      method: 'post',
+      headers: { 'Content-Type': 'application/json' },
+      url: '/inf_mgnt',
+      data: JSON.parse(`{"create_inf":{"cid":"${UserToken}","inf_list":{"company":"${
+        values.company ? values.company : ""
+      }", "contact":"${values.contact ? values.contact : ""}", "mail":"${
+        values.mail ? values.mail : ""
+      }", "phone":"${values.phone ? values.phone : ""}"}}}`),
+    }
+    axios(config2)
       .then((res) => {
         setUploading(false);
         message.success("Create successfully.");
@@ -652,9 +697,14 @@ const EditCustomerInfo = ({
   const EditCustomerInfoOnFinish = (values) => {
     console.log("Received values of form:", values);
     setUploading(true);
-    const EditCustInfiUrl = `/inf_mgnt?modify_inf={"cid":"${record.cid}", "inf_list":{"company":"${values.company}", "contact":"${values.contact}", "mail":"${values.mail}", "phone":"${values.phone}"}}`;
-    axios
-      .post(EditCustInfiUrl)
+    // const EditCustInfiUrl = `/inf_mgnt?modify_inf={"cid":"${record.cid}", "inf_list":{"company":"${values.company}", "contact":"${values.contact}", "mail":"${values.mail}", "phone":"${values.phone}"}}`;
+    const config = {
+      method: 'post',
+      headers: { 'Content-Type': 'application/json' },
+      url: '/inf_mgnt',
+      data: JSON.parse(`{"modify_inf":{"cid":"${record.cid}", "inf_list":{"company":"${values.company}", "contact":"${values.contact}", "mail":"${values.mail}", "phone":"${values.phone}"}}}`),
+    }
+    axios(config)
       .then(() => {
         setUploading(false);
         message.success("update successfully.");

@@ -21,8 +21,14 @@ const EventLogC = ({ record, EventLogModalvisible, setEventLogModalvisible, setR
     useEffect(() => {
       if (record.cid) {
         setUploading(true)
-        const EventLogUrl = `/cmd?get={"event_log":{"filter":{"cid":"${record.cid}"}}} `
-        axios.post(EventLogUrl).then((res)=>{
+        // const EventLogUrl = `/cmd?get={"event_log":{"filter":{"cid":"${record.cid}"}}} `
+        const config = {
+          method: 'post',
+          headers: { 'Content-Type': 'application/json' },
+          url: '/cmd',
+          data: JSON.parse(`{"get":{"event_log":{"filter":{"cid":"${record.cid}"}}}}`),
+        }
+        axios(config).then((res)=>{
             let EventLog = []
             res.data.response.event_log.list[0].event_list.forEach((item, index)=>{
                 let getTime =  new Date(item.timestamp*1000)

@@ -40,11 +40,24 @@ const EditGroupModalC = ({
   useEffect(()=>{
     if(record.cid){
       setUploading(true)
+      const config1 = {
+        method: 'post',
+        headers: { 'Content-Type': 'application/json' },
+        url: '/cmd',
+        data: JSON.parse(`{"get":{"nodeInf":{"filter":{"cid":"${record.cid}"},"nodeInf":{"cid":{},"gid":{},"token":{},"id":{}}}}}`),
+      }
+      const config2 = {
+        method: 'post',
+        headers: { 'Content-Type': 'application/json' },
+        url: '/device_mgnt/group',
+        data: JSON.parse(`{"list_group":{"cid":"${record.cid}"}}`),
+      }
+
       function NodeUrl() {
-        return axios.post(`/cmd?get={"nodeInf":{"filter":{"cid":"${record.cid}"},"nodeInf":{"cid":{},"gid":{},"token":{},"id":{}}}}`)
+        return axios(config1)
       }
       function getGroupUrl() {
-        return axios.post(`/device_mgnt/group?list_group={"cid":"${record.cid}"}`)
+        return axios(config2)
       }
       axios.all([NodeUrl(), getGroupUrl()])
       .then(axios.spread((acct, perms) => {
@@ -68,6 +81,7 @@ const EditGroupModalC = ({
           });
         }else{
           setGroupData([]);
+          setNodeList([]);
         }
 
         setUploading(false)

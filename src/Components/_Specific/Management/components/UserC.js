@@ -49,11 +49,16 @@ const ManagementC = () => {
   const [EventLogRecord, setEventLogRecord] = useState("");
   const [CustomerInfoRecord, setCustomerInfoRecord] = useState(false);
   const show = localStorage.getItem("authUser.level") === "super_super";
-  const CustInfoUrl = `/inf_mgnt?list_inf={${
-    level === "super_super" ? state.Login.Cid : `"cid":"${cid}"`
-  }} `;
+
+  const CustInfoUrl= '/inf_mgnt'
+  const CustInfoUrldata= `{"list_inf":{${level === "super_super" ? state.Login.Cid : `"cid":"${cid}"`}}}`
+
+
+  // const CustInfoUrl = `/inf_mgnt?list_inf={${
+  //   level === "super_super" ? state.Login.Cid : `"cid":"${cid}"`
+  // }} `;
   const [CustInfoLoading, CustInfoResponse] = useURLloader(
-    CustInfoUrl,
+    CustInfoUrl, CustInfoUrldata,
     IsUpdate
   );
   const history = useHistory();
@@ -67,10 +72,16 @@ const ManagementC = () => {
   const deleteUserInfo = (record) => {
     // console.log(record);
     setUploading(true);
-    const DeleteUrl = `/inf_mgnt?delete_inf={"cid":"${record.cid}"}`;
-    console.log(DeleteUrl);
-    axios
-      .post(DeleteUrl)
+    // const DeleteUrl = `/inf_mgnt?delete_inf={"cid":"${record.cid}"}`;
+    // console.log(DeleteUrl);
+    const config = {
+      method: 'post',
+      headers: { 'Content-Type': 'application/json' },
+      url: '/inf_mgnt',
+      data: JSON.parse(`{"delete_inf":{"cid":"${record.cid}"}}`),
+    }
+
+    axios(config)
       .then(() => {
         setUploading(false);
         setIsUpdate(!IsUpdate);

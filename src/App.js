@@ -10,9 +10,12 @@ import { Provider } from "./Utility/Reduxx";
 import { NavRoutes } from "./Routes/NavbarRoutes";
 import WrongPage from "./Pages/WrongPage";
 import InternalError from "./Pages/WrongPage/InternalFail";
+import CurrentAlarm from './Pages/Dashboard/CurrentAlarm'
 // import Management from './Pages/Management'
 import "antd/dist/antd.css";
-
+import IoTGuage from './Pages/Dashboard/IoTGuage'
+import BulkConfig from './Pages/Topology/BulkConfig'
+import AllRouter from './Pages/Topology/AllRouter'
 
 const App = () => {
 
@@ -37,6 +40,10 @@ const App = () => {
                           <Redirect to="/login" />
                         )
                       }></Route> */}
+                <Route path="/allrouters" exact component={AllRouter}></Route>       
+                <Route path="/bulkconfig" exact component={BulkConfig}></Route> 
+                <Route path="/iotguage" exact component={IoTGuage}></Route>   
+                <Route path="/alarm" exact component={CurrentAlarm}></Route>      
                 <Route path="/userlogin" exact component={Login}></Route>
                 <Route path="/register" exact component={Register}></Route>
                 <Route path="/internalerror" exact component={InternalError}></Route>

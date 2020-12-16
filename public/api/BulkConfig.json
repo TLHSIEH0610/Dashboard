@@ -1,0 +1,410 @@
+{
+    "response": {
+      "device_cfg": [
+        {
+          "nodeInf": {
+            "id": "014CBL7VE3ZK0419",
+            "name": "KingSolo-Device_1",
+            "cid": "1e20d72828924413aeffc0c51bf5be76",
+            "gid": [
+              "USA-California",
+              "abccc"
+            ],
+            "token": "eeabc035697d4d0eaa779bc32b56a753",
+            "model": "M330",
+            "topic_id": "014CBL7VE3ZK0419",
+            "byOne": "NO",
+            "health": "up",
+            "sim": "excellent",
+            "connect": "YES",
+            "alive": "30",
+            "lastUpdate": 1606166938
+          },
+          "obj": {
+            "report_period": {
+              "alive": 30,
+              "timeout": 30,
+              "status": 30,
+              "iot": 30,
+              "gps": 30
+            },
+            "identity": {
+              "hostname": "Cellular Router",
+              "lan_eth_mac": "00:19:15:F0:4A:E5",
+              "wan_eth_mac": "00:19:15:F0:4A:E6",
+              "wifi_ap_mac": "00:19:15:F0:4A:E7",
+              "bootloader_version": "1.03",
+              "hardware_mcsv": "014C008810431074",
+              "serial_number": "BL7VE3ZK0419",
+              "modem_firmware_version": "EC25AUFAR06A03M4G",
+              "IMEI": "861585046289714",
+              "partition": [
+                {
+                  "name": "a",
+                  "software_mcsv": "014C0088106311FB",
+                  "active": false
+                },
+                {
+                  "name": "b",
+                  "software_mcsv": "014C0088106311FB",
+                  "active": true
+                }
+              ],
+              "uptime": 1239
+            },
+            "status": {
+              "gps": {
+                "latitude": 0.0,
+                "longitude": 0.0,
+                "horizontal": 0.0,
+                "altitude": 0.0,
+                "date": "",
+                "utc-time": "",
+                "satellite": 0
+              },
+              "statistic": {
+                "lte": {
+                  "up_kbps": 0.0,
+                  "down_kbps": 0.0,
+                  "tx_kbytes": 0.0,
+                  "rx_kbytes": 0.0,
+                  "tx_dropped_pkts": 0,
+                  "rx_dropped_pkts": 0,
+                  "apn": [
+                    {
+                      "up_kbps": 0.0,
+                      "down_kbps": 0.0,
+                      "tx_kbytes": 0.0,
+                      "rx_kbytes": 0.0,
+                      "tx_dropped_pkts": 0,
+                      "rx_dropped_pkts": 0
+                    }
+                  ]
+                },
+                "wan": {
+                  "up_kbps": 0.0,
+                  "down_kbps": 0.0,
+                  "tx_kbytes": 0.0,
+                  "rx_kbytes": 0.0,
+                  "tx_dropped_pkts": 0,
+                  "rx_dropped_pkts": 0
+                },
+                "lan": {
+                  "up_kbps": 0.0,
+                  "down_kbps": 0.0,
+                  "tx_kbytes": 249.328,
+                  "rx_kbytes": 47.416,
+                  "tx_dropped_pkts": 0,
+                  "rx_dropped_pkts": 0
+                }
+              },
+              "sim": [
+                {
+                  "status": "not inserted",
+                  "operator": "",
+                  "access": "",
+                  "IMSI": "",
+                  "phone_number": "",
+                  "band": "",
+                  "EARFCN": 0,
+                  "PLMN": "",
+                  "roaming": false,
+                  "rssi_dbm": 0,
+                  "active": true
+                }
+              ],
+              "connection": {
+                "lte": {
+                  "ipv4": {
+                    "address": "",
+                    "netmask": "",
+                    "gateway": "",
+                    "uptime": 0
+                  },
+                  "active": false,
+                  "apn": [
+                    {
+                      "ipv4": {
+                        "address": "",
+                        "netmask": "",
+                        "gateway": "",
+                        "uptime": 0
+                      }
+                    }
+                  ]
+                },
+                "wan": {
+                  "ipv4": {
+                    "address": "192.168.0.165",
+                    "netmask": "255.255.255.0",
+                    "gateway": "192.168.0.250",
+                    "uptime": 1065
+                  },
+                  "active": true
+                },
+                "wwan": {
+                  "ipv4": {
+                    "address": "",
+                    "netmask": "",
+                    "gateway": "",
+                    "uptime": 0,
+                    "SSID": "",
+                    "MAC": "",
+                    "channel": 0
+                  },
+                  "active": false
+                },
+                "lan": {
+                  "ipv4": {
+                    "address": "192.168.1.1",
+                    "netmask": "255.255.255.0"
+                  },
+                  "ipv6": {
+                    "address": "",
+                    "uptime": 0
+                  }
+                }
+              },
+              "dns": {
+                "wan": [
+                  {
+                    "ipv4": [
+                      "8.8.4.4",
+                      "192.168.0.130",
+                      ""
+                    ],
+                    "ipv6": [
+                      "",
+                      "",
+                      ""
+                    ]
+                  }
+                ]
+              },
+              "alarm": [
+                
+              ]
+            },
+            "lan": {
+              "ipv4": {
+                "address": "192.168.1.1",
+                "netmask": "255.255.255.0",
+                "dhcp": {
+                  "mode": "off",
+                  "pool": [
+                    {
+                      "start": "192.168.1.112",
+                      "end": "192.168.1.222",
+                      "fixed_ip": [
+                        
+                      ],
+                      "_$help": {
+                        "fixed_ip": {
+                          "max": 16
+                        }
+                      }
+                    }
+                  ],
+                  "_$help": {
+                    "mode": [
+                      "off",
+                      "on"
+                    ],
+                    "pool": {
+                      "max": 1
+                    }
+                  }
+                }
+              },
+              "ipv6": {
+                "type": "delegate-prefix-from-wan",
+                "static": {
+                  "address": ""
+                },
+                "dhcp": {
+                  "assigment": "stateful",
+                  "_$help": {
+                    "assigment": [
+                      "stateful",
+                      "stateless"
+                    ]
+                  }
+                },
+                "_$help": {
+                  "type": [
+                    "delegate-prefix-from-wan",
+                    "static"
+                  ]
+                }
+              }
+            },
+            "wan": {
+              "priority": {
+                "_$help": {
+                  "order": {
+                    "wan": [
+                      "eth",
+                      "lte",
+                      "wifi-2.4G"
+                    ]
+                  }
+                },
+                "order": [
+                  "lte",
+                  "eth",
+                  "lte"
+                ],
+                "lte": {
+                  "mode": "bridge",
+                  "_$help": {
+                    "mode": [
+                      "bridge",
+                      "router"
+                    ]
+                  }
+                }
+              },
+              "ethernet": {
+                "type": "dhcp",
+                "dhcp": {
+                  "dns": {
+                    "ipv4": [
+                      {
+                        "type": "manual",
+                        "address": "8.8.4.4"
+                      },
+                      {
+                        "type": "ISP",
+                        "address": ""
+                      },
+                      {
+                        "type": "ISP",
+                        "address": ""
+                      }
+                    ],
+                    "_$help": {
+                      "ipv4": {
+                        "type": [
+                          "ISP",
+                          "manual",
+                          "none"
+                        ]
+                      }
+                    }
+                  }
+                },
+                "pppoe": {
+                  "username": "aaron",
+                  "password": "********",
+                  "service_name": "test_service"
+                },
+                "static": {
+                  "ipv4": {
+                    "address": "192.168.11.1",
+                    "netmask": "255.255.255.0",
+                    "gateway": "192.168.11.250",
+                    "dns": [
+                      {
+                        "address": "8.8.4.4"
+                      },
+                      {
+                        "address": ""
+                      },
+                      {
+                        "address": ""
+                      }
+                    ]
+                  }
+                },
+                "_$help": {
+                  "type": [
+                    "dhcp",
+                    "pppoe",
+                    "static"
+                  ]
+                }
+              }
+            },
+            "lte": {
+              "config": {
+                "_$help": {
+                  "mode": [
+                    "auto",
+                    "4G-only",
+                    "3G-only",
+                    "2G-only"
+                  ],
+                  "mtu": {
+                    "min": 700,
+                    "max": 1500
+                  }
+                },
+                "mode": "4G-only",
+                "mtu": 1200
+              },
+              "sim": [
+                {
+                  "pin": "********",
+                  "puk": "********",
+                  "pin_enabled": false,
+                  "apn": [
+                    {
+                      "apn": "internet",
+                      "ipv6_enabled": false,
+                      "auth": {
+                        "type": "chap",
+                        "username": "test",
+                        "password": "********",
+                        "_$help": {
+                          "type": [
+                            "none",
+                            "pap",
+                            "chap"
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                }
+              ],
+              "limit": [
+                {
+                  "enabled": true,
+                  "limit_mbyte": 1024,
+                  "reset": {
+                    "day": 1,
+                    "hour": 11,
+                    "minute": 11,
+                    "second": 11
+                  }
+                }
+              ],
+              "policy": {
+                "roaming": true,
+                "recovery": {
+                  "down_times": 10,
+                  "recover_apn": {
+                    "enabled": true,
+                    "action": "default-apn",
+                    "_$help": {
+                      "action": [
+                        "reboot",
+                        "default-apn",
+                        "previous-apn"
+                      ]
+                    }
+                  },
+                  "_$help": {
+                    "down_times": {
+                      "min": 3,
+                      "max": 15
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }

@@ -37,9 +37,15 @@ export const TokenModelC = ({
   useEffect(() => {
     if (record.cid) {
       setUploading(true);
-      const GetTokenUrl = `/device_mgnt/token?list_token={"cid":"${record.cid}"}`;
+      // const GetTokenUrl = `/device_mgnt/token?list_token={"cid":"${record.cid}"}`;
+      const config = {
+        method: 'post',
+        headers: { 'Content-Type': 'application/json' },
+        url: '/device_mgnt/token',
+        data: JSON.parse(`{"list_token":{"cid":"${record.cid}"}}`),
+      }
       axios
-        .post(GetTokenUrl)
+        (config)
         .then((res) => {
           setTokenList(res.data.response[0].token_list);
           form.setFieldsValue({ token: res.data.response[0].token_list });
@@ -67,12 +73,21 @@ export const TokenModelC = ({
         token_list += `{"old_token":"${TokenList[i]}","new_token":"${values.token[i]}"},`;
       }
     }
-    const ModifyTokeUrl = `/device_mgnt/token?modify_token={"cid":"${
-      record.cid
-    }", "token_list":[${token_list.substring(0, token_list.length - 1)}]}`;
+    // const ModifyTokeUrl = `/device_mgnt/token?modify_token={"cid":"${
+    //   record.cid
+    // }", "token_list":[${token_list.substring(0, token_list.length - 1)}]}`;
 
-    axios
-      .post(ModifyTokeUrl)
+    const config = {
+      method: 'post',
+      headers: { 'Content-Type': 'application/json' },
+      url: '/device_mgnt/token',
+      data: JSON.parse(`{"modify_token":{"cid":"${
+        record.cid
+      }", "token_list":[${token_list.substring(0, token_list.length - 1)}]}}`),
+    }
+
+
+    axios(config)
       .then((res) => {
         console.log(res);
         setUploading(false);
@@ -98,15 +113,24 @@ export const TokenModelC = ({
 
   const CreateToken = async () => {
     setUploading(true);
-    const generateTokenUrl = `/device_mgnt/token?generate_token={}`;
+    // const generateTokenUrl = `/device_mgnt/token?generate_token={}`;
     let newToken;
-    await axios.post(generateTokenUrl).then((res) => {
+    const config1 = {
+      method: 'post',
+      headers: { 'Content-Type': 'application/json' },
+      url: '/device_mgnt/token',
+      data: JSON.parse(`{"generate_token":{}}`),
+    }   
+    await axios(config1).then((res) => {
       newToken = res.data.response.token;
     });
-    axios
-      .post(
-        `/device_mgnt/token?create_token={"cid":"${record.cid}", "token_list":["${newToken}"]}`
-      )
+    const config2 = {
+      method: 'post',
+      headers: { 'Content-Type': 'application/json' },
+      url: '/device_mgnt/token',
+      data: JSON.parse(`{"create_token":{"cid":"${record.cid}", "token_list":["${newToken}"]}}`),
+    }
+    axios(config2)
       .then((resu) => {
         console.log(resu);
         setUploading(false);
@@ -127,9 +151,14 @@ export const TokenModelC = ({
 
   const DeleteToken = (item) => {
     setUploading(true);
-    const deleteTokenUrl = `/device_mgnt/token?delete_token={"cid":"${record.cid}", "token_list":["${item}"]}`;
-    axios
-      .post(deleteTokenUrl)
+    // const deleteTokenUrl = `/device_mgnt/token?delete_token={"cid":"${record.cid}", "token_list":["${item}"]}`;
+    const config = {
+      method: 'post',
+      headers: { 'Content-Type': 'application/json' },
+      url: '/device_mgnt/token',
+      data: JSON.parse(`{"delete_token":{"cid":"${record.cid}", "token_list":["${item}"]}}`),
+    }
+    axios(config)
       .then((resu) => {
         console.log(resu);
         setUploading(false);

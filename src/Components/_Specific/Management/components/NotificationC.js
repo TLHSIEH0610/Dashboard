@@ -41,9 +41,14 @@ const NotifiModalC = ({
   useEffect(() => {
     if (record.cid) {
       setUploading(true);
-      const NotifiUrl = `/cmd?get={"notification":{"filter":{"cid":"${record.cid}"}}}`;
-      axios
-      .post(NotifiUrl)
+      // const NotifiUrl = `/cmd?get={"notification":{"filter":{"cid":"${record.cid}"}}}`;
+      const config = {
+        method: 'post',
+        headers: { 'Content-Type': 'application/json' },
+        url: '/cmd',
+        data: JSON.parse(`{"get":{"notification":{"filter":{"cid":"${record.cid}"}}}}`),
+      }
+      axios(config)
       .then((res) => {
         const NotifiData = res.data.response.notification[0];
         form.setFieldsValue({

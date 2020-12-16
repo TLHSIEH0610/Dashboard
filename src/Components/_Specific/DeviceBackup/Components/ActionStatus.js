@@ -30,9 +30,14 @@ const ActionStatusC = ({ setIsUpdate, IsUpdate }) => {
 
   useEffect(() => {
     setUploading(true)
-    const ActionStateUrl = level==='super_super' ? `/cmd?get={"bck_rst_upg_list":{"list":{${state.Login.Cid}}}}`: `/cmd?get={"bck_rst_upg_list":{"list":{"cid":"${cid}"}}}`;     
-
-    axios.post(ActionStateUrl).then((res) => {
+    // const ActionStateUrl = level==='super_super' ? `/cmd?get={"bck_rst_upg_list":{"list":{${state.Login.Cid}}}}`: `/cmd?get={"bck_rst_upg_list":{"list":{"cid":"${cid}"}}}`;     
+    const config = {
+      method: 'post',
+      headers: { 'Content-Type': 'application/json' },
+      url: '/cmd',
+      data: JSON.parse(`{"get":{"bck_rst_upg_list":{"list":{${ level==='super_super' ? state.Login.Cid : `"cid":"${cid}"` }}}}}`)
+    }
+    axios(config).then((res) => {
       let responseData = [];
       res.data.response &&(
         res.data.response.bck_rst_upg.forEach((item, index) => {
@@ -154,9 +159,16 @@ const ActionStatusC = ({ setIsUpdate, IsUpdate }) => {
 
   function clearHistory(id) {
     setUploading(true)
-    let ClearHistoryUrl = `/cmd?set={"bck_rst_upg_list":{"delete":{"id":"${id}"}}}`;
-    console.log(ClearHistoryUrl)
-    axios.post(ClearHistoryUrl).then((res) => {
+    // let ClearHistoryUrl = `/cmd?set={"bck_rst_upg_list":{"delete":{"id":"${id}"}}}`;
+    // console.log(ClearHistoryUrl)
+    const config = {
+      method: 'post',
+      headers: { 'Content-Type': 'application/json' },
+      url: '/cmd',
+      data: JSON.parse(`{"set":{"bck_rst_upg_list":{"delete":{"id":"${id}"}}}}`)
+    }
+
+    axios(config).then((res) => {
       console.log(res)
       setCount((prevState) => prevState + 1)
       setUploading(false)
@@ -225,7 +237,7 @@ const ActionStatusC = ({ setIsUpdate, IsUpdate }) => {
         <Table
           columns={columns}
           dataSource={event}
-          pagination={false}
+          pagination={true}
           className={styles.table}
           loading={(count===0 && uploading)}
           expandable={{

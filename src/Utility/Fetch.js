@@ -22,7 +22,7 @@ export async function UserLogOut() {
     const url = "/logout"
     let response
     try{
-        response = await fetch(url, { credentials: 'include' })
+        response = await fetch(url, { credentials: 'include', method:'POST' })
         console.log(response)
         localStorage.clear()
         return response

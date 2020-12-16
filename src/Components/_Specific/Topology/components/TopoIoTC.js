@@ -53,29 +53,34 @@ const TopoIoTC = ({ IoTvisible, setIoTvisible, record, setRecord }) => {
   }
 
   useEffect(() => {
-    if (!record) {
-      // console.log(record)
-      return;
-    }
+    // if (!record) {
+    //   return;
+    // }
     if (record.id) {
       setUploading(true);
       const IoTUrl = Refresh
-        ? `/cmd?get={"device_cfg":{"filter":{"id":"${record.id}"},"nodeInf":{},"obj":{"iot":{}}}}`
-        : `/cmd?get={"device_iot":{"filter":{"id":"${record.id}"}}}`;
-      console.log(IoTUrl);
-      axios
-        .post(IoTUrl)
+        ? `{"get":{"device_cfg":{"filter":{"id":"${record.id}"},"nodeInf":{},"obj":{"iot":{}}}}}`
+        : `{"get":{"device_iot":{"filter":{"id":"${record.id}"}}}}`;
+      // console.log(IoTUrl);
+      const config = {
+        method: 'post',
+        headers: { 'Content-Type': 'application/json' },
+        url: '/cmd',
+        data: JSON.parse(IoTUrl),
+      }
+      axios(config)
         .then((res) => {
           console.log(res.data);
           if (!Refresh &&
-            res.data.response.device_iot[0] &&
-            res.data.response.device_iot[0].obj.iot
+            res.data.response.device_iot
+             && res.data.response.device_iot[0].obj.iot
           ) {
             console.log("有data");
             const IoTData =
               res.data.response.device_iot[0].obj.iot[Deviceindex].data;
             setHaveContent(true);
             setIoTData(IoTData);
+            setFourEightFiveList(res.data.response.device_iot[0].obj.iot);
 
             res.data.response.device_iot[0].obj.iot.forEach((item) => {
               let timestamp = new Date(item.timestamp * 1000);
@@ -83,8 +88,8 @@ const TopoIoTC = ({ IoTvisible, setIoTvisible, record, setRecord }) => {
                 timestamp.getMonth() + 1
               }-${timestamp.getDate()} ${timestamp.getHours()}:${timestamp.getMinutes()}`;
             });
-            setFourEightFiveList(res.data.response.device_iot[0].obj.iot);
-            console.log(res.data.response.device_iot[0].obj.iot);
+
+            
             form.setFieldsValue({
               battery_capacity_ah: IoTData.eeprom.battery_capacity_ah,
               battery_type: IoTData.eeprom.battery_type,
@@ -115,8 +120,9 @@ const TopoIoTC = ({ IoTvisible, setIoTvisible, record, setRecord }) => {
               temperature_coefficient: IoTData.eeprom.temperature_coefficient,
             });
           }else if(Refresh &&
-            res.data.response.device_cfg[0] &&
-            res.data.response.device_cfg[0].obj.iot){
+            res.data.response.device_cfg
+            && res.data.response.device_cfg[0].obj.iot
+            ){
               console.log("有data");
               const IoTData =
                 res.data.response.device_cfg[0].obj.iot[Deviceindex].data;
@@ -130,7 +136,6 @@ const TopoIoTC = ({ IoTvisible, setIoTvisible, record, setRecord }) => {
                 }-${timestamp.getDate()} ${timestamp.getHours()}:${timestamp.getMinutes()}`;
               });
               setFourEightFiveList(res.data.response.device_cfg[0].obj.iot);
-              console.log(res.data.response.device_cfg[0].obj.iot);
               form.setFieldsValue({
                 battery_capacity_ah: IoTData.eeprom.battery_capacity_ah,
                 battery_type: IoTData.eeprom.battery_type,
@@ -166,7 +171,7 @@ const TopoIoTC = ({ IoTvisible, setIoTvisible, record, setRecord }) => {
             setHaveContent(false);
           }
 
-          // setRefresh(false);
+          
           setUploading(false);
         })
         .catch((error) => {
@@ -182,7 +187,7 @@ const TopoIoTC = ({ IoTvisible, setIoTvisible, record, setRecord }) => {
         });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [record.id, Refresh]);
+  }, [record.id, Refresh, Deviceindex]);
 
   const callback = (page) => {
     setCurrentPage(page)
@@ -229,7 +234,7 @@ const TopoIoTC = ({ IoTvisible, setIoTvisible, record, setRecord }) => {
       {IoTData && !uploading ? (
         <Fragment>
           <Select
-            value={FourEightFiveList && FourEightFiveList[0].id}
+            defaultValue={FourEightFiveList && FourEightFiveList[0].id}
             className={styles.FourEightFiveBar}
             onChange={handleDeviceChange}
           >

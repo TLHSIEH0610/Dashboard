@@ -32,11 +32,23 @@ const DeviceStateC = ({
   useEffect(() => {
     if (record.id) {
       setUploading(true)
+      const config1 = {
+        method: 'post',
+        headers: { 'Content-Type': 'application/json' },
+        url: '/cmd',
+        data: JSON.parse(`{"get":{"device_status":{"filter":{"id":"${record.id}"},"nodeInf":{},"obj":{}}}}`),
+      }
+      const config2 = {
+        method: 'post',
+        headers: { 'Content-Type': 'application/json' },
+        url: '/cmd',
+        data: JSON.parse(`{"get":{"device_identity":{"filter":{"id":"${record.id}"},"nodeInf":{},"obj":{}}}}`),
+      }
       function DeviceStatusUrl() {
-        return axios.post(`/cmd?get={"device_status":{"filter":{"id":"${record.id}"},"nodeInf":{},"obj":{}}}`)
+        return axios(config1)
       }
       function DeviceIdentityUrl() {
-        return axios.post(`/cmd?get={"device_identity":{"filter":{"id":"${record.id}"},"nodeInf":{},"obj":{}}}`)
+        return axios(config2)
       }
       axios.all([DeviceStatusUrl(), DeviceIdentityUrl()])
       .then(axios.spread((acct, perms) => {

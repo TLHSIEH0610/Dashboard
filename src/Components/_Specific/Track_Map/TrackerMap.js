@@ -32,9 +32,14 @@ const TrackMap = ({ record, Mapvisible, setMapvisible, setRecord }) => {
   useEffect(() => {
     if (record.id) {
       setUploading(true);
-      const StatusUrl = `/cmd?get={"device_status":{"filter":{"id":"${record.id}"},"nodeInf":{},"obj":{}}}`;
-      axios
-        .post(StatusUrl)
+      // const StatusUrl = `/cmd?get={"device_status":{"filter":{"id":"${record.id}"},"nodeInf":{},"obj":{}}}`;
+      const config = {
+        method: 'post',
+        headers: { 'Content-Type': 'application/json' },
+        url: '/cmd',
+        data: JSON.parse(`{"get":{"device_status":{"filter":{"id":"${record.id}"},"nodeInf":{},"obj":{}}}}`),
+      }
+      axios(config)
         .then((res) => {
           const ResData = res.data.response.device_status[0].obj.status.gps;
           // console.log([ResData.latitude, ResData.longitude]);
@@ -59,10 +64,15 @@ const TrackMap = ({ record, Mapvisible, setMapvisible, setRecord }) => {
     const from_time = values.RangePicker[0]._d.getTime()/1000;
     const To_time = values.RangePicker[1]._d.getTime()/1000;
     console.log(values.RangePicker[0]._d, values.RangePicker[1]._d)
-    const GPStrackUrl = `cmd?get={"gps_track":{"filter":{"id":"${record.id}"},"utc_range":{"start":${parseInt(from_time)},"end":${parseInt(To_time)}},"nodeInf":{},"obj":{}}}`;
-    console.log(parseInt(from_time), parseInt(To_time))
-    axios
-      .post(GPStrackUrl)
+    // const GPStrackUrl = `cmd?get={"gps_track":{"filter":{"id":"${record.id}"},"utc_range":{"start":${parseInt(from_time)},"end":${parseInt(To_time)}},"nodeInf":{},"obj":{}}}`;
+    // console.log(parseInt(from_time), parseInt(To_time))
+    const config = {
+      method: 'post',
+      headers: { 'Content-Type': 'application/json' },
+      url: '/cmd',
+      data: JSON.parse(`{"get":{"gps_track":{"filter":{"id":"${record.id}"},"utc_range":{"start":${parseInt(from_time)},"end":${parseInt(To_time)}},"nodeInf":{},"obj":{}}}}`),
+    }
+    axios(config)
       .then((res) => {
         // console.log(res.data)
         const coordinateArr = res.data.response.gps_track[0].gps.list

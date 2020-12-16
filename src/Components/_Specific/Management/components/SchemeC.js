@@ -35,9 +35,15 @@ export const SchemeModalC = ({
 
     if(record.cid){
       setUploading(true)
-      const SchemeUrl = `/scheme_mgnt?list_scheme={"cid":"${record.cid}"}`;
+      // const SchemeUrl = `/scheme_mgnt?list_scheme={"cid":"${record.cid}"}`;
+      const config = {
+        method: 'post',
+        headers: { 'Content-Type': 'application/json' },
+        url: '/scheme_mgnt',
+        data: JSON.parse(`{"list_scheme":{"cid":"${record.cid}"}}`),
+      }
       axios
-      .post(SchemeUrl)
+      (config)
       .then((res) => {
         let SchemeData = res.data.response[0].scheme_list;
         let expire = new Date(SchemeData.expire * 1000);
@@ -79,16 +85,34 @@ export const SchemeModalC = ({
 
   const EditSchemeOnFinish = (values) =>{
     setUploading(true);
-
+    const config1 = {
+      method: 'post',
+      headers: { 'Content-Type': 'application/json' },
+      url: '/scheme_mgnt',
+      data: JSON.parse(`{"${IsCreate? 'create' : 'modify'}_scheme":{"cid":"${record.cid}","scheme_list":{"user":"${values.user}","group":"${values.group}","device":"${values.device}","expire":"${Date.parse(values.expire)/1000}","tracking":"${values.tracking}","tracking_pool":${values.tracking_pool},"iot":"${values.iot}","iot_poor":"${values.iot_poor}","period_alive":"${values.period_alive}","alive_timeout":"${values.alive_timeout}","period_status":"${values.period_status}","period_gps":"${values.period_gps}","period_iot":"${values.period_iot}"}}}`),
+    }
+    const config2 = {
+      method: 'post',
+      headers: { 'Content-Type': 'application/json' },
+      url: '/cmd',
+      data: JSON.parse(`{"set":{"device_cfg":{"filter":{"cid":"${record.cid}"},"obj":{"report_period":{"alive":"${values.period_alive}","timeout":"${values.alive_timeout}",
+      "status":"${values.period_status}","iot":"${values.period_iot}","gps":"${values.period_gps}"}}}}}`),
+    }
     function EditSchemeUrl() {
-      return axios.post(
-        `scheme_mgnt?${IsCreate? 'create' : 'modify'}_scheme={"cid":"${record.cid}","scheme_list":{"user":${values.user},"group":${values.group},"device":${values.device},"expire":${Date.parse(values.expire)/1000},"tracking":${values.tracking},"tracking_pool":${values.tracking_pool},"iot":${values.iot},"iot_poor":${values.iot_poor},"period_alive":${values.period_alive},"alive_timeout":${values.alive_timeout},"period_status":${values.period_status},"period_gps":${values.period_gps},"period_iot":${values.period_iot}}}`
-      );
+      return axios(config1);
     }
     function setAllScheme() {
-      return axios.post(`/cmd?set={"device_cfg":{"filter":{"cid":"${record.cid}"},"obj":{"report_period":{"alive":${values.period_alive},"timeout":${values.alive_timeout},
-      "status":${values.period_status},"iot":${values.period_iot},"gps":${values.period_gps}}}}}`);
+      return axios(config2);
     }
+    // function EditSchemeUrl() {
+    //   return axios.post(
+    //     `scheme_mgnt?${IsCreate? 'create' : 'modify'}_scheme={"cid":"${record.cid}","scheme_list":{"user":${values.user},"group":${values.group},"device":${values.device},"expire":${Date.parse(values.expire)/1000},"tracking":${values.tracking},"tracking_pool":${values.tracking_pool},"iot":${values.iot},"iot_poor":${values.iot_poor},"period_alive":${values.period_alive},"alive_timeout":${values.alive_timeout},"period_status":${values.period_status},"period_gps":${values.period_gps},"period_iot":${values.period_iot}}}`
+    //   );
+    // }
+    // function setAllScheme() {
+    //   return axios.post(`/cmd?set={"device_cfg":{"filter":{"cid":"${record.cid}"},"obj":{"report_period":{"alive":${values.period_alive},"timeout":${values.alive_timeout},
+    //   "status":${values.period_status},"iot":${values.period_iot},"gps":${values.period_gps}}}}}`);
+    // }
     axios
       .post([EditSchemeUrl(), setAllScheme()])
       .then(

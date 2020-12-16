@@ -68,7 +68,7 @@ const TopoFilterC = ({ setDataSource, dataSource, uploading }) => {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [restore]);
+  }, [restore, state.Topology.device]);
 
   const onFinish = (values) => {
 

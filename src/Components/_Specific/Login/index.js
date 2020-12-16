@@ -27,10 +27,15 @@ const LoginInput = () => {
   const OnFinish = (values) => {
     // console.log(values);
     setUploading(true)
-    const LogInUrl = `/login?user={"name":"${values.name}","password":"${values.password}"}`;
+    // const LogInUrl = `/login?user={"name":"${values.name}","password":"${values.password}"}`;
     // console.log(LogInUrl);
-    axios
-      .post(LogInUrl, { credentials: 'include' })
+    const config = {
+      method: 'post',
+      headers: { 'Content-Type': 'application/json' },
+      url: '/login',
+      data: JSON.parse(`{"user":{"name":"${values.name}","password":"${values.password}"}}`),
+    }
+    axios(config)
       .then((res) => {
         // console.log(res.data, res.data.response.name);
         Swal.fire({

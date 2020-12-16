@@ -1,17 +1,13 @@
 import React from "react";
-import PieChart from "../../Components/_Specific/Pie_Chart";
-import DashboardMap from "../../Components/_Specific/Track_Map/DashboardMap";
+import DashboardC from "../../Components/_Specific/Dashboard";
+// import DashboardMap from "../../Components/_Specific/Dashboard/Components/DashboardMap";
 // import styles from './index.module.scss'
 
 const Dashboard = () => {
   return (
-    <div>
-      <PieChart />
-      <DashboardMap
-      // centerPosition={[24.763963, 121.000095]}
-      // currentZoom={12}
-      />
-    </div>
+
+      <DashboardC />
+
   );
 };
 

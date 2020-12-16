@@ -6,6 +6,7 @@ import React, {
   Fragment,
 } from "react";
 import {
+  Drawer,
   Form,
   Input,
   Card,
@@ -14,6 +15,7 @@ import {
   message,
   Popconfirm,
   Menu,
+  Button,
   Dropdown,
 } from "antd";
 import Context from "../../../Utility/Reduxx";
@@ -32,19 +34,29 @@ import { DeviceSettingMC } from "./components/DeviceSettingC";
 import { healthIcon, strengthIcon } from "./components/TopologyF";
 import { TopoFilterMC } from "./components/Filter";
 import TrackMap from "../Track_Map/TrackerMap";
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
+import { ViewAllStatusMC } from "./components/ViewAllStatusC";
+import { FiMoreHorizontal } from "react-icons/fi";
+import { useHistory } from "react-router-dom";
 
 const TopologyC = () => {
   const { state } = useContext(Context);
   const [uploading, setUploading] = useState(false);
   const cid = localStorage.getItem("authUser.cid");
   const level = localStorage.getItem("authUser.level");
-  const NodeInfoUrl =
-  level === "super_super"
-      ? `/cmd?get={"nodeInf":{"filter":{${state.Login.Cid}}}}`
-      : `/cmd?get={"nodeInf":{"filter":{"cid":"${cid}"}}}`;
+  const history = useHistory();
+  const NodeInfoUrl = "/cmd";
+  const Urldata = `{"get":{"nodeInf":{"filter":{${
+    level === "super_super" ? state.Login.Cid : `"cid":"${cid}"`
+  }}}}}`;
+  const [AdvanceVisible, setAdvanceVisible] = useState(false);
+  // const NodeInfoUrl =
+  // level === "super_super"
+  //     ? `/cmd?get={"nodeInf":{"filter":{${state.Login.Cid}}}}`
+  //     : `/cmd?get={"nodeInf":{"filter":{"cid":"${cid}"}}}`;
   const [NodeInfoLoading, NodeInfoResponse] = useURLloader(
     NodeInfoUrl,
+    Urldata,
     uploading
   );
   const [dataSource, setDataSource] = useState([]);
@@ -57,13 +69,13 @@ const TopologyC = () => {
   // const [deviceindex, setDeviceindex] = useState(0);
   const EditableContext = React.createContext();
   // const [drawerVisible, setDrawerVisible] = useState(false);
-  const [AlarmRecord, setAlarmRecord] = useState([])
-  const [DeviceStatusRecord, setDeviceStatusRecord]  = useState([]) 
-  const [SettingRecord, setSettingRecord]  = useState([])
-  const [IoTRecord, setIoTRecord]  = useState([])
-  const [MapRecord, setMapRecord]  = useState([])
+  const [AlarmRecord, setAlarmRecord] = useState([]);
+  const [DeviceStatusRecord, setDeviceStatusRecord] = useState([]);
+  const [SettingRecord, setSettingRecord] = useState([]);
+  const [IoTRecord, setIoTRecord] = useState([]);
+  const [MapRecord, setMapRecord] = useState([]);
+  const [DrawerDisplay, setDrawerDisplay] = useState()
   const { t } = useTranslation();
-
 
   const EditableRow = ({ index, ...props }) => {
     const [form] = Form.useForm();
@@ -102,8 +114,6 @@ const TopologyC = () => {
       });
     };
 
-
-
     const save = async (e) => {
       try {
         const values = await form.validateFields();
@@ -112,11 +122,18 @@ const TopologyC = () => {
           return;
         }
         setUploading(true);
-        
+
         // const cid = localStorage.getItem("authUser.cid");
-        const RenameUrl = `/cmd?set={"node_name":{"filter":{"cid":"${record.cid}"},"list":[{"id":"${record.id}","name":"${values.name}"}]}}`;
-        axios
-          .post(RenameUrl)
+        // const RenameUrl = `/cmd?set={"node_name":{"filter":{"cid":"${record.cid}"},"list":[{"id":"${record.id}","name":"${values.name}"}]}}`;
+        const config = {
+          method: "post",
+          headers: { "Content-Type": "application/json" },
+          url: "/cmd",
+          data: JSON.parse(
+            `{"set":{"node_name":{"filter":{"cid":"${record.cid}"},"list":[{"id":"${record.id}","name":"${values.name}"}]}}}`
+          ),
+        };
+        axios(config)
           .then((res) => {
             handleSave({ ...record, ...values });
             console.log(res);
@@ -203,11 +220,12 @@ const TopologyC = () => {
   }, [NodeInfoResponse]);
 
   const menu = (record, index) => {
-    return(
-    <Menu>
-      <Menu.Item key={index}>{IconforGenerator(record, index)}</Menu.Item>
-    </Menu>
-  )};
+    return (
+      <Menu>
+        <Menu.Item key={index}>{IconforGenerator(record, index)}</Menu.Item>
+      </Menu>
+    );
+  };
 
   function IconforGenerator(record, index) {
     return (
@@ -293,10 +311,10 @@ const TopologyC = () => {
       </div>
     );
   }
-  const title = (content) =>t(content)
+  const title = (content) => t(content);
   let columns = [
     {
-      title: title('ISMS.Device'),
+      title: title("ISMS.Device"),
       dataIndex: "name",
       width: "35%",
       editable: true,
@@ -317,14 +335,17 @@ const TopologyC = () => {
       },
     },
     {
-      title: title('ISMS.Model'),
+      title: title("ISMS.Model"),
       dataIndex: "model",
       width: "15%",
       key: "2",
       responsive: ["sm"],
     },
     {
-      title: state.Global.innerWidth > 576 ? title('ISMS.Information') : title('ISMS.Info'),
+      title:
+        state.Global.innerWidth > 576
+          ? title("ISMS.Information")
+          : title("ISMS.Info"),
       dataIndex: "information",
       key: "information",
       render: (_, record, index) => {
@@ -352,7 +373,7 @@ const TopologyC = () => {
     const index = newData.findIndex((item) => row.key === item.key);
     const item = newData[index];
     newData.splice(index, 1, { ...item, ...row });
-    setDataSource(newData)
+    setDataSource(newData);
   };
 
   columns = columns.map((col) => {
@@ -372,14 +393,14 @@ const TopologyC = () => {
   });
 
   return (
-    <Fragment>
+    <div style={{ position: "relative" }}>
       <AlarmLogMC
         setRecord={setAlarmRecord}
         record={AlarmRecord}
         AlarmTablevisible={AlarmTablevisible}
         setAlarmTablevisible={setAlarmTablevisible}
       />
-      
+
       <DeviceStateMC
         record={DeviceStatusRecord}
         setRecord={setDeviceStatusRecord}
@@ -387,26 +408,37 @@ const TopologyC = () => {
         setDeviceStatevisible={setDeviceStatevisible}
       />
 
+      <TopoIoTMC
+        IoTvisible={IoTvisible}
+        setIoTvisible={setIoTvisible}
+        // setDeviceindex={setDeviceindex}
+        record={IoTRecord}
+        setRecord={setIoTRecord}
+      />
 
-        <TopoIoTMC
-          IoTvisible={IoTvisible}
-          setIoTvisible={setIoTvisible}
-          // setDeviceindex={setDeviceindex}
-          record={IoTRecord}
-          setRecord={setIoTRecord}
-        />
-
-
-
-        <TrackMap
-          // drawerVisible={drawerVisible}
-          // setDrawerVisible={setDrawerVisible}
-          setMapvisible={setMapvisible}
-          Mapvisible={Mapvisible}
-          record={MapRecord}
-          setRecord={setMapRecord}
-        />
-      
+      <TrackMap
+        // drawerVisible={drawerVisible}
+        // setDrawerVisible={setDrawerVisible}
+        setMapvisible={setMapvisible}
+        Mapvisible={Mapvisible}
+        record={MapRecord}
+        setRecord={setMapRecord}
+      />
+      <Drawer
+        title="Advance"
+        placement="right"
+        closable={false}
+        onClose={() => setAdvanceVisible(false)}
+        visible={AdvanceVisible}
+      >
+        <ul className={styles.Advance}>
+          <li className={styles.AdTitle}>View</li>
+          <li onClick={() => history.push("./allrouters")}>All Router Status</li>
+          {/* <li>All IoTs</li> */}
+          <li className={styles.AdTitle}>Setting</li>
+          <li onClick={() => history.push("./bulkconfig")}>Bulk Config</li>
+        </ul>
+      </Drawer>
 
       <DeviceSettingMC
         DeviceSettingvisible={DeviceSettingvisible}
@@ -415,8 +447,18 @@ const TopologyC = () => {
         record={SettingRecord}
         setRecord={setSettingRecord}
       />
+      <Button
+        onClick={() => setAdvanceVisible(true)}
+        className={styles.advanceIcon}
+        type="primary"
+        icon={<FiMoreHorizontal />}
+      ></Button>
       <Card style={{ marginBottom: "10px" }} className={styles.TopoTableCard}>
-        <TopoFilterMC setDataSource={setDataSource} dataSource={dataSource} uploading={NodeInfoLoading}/>
+        <TopoFilterMC
+          setDataSource={setDataSource}
+          dataSource={dataSource}
+          uploading={NodeInfoLoading}
+        />
       </Card>
       <Card bodyStyle={{ padding: "2px" }}>
         <Table
@@ -429,7 +471,7 @@ const TopologyC = () => {
           columns={columns}
         />
       </Card>
-    </Fragment>
+    </div>
   );
 };
 

@@ -5,8 +5,9 @@
 .LogoProscend{
   width: 160px;
   // margin-top:-10px;
-  margin-left:10px;
-  margin-bottom: 10px;
+  margin-left:22px;
+  margin-top: 15%;
+  // margin-bottom: 10px;
 }
 .LogoSmall{
   height: 25px;
@@ -24,7 +25,15 @@
   flex-direction: column;
 }
 .container{
-    position:relative
+    position:relative;
+    .version{
+      color: white;
+      position: absolute;
+      bottom:3%;
+      left:50%;
+      transform: translate(-50%, 0%);
+      font-weight: bold;
+    }
 }
 .navwrap {
   display: flex;
