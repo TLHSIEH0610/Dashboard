@@ -42,7 +42,7 @@ const CreateSchemeF = ({CreateSchemevisible, setCreateSchemevisible, uploading, 
         method: 'post',
         headers: { 'Content-Type': 'application/json' },
         url: '/scheme_mgnt',
-        data: JSON.parse(`{"create_scheme":{"cid":"${values.cid}", "scheme_list":{"user":${values.user},"group":${values.group},"device":${values.device},"expire":${values.expire._d.getTime()},"tracking":${values.tracking},"tracking_pool":${values.tracking_pool},"iot":${values.iot},"iot_poor":${values.iot_poor},"period_status":${values.period_status},"period_gps":${values.period_gps},"period_alive":${values.period_alive},"period_iot":${values.period_iot},"alive_timeout":${values.alive_timeout}}}}`),
+        data: JSON.parse(`{"create_scheme":{"cid":"${values.cid}", "scheme_list":{"user":${values.user},"group":${values.group},"device":${values.device},"expire":${values.expire._d.getTime()},"tracking":${123},"tracking_pool":${123},"iot":${123},"iot_poor":${123},"period_status":${values.period_status},"period_gps":${values.period_gps},"period_alive":${values.period_alive},"period_iot":${values.period_iot},"alive_timeout":${values.alive_timeout}}}}`),
       }
       axios(config).then((res)=>{
         console.log(res.data)
@@ -102,11 +102,11 @@ const CreateSchemeF = ({CreateSchemevisible, setCreateSchemevisible, uploading, 
           <Form.Item label="device" name="device" rules={[{ required: true, message: "Required!!" }]}>
             <Input />
           </Form.Item>
-          <Form.Item label="expire" name="expire" rules={[{ required: true, message: "Required!!" }]}>
-            {/* <Input /> */}
-            <DatePicker />
+          <Form.Item label="expire" name="expire" rules={[{ required: true, message: "Required xxxx-xx-xx!!" }]}>
+            <Input placeholder='2020-12-12' />
+            {/* <DatePicker /> */}
           </Form.Item>
-          <Form.Item label="tracking" name="tracking" rules={[{ required: true, message: "Required!!" }]}>
+          {/* <Form.Item label="tracking" name="tracking" rules={[{ required: true, message: "Required!!" }]}>
             <Input />
           </Form.Item>
           <Form.Item label="tracking_pool" name="tracking_pool" rules={[{ required: true, message: "Required!!" }]}>
@@ -117,7 +117,7 @@ const CreateSchemeF = ({CreateSchemevisible, setCreateSchemevisible, uploading, 
           </Form.Item>
           <Form.Item label="iot_poor" name="iot_poor" rules={[{ required: true, message: "Required!!" }]}>
             <Input />
-          </Form.Item>
+          </Form.Item> */}
           <Form.Item label="period_alive" name="period_alive" rules={[{ required: true, message: "Required!!" }]}>
             <Input />
           </Form.Item>

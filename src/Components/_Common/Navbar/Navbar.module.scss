@@ -1,13 +1,15 @@
 .Logo{
-  height:80px;
-  width:118.5px;
+  width:120px;
+  height:90px;
+  margin-top:10px;
+  margin-right: -23px;
 }
 .LogoProscend{
   width: 160px;
   // margin-top:-10px;
-  margin-left:22px;
-  margin-top: 15%;
-  // margin-bottom: 10px;
+  margin-left:10px;
+  margin-top: 5%;
+  margin-right: -23px !important;
 }
 .LogoSmall{
   height: 25px;
@@ -39,12 +41,12 @@
   display: flex;
   flex-direction: column;
   top: 0;
-  max-width: 200px;
+  max-width: 220px;
   height: 100vh;
-  padding:0 20px;
+  padding:0 5px;
   justify-content: flex-start;
   align-items: center;
-  background: rgb(4,43,87);
+  background: rgb(0,47,167);
   position: relative;
   &.MDshowNav{
     min-width: 230px;
@@ -65,6 +67,41 @@
   &.hideNavbar {
     display: none;
   }
+  .title {
+    // background: rgb(0,47,167);
+    // padding: 25px 0px;
+    line-height: 23px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.8rem;
+    position: relative;
+    // margin-left: 10px;
+    h2 {
+      margin-bottom: 0px;
+      line-height: 23px;
+      color: white;
+      margin-right:10px;
+    }
+    .cross {
+      width: auto;
+      // font-size: 2.3rem;
+      // position: absolute;
+      right: -5%;
+      top: -5%;
+      .BiChevronsLeft{
+        margin-right: -5px;
+        margin-left: 10px;
+        margin-top: -120px;
+        color: hsla(0, 0%, 100%, 0.65);
+        z-index: 2;
+      }
+      .BiChevronsRight{
+        margin-right: 3px;
+        margin-top: 10px;
+      }
+    }
+  }
   .navitems {
     display: flex;
     flex-direction: column;
@@ -76,30 +113,8 @@
       display: block;
       
     }
-    li.title {
-      background: rgb(4,43,87);
-      padding: 25px 15px;
-      line-height: 23px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 28px;
-      position: relative;
-      margin-right: 15px;
-      h2 {
-        margin-bottom: 0px;
-        line-height: 23px;
-        color: white;
-        margin-right:10px;
-      }
-      .cross {
-        width: auto;
-        font-size: 10px;
-        position: absolute;
-        right: -15%;
-        top: -5%
-      }
-    }
+
+
     li a {
       display: flex;
       align-items: center;

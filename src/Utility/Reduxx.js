@@ -6,7 +6,7 @@ export default Context;
 
 //建立全局Reducer
 const iniState = {
-  Global: { innerWidth:'', innerHeight:'', IsMD: false, showNav: true, Lang:'en', IsUpdate:false },
+  Global: { innerWidth:'', innerHeight:'', IsMD: false, showNav: true, Lang:'en', IsUpdate:false, PieData: undefined },
   Login: { IsLogin: true, LogPath: "/", User: null, Cid: ""},
   Topology: { id: "id", deviceStatusByID: "", health: null, strength: null, device: null },
   BackupRestore: {
@@ -43,6 +43,10 @@ const reducer = (state = iniState, action) => {
     case "id":
       newState = { ...state };
       newState.Topology.id = action.payload.id;
+      return newState;
+    case "setPieData":
+      newState = { ...state };
+      newState.Global.PieData = action.payload.PieData;
       return newState;
     case "deviceStatusByID":
       newState = { ...state };

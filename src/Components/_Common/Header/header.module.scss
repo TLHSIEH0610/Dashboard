@@ -13,6 +13,13 @@
     align-items: center;
     box-shadow: 3px 3px 5px lightgray;
     padding: 0 20px;
+    .headerStatistic{
+        margin-bottom:0;
+        margin-right: auto;
+        color:#042b57;
+        font-weight: 900;
+        font-size: 1.1rem;
+    }
     .Reverse{
         margin-right: auto;
         font-size: 1.5rem;
@@ -21,6 +28,10 @@
             display:none;
         }
     }
+}
+.usericon{
+    width:35px;
+    margin-right:2px;
 }
 .menu{
     font-size: 20px;

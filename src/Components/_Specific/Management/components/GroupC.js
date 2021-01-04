@@ -11,12 +11,14 @@ import {
   message,
   Tooltip,
   Popconfirm,
+  Col,
+  Row,
 } from "antd";
 import styles from "../management.module.scss";
 import axios from "axios";
 import { FcDeleteRow } from "react-icons/fc";
-import { UserLogOut } from '../../../../Utility/Fetch'
-import { useHistory } from 'react-router-dom'
+import { UserLogOut } from "../../../../Utility/Fetch";
+import { useHistory } from "react-router-dom";
 import Context from "../../../../Utility/Reduxx";
 
 const { TabPane } = Tabs;
@@ -26,80 +28,83 @@ const EditGroupModalC = ({
   GroupModalvisible,
   setGroupModalvisible,
   record,
-  setRecord
+  setRecord,
 }) => {
   const { dispatch } = useContext(Context);
   const [EditGroupform] = Form.useForm();
   const [CreateGroupform] = Form.useForm();
   const [uploading, setUploading] = useState(false);
-  const [IsUpdate, setIsUpdate] = useState(false)
+  const [IsUpdate, setIsUpdate] = useState(false);
   const [GroupData, setGroupData] = useState([{ name: "", node_list: [] }]);
   const [NodeList, setNodeList] = useState([]);
   const [currentPage, setCurrentPage] = useState("1");
-  const history = useHistory()
-  useEffect(()=>{
-    if(record.cid){
-      setUploading(true)
+  const history = useHistory();
+  useEffect(() => {
+    if (record.cid) {
+      setUploading(true);
       const config1 = {
-        method: 'post',
-        headers: { 'Content-Type': 'application/json' },
-        url: '/cmd',
-        data: JSON.parse(`{"get":{"nodeInf":{"filter":{"cid":"${record.cid}"},"nodeInf":{"cid":{},"gid":{},"token":{},"id":{}}}}}`),
-      }
+        method: "post",
+        headers: { "Content-Type": "application/json" },
+        url: "/cmd",
+        data: JSON.parse(
+          `{"get":{"nodeInf":{"filter":{"cid":"${record.cid}"},"nodeInf":{"cid":{},"gid":{},"token":{},"id":{}}}}}`
+        ),
+      };
       const config2 = {
-        method: 'post',
-        headers: { 'Content-Type': 'application/json' },
-        url: '/device_mgnt/group',
+        method: "post",
+        headers: { "Content-Type": "application/json" },
+        url: "/device_mgnt/group",
         data: JSON.parse(`{"list_group":{"cid":"${record.cid}"}}`),
-      }
+      };
 
       function NodeUrl() {
-        return axios(config1)
+        return axios(config1);
       }
       function getGroupUrl() {
-        return axios(config2)
+        return axios(config2);
       }
-      axios.all([NodeUrl(), getGroupUrl()])
-      .then(axios.spread((acct, perms) => {
-        if(acct.data.response?.nodeInf){
-          let NodeList = [];
-          acct.data.response.nodeInf.forEach((item, index) => {
-            NodeList.push({ key: index, id: item.nodeInf.id });
-          });
-          setNodeList(NodeList);
-          let GroupData = [];
-          perms.data.response[0].group_list.forEach((item, index) => {
-            GroupData.push({
-              key: index,
-              name: item.gid,
-              node_list: item.node_list,
-            });
-          });
-          setGroupData(GroupData);
-          EditGroupform.setFieldsValue({
-            Group: GroupData,
-          });
-        }else{
-          setGroupData([]);
-          setNodeList([]);
-        }
+      axios
+        .all([NodeUrl(), getGroupUrl()])
+        .then(
+          axios.spread((acct, perms) => {
+            if (acct.data.response?.nodeInf) {
+              let NodeList = [];
+              acct.data.response.nodeInf.forEach((item, index) => {
+                NodeList.push({ key: index, id: item.nodeInf.id });
+              });
+              setNodeList(NodeList);
+              let GroupData = [];
+              perms.data.response[0].group_list.forEach((item, index) => {
+                GroupData.push({
+                  key: index,
+                  name: item.gid,
+                  node_list: item.node_list,
+                });
+              });
+              setGroupData(GroupData);
+              EditGroupform.setFieldsValue({
+                Group: GroupData,
+              });
+            } else {
+              setGroupData([]);
+              setNodeList([]);
+            }
 
-        setUploading(false)
-
-      }))
-      .catch((error) => { 
-        console.error(error) 
-        if (error.response && error.response.status === 401) {
-          dispatch({ type: "setLogin", payload: { IsLogin: false } });
-          UserLogOut();
-          history.push("/userlogin");                                                                         
-        } 
-        setUploading(false)
-      })
+            setUploading(false);
+          })
+        )
+        .catch((error) => {
+          console.error(error);
+          if (error.response && error.response.status === 401) {
+            dispatch({ type: "setLogin", payload: { IsLogin: false } });
+            UserLogOut();
+            history.push("/userlogin");
+          }
+          setUploading(false);
+        });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  },[record.cid, IsUpdate])
-
+  }, [record.cid, IsUpdate]);
 
   function callback(page) {
     setCurrentPage(page);
@@ -114,14 +119,14 @@ const EditGroupModalC = ({
       .then(() => {
         setUploading(false);
         message.success("Delete successfully.");
-        setIsUpdate(!IsUpdate)
+        setIsUpdate(!IsUpdate);
       })
       .catch((error) => {
         if (error.response && error.response.status === 401) {
           dispatch({ type: "setLogin", payload: { IsLogin: false } });
           UserLogOut();
-          history.push("/userlogin");                                                                         
-        } 
+          history.push("/userlogin");
+        }
         message.error("Delete fail.");
         setUploading(false);
         console.log(error);
@@ -131,7 +136,9 @@ const EditGroupModalC = ({
   const UpdateGrouponFinish = (values) => {
     console.log(values);
     setUploading(true);
-    const EditGroupUrl = `/device_mgnt/group?modify_group={"cid":"${record.cid}","group_list":${JSON.stringify(values.Group)}}`;
+    const EditGroupUrl = `/device_mgnt/group?modify_group={"cid":"${
+      record.cid
+    }","group_list":${JSON.stringify(values.Group)}}`;
     console.log(EditGroupUrl);
 
     axios
@@ -139,7 +146,7 @@ const EditGroupModalC = ({
       .then(() => {
         message.success("Update successfully.");
         setUploading(false);
-        setIsUpdate(!IsUpdate)
+        setIsUpdate(!IsUpdate);
       })
       .catch((error) => {
         console.log(error);
@@ -147,8 +154,8 @@ const EditGroupModalC = ({
         if (error.response && error.response.status === 401) {
           dispatch({ type: "setLogin", payload: { IsLogin: false } });
           UserLogOut();
-          history.push("/userlogin");                                                                         
-        } 
+          history.push("/userlogin");
+        }
         setUploading(false);
       });
   };
@@ -168,7 +175,7 @@ const EditGroupModalC = ({
       .then((res) => {
         setUploading(false);
         message.success("Create completely.");
-        setIsUpdate(!IsUpdate)
+        setIsUpdate(!IsUpdate);
         console.log(res);
       })
       .catch((error) => {
@@ -176,13 +183,12 @@ const EditGroupModalC = ({
         if (error.response && error.response.status === 401) {
           dispatch({ type: "setLogin", payload: { IsLogin: false } });
           UserLogOut();
-          history.push("/userlogin");                                                                         
-        } 
+          history.push("/userlogin");
+        }
         message.error("Create fail.");
         setUploading(false);
       });
   };
-
 
   function tagRender(props) {
     const { label, _, closable, onClose } = props; // eslint-disable-line no-unused-vars
@@ -206,23 +212,35 @@ const EditGroupModalC = ({
       key: "name",
       render: (_, record, index) => {
         return (
-          <div style={{ display: "flex", flexDirection: "column", justifyContent:'center', alignItems:'center' }}>
-              <Form.Item
-                style={{ marginBottom:'10px' }}
-                className={styles.formitem}
-                name={["Group", index, "name"]}
-                rules={[{ required: true, message: "Group is required!" }]}
-                // initialValue={record.name}
-              >
-                <Input disabled={true} />
-              </Form.Item>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Form.Item
+              style={{ marginBottom: "10px" }}
+              className={styles.formitem}
+              name={["Group", index, "name"]}
+              rules={[{ required: true, message: "Group is required!" }]}
+              // initialValue={record.name}
+            >
+              <Input disabled={true} />
+            </Form.Item>
 
             <Tooltip title="Delete Group">
               <Popconfirm
                 title="Sure to delete?"
-                onConfirm={()=>{deleteGroup(record)}}
+                onConfirm={() => {
+                  deleteGroup(record);
+                }}
               >
-                <FcDeleteRow className={styles.DeleteGroupIcon} style={{fontSize:'2rem', cursor:'pointer' }}/>
+                <FcDeleteRow
+                  className={styles.DeleteGroupIcon}
+                  style={{ fontSize: "2rem", cursor: "pointer" }}
+                />
               </Popconfirm>
             </Tooltip>
           </div>
@@ -236,30 +254,30 @@ const EditGroupModalC = ({
       key: "node_list",
       render: (_, __, index) => {
         return (
-            <Form.Item
-              className={styles.formitem}
-              name={["Group", index, "node_list"]}
-              rules={[{ required: true, message: "Deivce Id is required!" }]}
-              // initialValue={record.node_list}
+          <Form.Item
+            className={styles.formitem}
+            name={["Group", index, "node_list"]}
+            rules={[{ required: true, message: "Deivce Id is required!" }]}
+            // initialValue={record.node_list}
+          >
+            <Select
+              mode="multiple"
+              placeholder="Select devices"
+              showArrow
+              tagRender={tagRender}
+              style={{ width: "100%" }}
+              className={styles.deviceinput}
+              onFocus={() => {}}
             >
-              <Select
-                mode="multiple"
-                placeholder="Select devices"
-                showArrow
-                tagRender={tagRender}
-                style={{ width: "100%" }}
-                className={styles.deviceinput}
-                onFocus={() => {}}
-              >
-                {NodeList.map((item, index) => {
-                  return (
-                    <Option key={index} value={item.id}>
-                      {item.id}
-                    </Option>
-                  );
-                })}
-              </Select>
-            </Form.Item>
+              {NodeList.map((item, index) => {
+                return (
+                  <Option key={index} value={item.id}>
+                    {item.id}
+                  </Option>
+                );
+              })}
+            </Select>
+          </Form.Item>
         );
       },
     },
@@ -269,13 +287,20 @@ const EditGroupModalC = ({
     <Modal
       visible={GroupModalvisible}
       // onOk={() => setGroupModalvisible(false)}
-      onCancel={() => {setGroupModalvisible(false); setRecord({cid:null}) }}
+      onCancel={() => {
+        setGroupModalvisible(false);
+        setRecord({ cid: null });
+      }}
       centered={true}
       className={styles.modal}
       destroyOnClose={true}
       footer={[
         currentPage === "1" && (
-          <Button loading={uploading} key="back" onClick={() => CreateGroupform.submit() }>
+          <Button
+            loading={uploading}
+            key="back"
+            onClick={() => CreateGroupform.submit()}
+          >
             Submit
           </Button>
         ),
@@ -297,20 +322,19 @@ const EditGroupModalC = ({
       <Tabs defaultActiveKey="1" onChange={callback}>
         <TabPane tab="Create Group" key="1">
           {/* <Card loading={Nodeloading || Grouploading} bordered={false}> */}
-            <Form
-              name="CreateGroup"
-              onFinish={CreateGrouponFinish}
-              autoComplete="off"
-              form={CreateGroupform}
-              className={styles.Form}
-            >
-              <div className={styles.formwrap}>
-                <div className={styles.formDiv}>
-                  <p>Device</p>
+          <Form
+            name="CreateGroup"
+            onFinish={CreateGrouponFinish}
+            autoComplete="off"
+            form={CreateGroupform}
+            className={styles.Form}
+            layout="vertical"
+          >
+            <div className={styles.formwrap}>
+              <Row gutter={24} justify="flex-start">
+                <Col xs={24} sm={24} md={24} lg={9} xl={8}>
                   <Form.Item
-                    // label='Device'
-                    style={{ width: 250 }}
-                    className={styles.formitem}
+                    label="Device"
                     name="Device_ID"
                     rules={[
                       { required: true, message: "Deivce Id is required!" },
@@ -322,9 +346,7 @@ const EditGroupModalC = ({
                       placeholder="Select devices"
                       showArrow
                       tagRender={tagRender}
-                      // style={{ width: 230 }}
-                      className={styles.deviceinput}
-                      onFocus={() => {}}
+                      maxTagCount={1}
                     >
                       {NodeList.map((item, index) => {
                         return (
@@ -335,12 +357,10 @@ const EditGroupModalC = ({
                       })}
                     </Select>
                   </Form.Item>
-                </div>
-                <div className={styles.formDiv}>
-                  <p>Group Name</p>
+                </Col>
+                <Col xs={24} sm={24} md={24} lg={5} xl={6}>
                   <Form.Item
-                    // label='Action'
-                    className={styles.formitem}
+                    label="Group Name"
                     name="groupName"
                     rules={[
                       { required: true, message: "Group name is required" },
@@ -348,26 +368,26 @@ const EditGroupModalC = ({
                   >
                     <Input />
                   </Form.Item>
-                </div>
-              </div>
-            </Form>
-          {/* </Card> */}
+                </Col>
+              </Row>
+            </div>
+          </Form>
         </TabPane>
         <TabPane tab="Edit Group" key="2" className={styles.groupPane}>
-        <Form
+          <Form
             name={["Group"]}
             onFinish={UpdateGrouponFinish}
             autoComplete="off"
             form={EditGroupform}
             className={styles.Form}
           >
-          <Table
-            columns={columns}
-            dataSource={GroupData}
-            pagination={false}
-            loading={uploading}
-          />
-        </Form>
+            <Table
+              columns={columns}
+              dataSource={GroupData}
+              pagination={false}
+              loading={uploading}
+            />
+          </Form>
         </TabPane>
       </Tabs>
       {/* </Card> */}
@@ -375,9 +395,7 @@ const EditGroupModalC = ({
   );
 };
 
-export const EditGroupModalMC = React.memo( EditGroupModalC )
-
-
+export const EditGroupModalMC = React.memo(EditGroupModalC);
 
 // export const GroupManagementC = () => {
 //   // const [form] = Form.useForm();
@@ -421,10 +439,9 @@ export const EditGroupModalMC = React.memo( EditGroupModalC )
 //       setGroupList(GroupList);
 //     }
 //   }, [Groupresponse]);
-  
 
 //   useEffect(() => {
-    
+
 //     if (Noderesponse) {
 //       let NodeList = [];
 //       Noderesponse.response.nodeInf.forEach((item, index) => {
@@ -443,12 +460,12 @@ export const EditGroupModalMC = React.memo( EditGroupModalC )
 //       width: "10%",
 //       render: (value, row, index) => {
 //         console.log(value, row, index)
-        
+
 //         const obj = {
 //           children: value,
 //           props: {},
 //         };
-        
+
 //         if(!cidList.has(row.cid) && row.node_list ){
 //           cidList.add(row.cid)
 //           obj.props.rowSpan = row.length;
@@ -482,7 +499,7 @@ export const EditGroupModalMC = React.memo( EditGroupModalC )
 //                   {node}
 //                 </Tag>
 //             );
-         
+
 //           })
 //         }
 //       },

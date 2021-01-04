@@ -1,5 +1,5 @@
-import React from "react";
-import { Descriptions } from "antd";
+import React, { Fragment, useState } from "react";
+import { Descriptions, Row, Col, Radio } from "antd";
 import styles from "../topology.module.scss";
 import "echarts/lib/chart/bar";
 import ReactEchartsCore from "echarts-for-react/lib/core";
@@ -7,8 +7,6 @@ import echarts from "echarts/lib/echarts";
 import "echarts/lib/component/tooltip";
 import "echarts/lib/component/title";
 import "echarts/lib/component/legend";
-
-
 
 const IdentityTable = ({ DeviceIdentity }) => {
   return (
@@ -153,153 +151,215 @@ const StatusConnection = ({ DeviceStatus }) => {
   const connection = DeviceStatus.status.connection;
 
   return (
-
-      
-        <Descriptions
-          bordered
-          className={[styles.desc,styles['override-ant-descriptions-view']]}
-          column={{ xxl: 3, xl: 2, lg: 2, md: 2, sm: 2, xs: 1 }}
-        >
-          <Descriptions.Item label="LAN_ip4_adress">
-            {connection.lan.ipv4.adress}
-          </Descriptions.Item>
-          <Descriptions.Item label="LAN_ip4_netmask">
-            {connection.lan.ipv4.netmask}
-          </Descriptions.Item>
-          <Descriptions.Item label="LAN_ip6_adress">
-            {connection.lan.ipv6.address}
-          </Descriptions.Item>
-          <Descriptions.Item label="LAN_ip6_up_time">
-            {connection.lan.ipv6.uptime}{" "}
-          </Descriptions.Item>
-        {/* </Descriptions> */}
-        {/* <Descriptions
+    <Descriptions
+      bordered
+      className={[styles.desc, styles["override-ant-descriptions-view"]]}
+      column={{ xxl: 3, xl: 2, lg: 2, md: 2, sm: 2, xs: 1 }}
+    >
+      <Descriptions.Item label="LAN_ip4_adress">
+        {connection.lan?.ipv4.adress}
+      </Descriptions.Item>
+      <Descriptions.Item label="LAN_ip4_netmask">
+        {connection.lan?.ipv4.netmask}
+      </Descriptions.Item>
+      <Descriptions.Item label="LAN_ip6_adress">
+        {connection.lan?.ipv6.address}
+      </Descriptions.Item>
+      <Descriptions.Item label="LAN_ip6_up_time">
+        {connection.lan?.ipv6.uptime}{" "}
+      </Descriptions.Item>
+      {/* </Descriptions> */}
+      {/* <Descriptions
           bordered
            className={[styles.desc,styles['override-ant-descriptions-view']]}
           column={{ xxl: 3, xl: 2, lg: 2, md: 2, sm: 2, xs: 1 }}
         > */}
-          <Descriptions.Item label="LTE_active">
-            {connection.lte.active}
-          </Descriptions.Item>
-          <Descriptions.Item label="LTE_ip4_apn_address">
-            {connection.lte.apn[0].ipv4.address}
-          </Descriptions.Item>
-          <Descriptions.Item label="LTE_ip4_apn_gateway">
-            {connection.lte.apn[0].ipv4.gateway}
-          </Descriptions.Item>
-          <Descriptions.Item label="LTE_ip4_apn_netmask">
-            {connection.lte.apn[0].ipv4.netmask}
-          </Descriptions.Item>
-          <Descriptions.Item label="LTE_ip4_apn_uptime">
-            {connection.lte.apn[0].ipv4.uptime}
-          </Descriptions.Item>
-          <Descriptions.Item label="LTE_ip4_address">
-            {connection.lte.ipv4.address}
-          </Descriptions.Item>
-          <Descriptions.Item label="LTE_ip4_gateway">
-            {connection.lte.ipv4.gateway}
-          </Descriptions.Item>
-          <Descriptions.Item label="LTE_ip4_netmask">
-            {connection.lte.ipv4.netmask}
-          </Descriptions.Item>
-          <Descriptions.Item label="LTE_ip4_uptime">
-            {connection.lte.ipv4.uptime}
-          </Descriptions.Item>
-        {/* // </Descriptions>
+      <Descriptions.Item label="LTE_active">
+        {connection.lte?.active}
+      </Descriptions.Item>
+      <Descriptions.Item label="LTE_ip4_apn_address">
+        {connection.lte?.apn[0].ipv4.address}
+      </Descriptions.Item>
+      <Descriptions.Item label="LTE_ip4_apn_gateway">
+        {connection.lte?.apn[0].ipv4.gateway}
+      </Descriptions.Item>
+      <Descriptions.Item label="LTE_ip4_apn_netmask">
+        {connection.lte?.apn[0].ipv4.netmask}
+      </Descriptions.Item>
+      <Descriptions.Item label="LTE_ip4_apn_uptime">
+        {connection.lte?.apn[0].ipv4.uptime}
+      </Descriptions.Item>
+      <Descriptions.Item label="LTE_ip4_address">
+        {connection.lte?.ipv4.address}
+      </Descriptions.Item>
+      <Descriptions.Item label="LTE_ip4_gateway">
+        {connection.lte?.ipv4.gateway}
+      </Descriptions.Item>
+      <Descriptions.Item label="LTE_ip4_netmask">
+        {connection.lte?.ipv4.netmask}
+      </Descriptions.Item>
+      <Descriptions.Item label="LTE_ip4_uptime">
+        {connection.lte?.ipv4.uptime}
+      </Descriptions.Item>
+      {/* // </Descriptions>
         // <Descriptions */}
-        {/* //   bordered
+      {/* //   bordered
         //    className={[styles.desc,styles['override-ant-descriptions-view']]}
         //   column={{ xxl: 3, xl: 2, lg: 2, md: 2, sm: 2, xs: 1 }}
         // > */}
-          <Descriptions.Item label="WAN_active">
-            {connection.wan.active}
-          </Descriptions.Item>
-          <Descriptions.Item label="WAN_ip4_address">
-            {connection.wan.ipv4.address}
-          </Descriptions.Item>
-          <Descriptions.Item label="WAN_ip4_gateway">
-            {connection.wan.ipv4.gateway}
-          </Descriptions.Item>
-          <Descriptions.Item label="WAN_ip4_netmask">
-            {connection.wan.ipv4.netmask}{" "}
-          </Descriptions.Item>
-          <Descriptions.Item label="WAN_ip4_up_time">
-            {connection.wan.ipv4.uptime}{" "}
-          </Descriptions.Item>
-        {/* // </Descriptions>
+      <Descriptions.Item label="WAN_active">
+        {connection.wan?.active}
+      </Descriptions.Item>
+      <Descriptions.Item label="WAN_ip4_address">
+        {connection.wan?.ipv4.address}
+      </Descriptions.Item>
+      <Descriptions.Item label="WAN_ip4_gateway">
+        {connection.wan?.ipv4.gateway}
+      </Descriptions.Item>
+      <Descriptions.Item label="WAN_ip4_netmask">
+        {connection.wan?.ipv4.netmask}{" "}
+      </Descriptions.Item>
+      <Descriptions.Item label="WAN_ip4_up_time">
+        {connection.wan?.ipv4.uptime}{" "}
+      </Descriptions.Item>
+      {/* // </Descriptions>
         // <Descriptions */}
-        {/* //   bordered
+      {/* //   bordered
         //    className={[styles.desc,styles['override-ant-descriptions-view']]}
         //   column={{ xxl: 3, xl: 2, lg: 2, md: 2, sm: 2, xs: 1 }}
         // > */}
-          <Descriptions.Item label="WWAN_active">
-            {connection.wwan.active}
-          </Descriptions.Item>
-          <Descriptions.Item label="WWAN_ip4_MAC">
-            {connection.wwan.ipv4.MAC}
-          </Descriptions.Item>
-          <Descriptions.Item label="WWAN_ip4_SSID">
-            {connection.wwan.ipv4.SSID}
-          </Descriptions.Item>
-          <Descriptions.Item label="WWAN_ip4_address">
-            {connection.wwan.ipv4.address}{" "}
-          </Descriptions.Item>
-          <Descriptions.Item label="WWAN_ip4_channel">
-            {connection.wwan.ipv4.channel}{" "}
-          </Descriptions.Item>
-          <Descriptions.Item label="WWAN_ip4_gateway">
-            {connection.wwan.ipv4.gateway}{" "}
-          </Descriptions.Item>
-          <Descriptions.Item label="WWAN_ip4_netmask">
-            {connection.wwan.ipv4.netmask}{" "}
-          </Descriptions.Item>
-          <Descriptions.Item label="WWAN_ip4_up_time">
-            {connection.wwan.ipv4.uptime}{" "}
-          </Descriptions.Item>
-        </Descriptions>
-
+      <Descriptions.Item label="WWAN_active">
+        {connection.wwan?.active}
+      </Descriptions.Item>
+      <Descriptions.Item label="WWAN_ip4_MAC">
+        {connection.wwan?.ipv4.MAC}
+      </Descriptions.Item>
+      <Descriptions.Item label="WWAN_ip4_SSID">
+        {connection.wwan?.ipv4.SSID}
+      </Descriptions.Item>
+      <Descriptions.Item label="WWAN_ip4_address">
+        {connection.wwan?.ipv4.address}{" "}
+      </Descriptions.Item>
+      <Descriptions.Item label="WWAN_ip4_channel">
+        {connection.wwan?.ipv4.channel}{" "}
+      </Descriptions.Item>
+      <Descriptions.Item label="WWAN_ip4_gateway">
+        {connection.wwan?.ipv4.gateway}{" "}
+      </Descriptions.Item>
+      <Descriptions.Item label="WWAN_ip4_netmask">
+        {connection.wwan?.ipv4.netmask}{" "}
+      </Descriptions.Item>
+      <Descriptions.Item label="WWAN_ip4_up_time">
+        {connection.wwan?.ipv4.uptime}{" "}
+      </Descriptions.Item>
+    </Descriptions>
   );
 };
 
 export const StatusConnectionMF = React.memo(StatusConnection);
 
 const TxRxStatistic = ({ DeviceStatus }) => {
+  const [currentValue, setCurrentValue] = useState("Tx/Rx");
   const statistic = DeviceStatus.status.statistic;
   const getOption = () => {
     const option = {
       title: {
         show: true,
-        text: "DataUsage",
+        text: "",
         textStyle: { fontWeight: "bold", fontFamily: "sans-serif" },
         right: "auto",
         left: "auto",
       },
       legend: { show: true, right: "10%" },
       tooltip: {},
-      dataset: {
+      xAxis: { type: "category" },
+      yAxis: { name: "kbytes" },
+    };
+
+    if (currentValue === "Tx/Rx") {
+      option.dataset = {
         source: [
           ["product", "tx", "rx"],
-          ["LTE", statistic.lte.tx_kbytes, statistic.lte.rx_kbytes],
-          ["WAN", statistic.wan.tx_kbytes, statistic.wan.rx_kbytes],
-          ["LAN", statistic.lan.tx_kbytes, statistic.lan.rx_kbytes],
+          ["LTE", statistic?.lte.tx_kbytes, statistic?.lte.rx_kbytes],
+          [
+            "LTE(APN)",
+            statistic?.lte.apn[0].tx_kbytes,
+            statistic?.lte.apn[0].rx_kbytes,
+          ],
+          ["WAN", statistic?.wan.tx_kbytes, statistic?.wan.rx_kbytes],
+          ["LAN", statistic?.lan.tx_kbytes, statistic?.lan.rx_kbytes],
         ],
-      },
-      xAxis: { type: "category" },
-      yAxis: {},
-      series: [{ type: "bar" }, { type: "bar" }],
-    };
+      };
+      option.series = [{ type: "bar" }, { type: "bar" }];
+    } else if (currentValue === "Tx/Rx Dropped") {
+      option.dataset = {
+        source: [
+          ["product", "tx", "rx"],
+          ["LTE", statistic?.lte.tx_dropped_pkts, statistic?.lte.rx_dropped_pkts],
+          [
+            "LTE(APN)",
+            statistic?.lan.tx_dropped_pkts,
+            statistic?.lan.rx_dropped_pkts,
+          ],
+          ["WAN", statistic?.lan.tx_dropped_pkts, statistic?.lan.rx_dropped_pkts],
+          ["LAN", statistic?.lan.tx_dropped_pkts, statistic?.lan.rx_dropped_pkts],
+        ],
+      };
+      option.series = [{ type: "bar" }, { type: "bar" }];
+    } else {
+      option.xAxis.data = ["LTE", "LTE(APN)", "WAN", "LAN"];
+      option.series = [
+        {
+          data:
+            currentValue === "Uplink Speed"
+              ? [
+                  statistic?.lte.up_kbps,
+                  statistic?.lte.apn[0].up_kbps,
+                  statistic?.wan.up_kbps,
+                  statistic?.lan.up_kbps,
+                ]
+              : [
+                  statistic?.lte.down_kbps,
+                  statistic?.lte.apn[0].down_kbps,
+                  statistic?.wan.down_kbps,
+                  statistic?.lan.down_kbps,
+                ],
+          type: "bar",
+        },
+      ];
+    }
     return option;
   };
 
+  const onChange = (e) => {
+    setCurrentValue(e.target.value);
+  };
+
   return (
-    <ReactEchartsCore
-      echarts={echarts}
-      option={getOption()}
-      notMerge={true}
-      lazyUpdate={true}
-      theme={"theme_name"}
-      className={styles.echartBar}
-    />
+    <Fragment>
+      <Row gutter={24}>
+        <Col xs={24} sm={24} md={24} lg={24}>
+          <Radio.Group onChange={(e) => onChange(e)} value={currentValue}>
+            <Radio value={"Tx/Rx"}>Tx/Rx</Radio>
+            <Radio value={"Tx/Rx Dropped"}>Tx/Rx Dropped</Radio>
+            <Radio value={"Uplink Speed"}>Uplink Speed</Radio>
+            <Radio value={"Downlink Speed"}>Downlink Speed</Radio>
+          </Radio.Group>
+        </Col>
+      </Row>
+      <Row gutter={24}>
+        <Col xs={24} sm={24} md={24} lg={24}>
+          <ReactEchartsCore
+            echarts={echarts}
+            option={getOption()}
+            notMerge={true}
+            lazyUpdate={true}
+            theme={"theme_name"}
+            className={styles.echartBar}
+          />
+        </Col>
+      </Row>
+    </Fragment>
   );
 };
 

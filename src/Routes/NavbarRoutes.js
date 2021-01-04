@@ -3,50 +3,44 @@ import Dashboard from '../Pages/Dashboard'
 import Topology from '../Pages/Topology'
 import Backup from '../Pages/BackupStore'
 import Management from '../Pages/Management'
-// import IoT from '../Pages/IoT'
-import { FcPieChart, FcParallelTasks, FcRotateToPortrait, FcEngineering } from 'react-icons/fc'
+import { AiFillSetting } from 'react-icons/ai'
+import { MdCastConnected } from 'react-icons/md'
+import { FaFileUpload, FaChartLine } from 'react-icons/fa'
 
 
 export const NavRoutes = [
     {
-        title: 'Dashboard',
+        title: 'DASHBOARD',
         path: '/',
-        icon: <FcPieChart style={{fontSize:'1.5rem'}}/>,
+        icon: <FaChartLine style={{fontSize:'1.5rem'}}/>,
         cName: 'NavText',
         auth: true,
         component: Dashboard
     },
     {
-        title: 'Topology',
+        title: 'TOPOLOGY',
         path: '/topology',
-        icon: <FcParallelTasks style={{fontSize:'1.5rem'}}/>,
+        icon: <MdCastConnected style={{fontSize:'1.5rem'}}/>,
         cName: 'NavText',
         auth: true,
         component: Topology
     },
-    // {
-    //     title: 'IoT',
-    //     path: '/iot',
-    //     icon: <FcMultipleSmartphones style={{fontSize:'1.5rem'}}/>,
-    //     cName: 'NavText',
-    //     auth: true,
-    //     component: IoT
-    // },
     {
-        title: 'Upgrade',
+        title: 'UPGRADE',
         path: '/backuprestore',
-        icon: <FcRotateToPortrait style={{fontSize:'1.5rem'}}/>,
+        icon: <FaFileUpload style={{fontSize:'1.5rem'}}/>,
         cName: 'NavText',
         auth: true,
+        super:true,
         component: Backup
     },
     {
-        title: 'Management',
+        title: 'MANAGEMENT',
         path: '/management',
-        icon: <FcEngineering style={{fontSize:'1.5rem'}}/>,
+        icon: <AiFillSetting style={{fontSize:'1.6rem'}}/>,
         cName: 'NavText',
         auth: true,
-        // super:true,
+        super:true,
         component: Management
 
     },

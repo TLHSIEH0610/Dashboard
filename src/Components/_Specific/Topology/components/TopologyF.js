@@ -7,14 +7,15 @@ import {
   MdSignalCellular4Bar,
 } from "react-icons/md";
 import {} from 'react-icons/bs'
-import { ImCircleDown, ImCancelCircle } from "react-icons/im";
+import { ImCancelCircle } from "react-icons/im";
 import { AiFillWarning } from "react-icons/ai";
+import { FaCheckCircle } from 'react-icons/fa'
 
 export function healthIcon(health) {
   switch (health) {
     case "up":
       return (
-          <ImCircleDown className={styles.up} />
+          <FaCheckCircle className={styles.up} />
       );
     case "critical":
       return (

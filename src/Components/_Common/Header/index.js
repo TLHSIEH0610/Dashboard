@@ -1,15 +1,15 @@
-import React, { useEffect, useContext, useState, Fragment } from "react";
+import React, { useEffect, useContext, useState } from "react";
 import styles from "./header.module.scss";
-import { Menu, Select, Tag } from "antd";
-import { FcManager, FcList } from "react-icons/fc";
-import { FaLanguage, FaBell } from "react-icons/fa";
+import { Menu, Select } from "antd";
+import { FcList } from "react-icons/fc";
+import { FaLanguage } from "react-icons/fa";
 import Context from "../../../Utility/Reduxx";
 import axios from "axios";
-// import Swal from "sweetalert2";
+import Swal from "sweetalert2";
 import { useHistory } from "react-router-dom";
 import i18n from "i18next";
-import { AiFillWarning } from "react-icons/ai";
-// import { Translator } from '../../../i18n/index'
+// import { UserLogOut } from "../../../Utility/Fetch";
+import { Translator } from "../../../i18n/index";
 // import useURLloader from "../../../hook/useURLloader";
 
 const { SubMenu } = Menu;
@@ -19,64 +19,98 @@ const Header = () => {
   const { state, dispatch } = useContext(Context);
   const User = localStorage.getItem("authUser.name");
   // const [User, setUser] = useState(localStorage.getItem("authUser.name"));
-  const history = useHistory()
-  const cid = localStorage.getItem("authUser.cid");
+  const history = useHistory();
+
   const level = localStorage.getItem("authUser.level");
   // const CustomerListUrl = `/inf_mgnt?list_inf={}`;
   // const [CustomerListloading, CustomerListResponse] = useURLloader(CustomerListUrl, state.Login.Cid);
   const [CustomerList, setCustomerList] = useState(null);
   const [uploading, setUploading] = useState(false);
-  const [CurrentAlarm, setCurrentAlarm] = useState(null);
+  const [PieData, setPieData] = useState(undefined);
+  // const [CurrentAlarm, setCurrentAlarm] = useState(null);
+  const [HealthSum, setHealthSum] = useState();
+  const [SignalSum, setSignalSum] = useState();
 
+  useEffect(() => {
+    const level = localStorage.getItem("authUser.level");
+
+    if (level === "super_super") {
+      setUploading(true);
+      const config1 = {
+        method: "post",
+        headers: { "Content-Type": "application/json" },
+        url: "/inf_mgnt",
+        data: JSON.parse(`{"list_inf":{}}`),
+      };
+
+      axios(config1)
+        .then((res) => {
+          setUploading(false);
+          setCustomerList(res.data);
+        })
+        .catch((error) => {
+          setUploading(false);
+          console.log(error.status);
+        });
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.Global.IsUpdate]);
 
   useEffect(() => {
     setUploading(true);
+    const cid = localStorage.getItem("authUser.cid");
     const config1 = {
-      method: 'post',
-      headers: { 'Content-Type': 'application/json' },
-      url: '/inf_mgnt',
-      data: JSON.parse(`{"list_inf":{}}`),
-    }
-    const config2 = {
-      method: 'post',
-      headers: { 'Content-Type': 'application/json' },
-      url: '/cmd',
-      data: JSON.parse(`{"get":{"current_alarm":{"filter":{${
-        level === "super_super" ? state.Login.Cid : `"cid":"${cid}"`
-      }}}}}`),
-    }
+      method: "post",
+      headers: { "Content-Type": "application/json" },
+      url: "/cmd",
+      data: JSON.parse(
+        `{"get":{"statistic":{"filter":{${
+          level === "super_super" ? state.Login.Cid : `"cid":"${cid}"`
+        }}}}}`
+      ),
+    };
 
-    function CustomerListUrl() {
-      return axios(config1);
-    }
-    function AlarmUrl() {
-      return axios(config2);
-    }
-    // const CustomerListUrl = `/inf_mgnt?list_inf={}`;
-    // const AlarmUrl = `/cmd?get={"current_alarm":{"filter":{${
-    //   level === "super_super" ? state.Login.Cid : `"cid":"${cid}"`
-    // }}}}`;
-    axios
-      .all([CustomerListUrl(), AlarmUrl()])
-      .then(
-        axios.spread((acct, perms) => {
+    axios(config1)
+      .then(((res) => {
           setUploading(false);
-          setCustomerList(acct.data);
-          setCurrentAlarm(perms.data.response.current_alarm.list[0].alarm_list);
-          // console.log(perms.data.response.current_alarm.list[0].alarm_list);
+          const PieData = res.data.response.statistic.obj;
+          setPieData(PieData);
+          const HealthSum = (() =>
+            [
+              PieData.health?.up,
+              PieData.health?.warning,
+              PieData.health?.critical,
+              PieData.health?.offline,
+            ].reduce(function (a, b) {
+              return a + b;
+            }, 0))();
+          setHealthSum(HealthSum);
+
+          const SimSum = (() =>
+            [
+              PieData.sim?.excellent,
+              PieData.sim?.good,
+              PieData.sim?.fair,
+              PieData.sim?.poor,
+            ].reduce(function (a, b) {
+              return a + b;
+            }, 0))();
+          setSignalSum(SimSum);
+
+          dispatch({
+            type: "setPieData",
+            payload: { PieData: PieData, HealthSum: HealthSum, SimSum: SimSum },
+          });
         })
       )
-
-      // axios.post(CustomerListUrl).then((res)=>{
-      //   setUploading(false)
-      //   setCustomerList(res.data)
-      // })
       .catch((error) => {
         setUploading(false);
-        console.log(error);
+        console.log(error.status);
       });
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.Login.User, state.Global.IsUpdate]);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.Global.IsUpdate, state.Login.Cid]);
 
   function handleChange(value) {
     console.log(`selected ${value}`);
@@ -91,6 +125,12 @@ const Header = () => {
 
   return (
     <div className={styles.head}>
+      {state.Login.IsLogin && PieData && state.Global.innerWidth > 768 && (
+        <p className={styles.headerStatistic}>
+          UP: {PieData?.health?.up}/{HealthSum}, EXCELLENT:{" "}
+          {PieData?.sim?.excellent}/{SignalSum}
+        </p>
+      )}
       <FcList
         className={
           state.Global.IsMD
@@ -156,13 +196,43 @@ const Header = () => {
       <Menu mode="horizontal" className={styles.menu}>
         <SubMenu
           key="user"
-          icon={<FcManager className={styles.user} />}
+          icon={
+            <img
+              className={styles.usericon}
+              src={require("../../../image/user.png")}
+              alt=''
+            />
+          }
           title={state.Login.IsLogin && User}
         >
           {/* <Menu.Item key="setting2" onClick={()=>{
             history.push('/management')
           }}>{Translator("ISMS.Setting")}</Menu.Item> */}
-          {/* <Menu.Item key="setting3" onClick={()=>Logout()}>{Translator("ISMS.LogOut")}</Menu.Item> */}
+          <Menu.Item
+            key="setting3"
+            onClick={() => {
+              console.log("執行");
+              axios
+                .post("/logout", { credentials: "include" })
+                .then(() => {
+                  console.log("回復");
+                  localStorage.clear();
+
+                  Swal.fire({
+                    title: "Sign Out Success",
+                    icon: "success",
+                    showConfirmButton: false,
+                    timer: 1200,
+                  });
+                  history.push("/userlogin");
+                })
+                .then(() => {
+                  dispatch({ type: "setLogin", payload: { IsLogin: false } });
+                });
+            }}
+          >
+            {Translator("ISMS.LogOut")}
+          </Menu.Item>
         </SubMenu>
       </Menu>
 

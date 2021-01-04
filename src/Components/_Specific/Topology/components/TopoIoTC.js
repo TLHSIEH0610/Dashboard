@@ -71,13 +71,11 @@ const TopoIoTC = ({ IoTvisible, setIoTvisible, record, setRecord }) => {
       axios(config)
         .then((res) => {
           console.log(res.data);
-          if (!Refresh &&
-            res.data.response.device_iot
-             && res.data.response.device_iot[0].obj.iot
+          if (!Refresh && res.data.response.device_iot?.[0]?.obj?.iot
           ) {
             console.log("有data");
             const IoTData =
-              res.data.response.device_iot[0].obj.iot[Deviceindex].data;
+              res.data.response.device_iot[0].obj.iot?.[Deviceindex]?.data;
             setHaveContent(true);
             setIoTData(IoTData);
             setFourEightFiveList(res.data.response.device_iot[0].obj.iot);
@@ -91,33 +89,33 @@ const TopoIoTC = ({ IoTvisible, setIoTvisible, record, setRecord }) => {
 
             
             form.setFieldsValue({
-              battery_capacity_ah: IoTData.eeprom.battery_capacity_ah,
-              battery_type: IoTData.eeprom.battery_type,
-              charge_limit_voltage_v: IoTData.eeprom.charge_limit_voltage_v,
+              battery_capacity_ah: IoTData?.eeprom.battery_capacity_ah,
+              battery_type: IoTData?.eeprom.battery_type,
+              charge_limit_voltage_v: IoTData?.eeprom.charge_limit_voltage_v,
               discharge_limit_voltage_v:
-                IoTData.eeprom.discharge_limit_voltage_v,
+                IoTData?.eeprom.discharge_limit_voltage_v,
               equalizing_charge_interval_day:
-                IoTData.eeprom.equalizing_charge_interval_day,
+                IoTData?.eeprom.equalizing_charge_interval_day,
               equalizing_charge_time_min:
-                IoTData.eeprom.equalizing_charge_time_min,
+                IoTData?.eeprom.equalizing_charge_time_min,
               equalizing_charge_voltage_v:
-                IoTData.eeprom.equalizing_charge_voltage_v,
+                IoTData?.eeprom.equalizing_charge_voltage_v,
               folating_charge_voltage_v:
-                IoTData.eeprom.folating_charge_voltage_v,
+                IoTData?.eeprom.folating_charge_voltage_v,
               low_voltage_warning_voltage_v:
-                IoTData.eeprom.low_voltage_warning_voltage_v,
-              over_discharge_delay_s: IoTData.eeprom.over_discharge_delay_s,
+                IoTData?.eeprom.low_voltage_warning_voltage_v,
+              over_discharge_delay_s: IoTData?.eeprom.over_discharge_delay_s,
               over_discharge_reverse_voltage_v:
-                IoTData.eeprom.over_discharge_reverse_voltage_v,
-              over_discharge_voltage_v: IoTData.eeprom.over_discharge_voltage_v,
-              overvoltage_voltage_v: IoTData.eeprom.overvoltage_voltage_v,
+                IoTData?.eeprom.over_discharge_reverse_voltage_v,
+              over_discharge_voltage_v: IoTData?.eeprom.over_discharge_voltage_v,
+              overvoltage_voltage_v: IoTData?.eeprom.overvoltage_voltage_v,
               rasing_charge_reverse_voltage_v:
-                IoTData.eeprom.rasing_charge_reverse_voltage_v,
-              rasing_charge_time_min: IoTData.eeprom.rasing_charge_time_min,
-              rasing_charge_voltage_v: IoTData.eeprom.rasing_charge_voltage_v,
-              recognized_voltage_v: IoTData.eeprom.recognized_voltage_v,
-              system_voltage_v: IoTData.eeprom.system_voltage_v,
-              temperature_coefficient: IoTData.eeprom.temperature_coefficient,
+                IoTData?.eeprom.rasing_charge_reverse_voltage_v,
+              rasing_charge_time_min: IoTData?.eeprom.rasing_charge_time_min,
+              rasing_charge_voltage_v: IoTData?.eeprom.rasing_charge_voltage_v,
+              recognized_voltage_v: IoTData?.eeprom.recognized_voltage_v,
+              system_voltage_v: IoTData?.eeprom.system_voltage_v,
+              temperature_coefficient: IoTData?.eeprom.temperature_coefficient,
             });
           }else if(Refresh &&
             res.data.response.device_cfg

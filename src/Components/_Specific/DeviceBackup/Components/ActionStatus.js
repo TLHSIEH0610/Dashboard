@@ -186,16 +186,16 @@ const ActionStatusC = ({ setIsUpdate, IsUpdate }) => {
     {
       title: Translator("ISMS.Device"),
       dataIndex: "id",
-      width: "30%",
+      // width: "30%",
       ...getColumnSearchProps("id"),
       render: (_, record) => record.device_name!=='' ? record.device_name : record.id
     },
-    {
-      title: Translator("ISMS.Device"),
-      dataIndex: "model",
-      width: "15%",
-      ...getColumnSearchProps("model"),
-    },
+    // {
+    //   title: Translator("ISMS.Device"),
+    //   dataIndex: "model",
+    //   width: "15%",
+    //   ...getColumnSearchProps("model"),
+    // },
     {
       title: Translator("ISMS.Action"),
       dataIndex: "action",

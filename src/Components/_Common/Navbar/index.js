@@ -1,28 +1,28 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useContext, useEffect, Fragment } from "react";
 import styles from "./Navbar.module.scss";
 import { NavRoutes } from "../../../Routes/NavbarRoutes";
-import { ImCross } from "react-icons/im";
+import { BiChevronsLeft, BiChevronsRight } from "react-icons/bi";
 // import { UserLogOut } from "../../../Utility/Fetch";
 // import axios from 'axios'
-import { useHistory, Link } from "react-router-dom";
-import Swal from "sweetalert2";
+import { Link } from "react-router-dom";
+// import Swal from "sweetalert2";
 import Context from "../../../Utility/Reduxx";
-import { Button, Tooltip } from "antd";
-import { FcExternal } from "react-icons/fc";
-import { FcList } from "react-icons/fc";
+import { Tooltip } from "antd";
+// import { FcExternal } from "react-icons/fc";
 import { useTranslation } from "react-i18next";
-import { UserLogOut } from "../../../Utility/Fetch";
+// import { UserLogOut } from "../../../Utility/Fetch";
+// import { BiLogOut } from "react-icons/bi";
 
 const Nav = () => {
-  const history = useHistory();
+  // const history = useHistory();
   const { state, dispatch } = useContext(Context);
-  const [uploading, setUploading] = useState(false);
+  // const [uploading, setUploading] = useState(false);
   const showNav = state.Global.showNav;
   const IsMD = state.Global.IsMD;
-  // const [Auth, setAuth] = useState(localStorage.getItem("auth.isAuthed"));
-  // const ShowSuperOnNav =
-  //   state.Login.Cid === "" &&
-  //   localStorage.getItem("authUser.cid") === "proscend";
+  const User = localStorage.getItem("authUser.name");
+  const level = localStorage.getItem("authUser.level");
+  // const [level, setLevel] = useState(undefined)
+  // console.log(state.Login.IsLogin)
   const { t } = useTranslation();
 
   const ShowBar = () => {
@@ -34,6 +34,9 @@ const Nav = () => {
       },
     });
   };
+  // useEffect(()=>{
+  //   setLevel(localStorage.getItem("authUser.level"))
+  // },[])
   useEffect(() => {
     if (state.Global.innerWidth < 1200) {
       // setShowNav(false);
@@ -100,21 +103,22 @@ const Nav = () => {
   }, [state.Login.IsLogin]);
 
   return (
-    <div className={styles.container}>
-      <div
-        className={
-          showNav
-            ? IsMD
-              ? `${styles.navwrap} ${styles.MDshowNav}`
-              : `${styles.navwrap}`
-            : IsMD
-            ? `${styles.MDhideNav} `
-            : `${styles.navwrap} ${styles.ChangeBGforHide}`
-        }
-        // style={IsMD ? {display:'none'}: null}
-      >
-        <ul className={styles.navitems}>
-          <li
+    state.Login.IsLogin &&
+    User &&(
+      <div className={styles.container}>
+        <div
+          className={
+            showNav
+              ? IsMD
+                ? `${styles.navwrap} ${styles.MDshowNav}`
+                : `${styles.navwrap}`
+              : IsMD
+              ? `${styles.MDhideNav} `
+              : `${styles.navwrap} ${styles.ChangeBGforHide}`
+          }
+          // style={IsMD ? {display:'none'}: null}
+        >
+          <div
             className={styles.title}
             style={showNav ? null : { background: "white" }}
           >
@@ -132,41 +136,74 @@ const Nav = () => {
                   alt=""
                   src={require("../../../image/Logo-Proscend-White-300.png")}
                   className={styles.LogoProscend}
+                  style={{ marginRight: "20px" }}
                 />
-                {/* <img
+                <img
                   alt=""
-                  src={require("../../../image/ISMS.png")}
+                  src={require("../../../image/OsmartNavLogo.png")}
                   className={styles.Logo}
-                /> */}
+                />
               </div>
             ) : null}
+
             <Link to="#" className={styles.cross} onClick={ShowBar}>
               {showNav ? (
-                <ImCross />
+                <BiChevronsLeft
+                  className={styles.BiChevronsLeft}
+                  style={{
+                    fontSize: "1.5rem",
+                    cursor: "pointer",
+                  }}
+                />
               ) : (
-                <FcList style={{ fontSize: "1.5rem" }} />
+                <BiChevronsRight
+                  className={styles.BiChevronsRight}
+                  style={{
+                    fontSize: "2.3rem",
+                    cursor: "pointer",
+                    // marginRight: "3px",
+                    color: "#042b57",
+                    marginLeft: "2%",
+                  }}
+                />
               )}
             </Link>
-          </li>
+          </div>
 
-          {
-            NavRoutes.map((item,index)=>{
+          <ul className={styles.navitems}>
+            {level && NavRoutes.map((item, index) => {
+              if(item.super && (level!=='super_super' && level !== 'super' && level !== 'admin')){
+                return
+              }
               return (
-                <li className={item.navitem} key={index}>
+                <Fragment  key={index}>
+                {<li className={item.navitem} key={index}>
                   <Link to={item.path}>
                     <Tooltip title={item.title} placement="right" key={index}>
                       {/* {item.icon}</Tooltip> {showNav ? <span>{item.title}</span> : null} */}
-                      {item.icon}
+                      <span
+                        style={
+                          showNav
+                            ? { margin: 0, width: "auto" }
+                            : { color: "#042b57", margin: 0, width: "auto" }
+                        }
+                      >
+                        {item.icon}
+                      </span>
                     </Tooltip>
-                    {showNav ? <span>{t(`ISMS.${item.title}`)} </span> : null}
+                    {showNav ? (
+                      <span className={"Oswald"} style={{ textAlign: "left" }}>
+                        {t(`ISMS.${item.title}`)}{" "}
+                      </span>
+                    ) : null}
                   </Link>
                   {/* {t('ISMS.goRegister1')} */}
-                </li>
+                </li>}
+                </Fragment>
               );
-            })
-          }
+            })}
 
-          {/* {NavRoutes.map((item, index) => {
+            {/* {NavRoutes.map((item, index) => {
             // item.super? ShowSuperOnNav
             if (item.super && !ShowSuperOnNav) {
               return;
@@ -182,10 +219,11 @@ const Nav = () => {
               </li>
             );
           })} */}
-          
-        </ul>
-        {
-          state.Login.IsLogin &&
+          </ul>
+
+          {/* Logout */}
+
+          {/* {
             (showNav ? (
               <Button
                 className={styles.LogoutBtn}
@@ -212,11 +250,12 @@ const Nav = () => {
               </Button>
             ) : (
               <Tooltip title={"Sign-out"} placement="right">
-                <FcExternal
+                <BiLogOut
                   style={{
-                    fontSize: "1.5rem",
+                    fontSize: "1.6rem",
                     cursor: "pointer",
                     marginRight: "8px",
+                    color: "#042b57",
                   }}
                   onClick={async () => {
                     setUploading(true);
@@ -237,26 +276,11 @@ const Nav = () => {
                 />
               </Tooltip>
             ))
-          // : (
-          //   showNav &&
-          //   <button
-          //     className={styles.LogoutBtn}
-          //     onClick={() => {
-          //       history.push("/login");
-          //     }}
-          //   >
-          //     {t('ISMS.Login')}
-          //   </button>
-          // :
-          // <Tooltip title={'Sign-in'} placement="right">
-          // <FcInternal style={{fontSize:'1.5rem', cursor:'pointer'}} onClick={() => {
-          //   history.push("/login");
-          // }}/>
-          // </Tooltip>
-        }
+        } */}
+        </div>
+        <p className={styles.version}>Ver.KS201231</p>
       </div>
-      <p className={styles.version}>Ver.120317</p>
-    </div>
+    )
   );
 };
 

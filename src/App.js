@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { BrowserRouter, Route, Redirect, Switch } from "react-router-dom";
 // import Dashboard from "./Pages/Dashboard";
 import Nav from "./Components/_Common/Navbar";
@@ -19,6 +19,10 @@ import AllRouter from './Pages/Topology/AllRouter'
 
 const App = () => {
 
+  const [level, setLevel] = useState(undefined)
+  useEffect(()=>{
+    setLevel(localStorage.getItem("authUser.level"))
+  },[localStorage.getItem("authUser.level")])
 
   return (
     <BrowserRouter>
@@ -48,6 +52,7 @@ const App = () => {
                 <Route path="/register" exact component={Register}></Route>
                 <Route path="/internalerror" exact component={InternalError}></Route>
                 {NavRoutes.map((item, index) => {
+
                   return (
                     <Route
                       key={index}

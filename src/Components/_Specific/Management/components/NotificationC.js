@@ -116,7 +116,7 @@ const NotifiModalC = ({
       visible={NotifiModalvisible}
       title="Notification"
       // onOk={() => setNotifiModalvisible(false)}
-      onCancel={() => {setNotifiModalvisible(false); setRecord({cid:null}); }}
+      onCancel={() => {setNotifiModalvisible(false); setRecord({cid:null}); form.resetFields()}}
       centered={true}
       className={styles.modal}
       destroyOnClose={true}

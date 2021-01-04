@@ -1,18 +1,19 @@
 import React, { useEffect, useState, useRef, useContext } from "react";
 import styles from "../topology.module.scss";
-import { Form, Select, Tag, Button } from "antd";
+import { Form, Select, Tag, Button, Row, Col } from "antd";
 import Context from "../../../../Utility/Reduxx";
 import { Translator } from "../../../../i18n/index";
 
 const { Option } = Select;
 
-const TopoFilterC = ({ setDataSource, dataSource, uploading }) => {
+const TopoFilterC = ({ setDataSource, dataSource, uploading, groups }) => {
   const [form] = Form.useForm();
   const { state, dispatch } = useContext(Context);
   const [restore, setRestore] = useState([]);
   const [modelOptions, setModelOptions] = useState("");
 
   let count = useRef(0);
+
 
   useEffect(() => {
     if (count.current !== 0 && !uploading) {
@@ -41,7 +42,7 @@ const TopoFilterC = ({ setDataSource, dataSource, uploading }) => {
   ];
 
   useEffect(() => {
-    if (restore.length !== 0) {
+    if (restore && restore.length !== 0) {
       const set = new Set();
       restore.filter((item) =>
         !set.has(item.model) ? set.add(item.model) : false
@@ -71,28 +72,31 @@ const TopoFilterC = ({ setDataSource, dataSource, uploading }) => {
   }, [restore, state.Topology.device]);
 
   const onFinish = (values) => {
-
     count.current++;
     let NewData = restore;
     if (
       !values.health.length ||
       !values.strength.length ||
       !values.model.length ||
-      !values.device.length
+      !values.device.length ||
+      !values.groups.length
     ) {
       setDataSource(restore);
     }
 
     NewData = NewData.filter((item) => {
+      // console.log(values.groups)
+      let groupfilter
+      if(values.groups?.length){
+        groupfilter = item.gid.filter(g=> values.groups.indexOf(g) > -1)
+      }
+
       return (
-        (values.device.length
-          ? values.device.includes(item.name) || values.device.includes(item.id)
-          : true) &&
+        (values.device.length ? values.device.includes(item.name) || values.device.includes(item.id): true) &&
         (values.model.length ? values.model.includes(item.model) : true) &&
         (values.health.length ? values.health.includes(item.health) : true) &&
-        (values.strength.length
-          ? values.strength.includes(item.strength)
-          : true)
+        (values.strength.length? values.strength.includes(item.strength): true) &&
+        (groupfilter?.length ? true : (!values.groups?.length))
       );
     });
     setDataSource(NewData);
@@ -129,103 +133,142 @@ const TopoFilterC = ({ setDataSource, dataSource, uploading }) => {
   }
 
   return (
-    <Form onFinish={onFinish} form={form} className={styles.FilterForm}>
-      <Form.Item
-        name="device"
-        label={Translator("ISMS.Device")}
-        className={styles.FilterDevice}
-      >
-        <Select
-          loading={uploading}
-          disabled={uploading}
-          // mode="multiple"
-          mode='tags'
-          placeholder={Translator("ISMS.Search")}
-          showArrow
-          tagRender={tagRender}
-          onFocus={() => {}}
-          onChange={() => form.submit()}
-          onBlur={() => form.submit()}
-        >
-          {restore.map((item, index) => {
-            return (
-              <Option key={index} value={item.name ? item.name : item.id}>
-                {item.name ? item.name : item.id}
-              </Option>
-            );
-          })}
-        </Select>
-      </Form.Item>
-      <Form.Item
-        name="model"
-        label={Translator("ISMS.Model")}
-        className={styles.FilterModel}
-      >
-        <Select
-          loading={uploading}
-          disabled={uploading}
-          mode="multiple"
-          showArrow
-          placeholder={Translator("ISMS.Search")}
-          tagRender={tagRender}
-          style={{ width: "100%" }}
-          options={modelOptions}
-          onChange={() => form.submit()}
-        />
-      </Form.Item>
-      <Form.Item
-        name="health"
-        label={Translator("ISMS.Health")}
-        className={styles.FilterHealth}
-      >
-        <Select
-          loading={uploading}
-          disabled={uploading}
-          mode="multiple"
-          placeholder={Translator("ISMS.Search")}
-          showArrow
-          tagRender={tagRender}
-          style={{ width: "100%" }}
-          options={healthoptions}
-          onChange={() => form.submit()}
-        />
-      </Form.Item>
-      <Form.Item
-        name="strength"
-        label={Translator("ISMS.Strength")}
-        className={styles.FilterStrength}
-      >
-        <Select
-          loading={uploading}
-          disabled={uploading}
-          mode="multiple"
-          placeholder={Translator("ISMS.Search")}
-          showArrow
-          tagRender={tagRender}
-          style={{ width: "100%" }}
-          options={strengthoptions}
-          onChange={() => form.submit()}
-        />
-      </Form.Item>
-      <Form.Item style={{ marginLeft: "15px" }}>
-        <Button
-          type={"primary"}
-          loading={uploading}
-          disabled={uploading}
-          onClick={() => {
-            // console.log(restore);
-            setDataSource(restore);
-            form.setFieldsValue({
-              device: [],
-              model: [],
-              health: [],
-              strength: [],
-            });
-          }}
-        >
-          {Translator("ISMS.Reset")}
-        </Button>
-      </Form.Item>
+    <Form onFinish={onFinish} form={form} layout={"vertical"}>
+      <div className={styles.FormWrapper}>
+        <Row gutter={24}>
+          <Col xs={24} sm={24} md={12} lg={9} xl={9}>
+            <Form.Item
+              name="device"
+              label={Translator("ISMS.Device")}
+              // className={styles.FilterDevice}
+            >
+              <Select
+                loading={uploading}
+                disabled={uploading}
+                maxTagCount={1}
+                mode="multiple"
+                // mode="tags"
+                placeholder={Translator("ISMS.Search")}
+                showArrow
+                tagRender={tagRender}
+                onChange={() => form.submit()}
+                onBlur={() => form.submit()}
+              >
+                {restore?.map((item, index) => {
+                  return (
+                    <Option key={index} value={item.name ? item.name : item.id}>
+                      {item.name ? item.name : item.id}
+                    </Option>
+                  );
+                })}
+              </Select>
+            </Form.Item>
+          </Col>
+          <Col xs={24} sm={24} md={10} lg={5}>
+            <Form.Item
+              name="model"
+              label={Translator("ISMS.Model")}
+              className={styles.FilterModel}
+            >
+              <Select
+                loading={uploading}
+                disabled={uploading}
+                mode="multiple"
+                maxTagCount={1}
+                showArrow
+                placeholder={Translator("ISMS.Search")}
+                tagRender={tagRender}
+                // style={{ width: "100%" }}
+                options={modelOptions}
+                onChange={() => form.submit()}
+              />
+            </Form.Item>
+          </Col>
+          <Col xs={24} sm={24} md={10} lg={5}>
+            <Form.Item
+              name="health"
+              label={Translator("ISMS.Health")}
+              className={styles.FilterHealth}
+            >
+              <Select
+                loading={uploading}
+                disabled={uploading}
+                maxTagCount={1}
+                mode="multiple"
+                placeholder={Translator("ISMS.Search")}
+                showArrow
+                tagRender={tagRender}
+                // style={{ width: "100%" }}
+                options={healthoptions}
+                onChange={() => form.submit()}
+              />
+            </Form.Item>
+          </Col>
+          <Col xs={24} sm={24} md={10} lg={5}>
+            <Form.Item
+              name="strength"
+              label={Translator("ISMS.Strength")}
+              className={styles.FilterStrength}
+            >
+              <Select
+                loading={uploading}
+                disabled={uploading}
+                mode="multiple"
+                placeholder={Translator("ISMS.Search")}
+                showArrow
+                maxTagCount={1}
+                tagRender={tagRender}
+                // style={{ width: "100%" }}
+                options={strengthoptions}
+                onChange={() => form.submit()}
+              />
+            </Form.Item>
+          </Col>
+          <Col xs={24} sm={24} md={10} lg={5}>
+            <Form.Item name="groups" label={"Group"}>
+              <Select
+                loading={uploading}
+                disabled={uploading}
+                mode="multiple"
+                placeholder={Translator("ISMS.Search")}
+                showArrow
+                maxTagCount={1}
+                tagRender={tagRender}
+                onChange={() => form.submit()}
+              >
+                {groups?.map((item, index) => {
+                  return (
+                    <Option key={index} value={item}>
+                      {item}
+                    </Option>
+                  );
+                })}
+              </Select>
+            </Form.Item>
+          </Col>
+          <Col xs={24} sm={4} md={3} lg={3}>
+            <Form.Item style={{ marginLeft: "15px" }}>
+              <Button
+                type={"primary"}
+                loading={uploading}
+                disabled={uploading}
+                onClick={() => {
+                  // console.log(restore);
+                  setDataSource(restore);
+                  form.setFieldsValue({
+                    device: [],
+                    model: [],
+                    health: [],
+                    strength: [],
+                  });
+                }}
+              >
+                {Translator("ISMS.Reset")}
+              </Button>
+            </Form.Item>
+          </Col>
+        </Row>
+      </div>
     </Form>
   );
 };

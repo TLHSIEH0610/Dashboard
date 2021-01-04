@@ -10,7 +10,6 @@ import {
   FcTimeline,
   FcConferenceCall,
   FcSpeaker,
-  FcGoodDecision,
   FcFinePrint
 } from "react-icons/fc";
 import { NotifiModalMC } from "./NotificationC";
@@ -48,7 +47,6 @@ const ManagementC = () => {
   const [SchemeRecord, setSchemeRecord] = useState("");
   const [EventLogRecord, setEventLogRecord] = useState("");
   const [CustomerInfoRecord, setCustomerInfoRecord] = useState(false);
-  const show = localStorage.getItem("authUser.level") === "super_super";
 
   const CustInfoUrl= '/inf_mgnt'
   const CustInfoUrldata= `{"list_inf":{${level === "super_super" ? state.Login.Cid : `"cid":"${cid}"`}}}`
@@ -65,7 +63,9 @@ const ManagementC = () => {
 
   useEffect(() => {
     if (CustInfoResponse) {
+      console.log(CustInfoUrldata)
       setCustomerList(CustInfoResponse.response);
+      console.log(CustInfoResponse.response)
     }
   }, [CustInfoResponse]);
 
@@ -147,7 +147,7 @@ const ManagementC = () => {
                   setCreateUserRecord(record);
                 }}
               >
-                <FcGoodDecision className={styles.CreateUserIcon} />
+                <img src={require("../../../../image/customer.png")} className={styles.CreateUserIcon}/>
               </a>
             </Tooltip>
 
@@ -199,7 +199,7 @@ const ManagementC = () => {
                 <FcFinePrint className={styles.ViewSchemeIcon} />
               </a>
             </Tooltip>
-            {show && state.Login.Cid === "" && (
+            {level === "super_super" && state.Login.Cid === "" && (
               <Tooltip title="Delete Customer">
                 <Popconfirm
                   title="Sure to Delete?"
@@ -247,6 +247,7 @@ const ManagementC = () => {
         setRecord={setCreateUserRecord}
         CreateUservisible={CreateUservisible}
         setCreateUservisible={setCreateUservisible}
+        level={level}
       />
 
       <EditGroupModalMC
@@ -279,7 +280,7 @@ const ManagementC = () => {
 
 
       <Card>
-        {show && (
+        {(level=== "super_super")&& (
           <Button
             type="primary"
             onClick={() => setCreateVisible(true)}
@@ -288,7 +289,7 @@ const ManagementC = () => {
           >
             {Translator("ISMS.Create Customer")}
           </Button>
-        )}
+        ) }
 
         <Form form={form} component={false}>
           <Table
@@ -297,7 +298,6 @@ const ManagementC = () => {
             columns={columns}
             dataSource={CustomerList}
             rowKey={(record) => record.cid}
-            // expandable={{ expandedRowRender }}
           />
         </Form>
       </Card>

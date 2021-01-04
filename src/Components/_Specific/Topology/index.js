@@ -6,7 +6,6 @@ import React, {
   Fragment,
 } from "react";
 import {
-  Drawer,
   Form,
   Input,
   Card,
@@ -15,8 +14,8 @@ import {
   message,
   Popconfirm,
   Menu,
-  Button,
   Dropdown,
+  Tabs,
 } from "antd";
 import Context from "../../../Utility/Reduxx";
 import useURLloader from "../../../hook/useURLloader";
@@ -35,21 +34,24 @@ import { healthIcon, strengthIcon } from "./components/TopologyF";
 import { TopoFilterMC } from "./components/Filter";
 import TrackMap from "../Track_Map/TrackerMap";
 import { useTranslation } from "react-i18next";
-import { ViewAllStatusMC } from "./components/ViewAllStatusC";
-import { FiMoreHorizontal } from "react-icons/fi";
-import { useHistory } from "react-router-dom";
+// import { useHistory } from "react-router-dom";
+import { ViewAllStatusMC } from './components/ViewAllStatusC'
+import { BulkConfigMC } from './components/BulkConfigC'
+
+
+const { TabPane } = Tabs;
 
 const TopologyC = () => {
   const { state } = useContext(Context);
   const [uploading, setUploading] = useState(false);
   const cid = localStorage.getItem("authUser.cid");
   const level = localStorage.getItem("authUser.level");
-  const history = useHistory();
+  // const history = useHistory();
   const NodeInfoUrl = "/cmd";
   const Urldata = `{"get":{"nodeInf":{"filter":{${
     level === "super_super" ? state.Login.Cid : `"cid":"${cid}"`
   }}}}}`;
-  const [AdvanceVisible, setAdvanceVisible] = useState(false);
+
   // const NodeInfoUrl =
   // level === "super_super"
   //     ? `/cmd?get={"nodeInf":{"filter":{${state.Login.Cid}}}}`
@@ -60,7 +62,8 @@ const TopologyC = () => {
     uploading
   );
   const [dataSource, setDataSource] = useState([]);
-  // const [IoTDeviceList, setIoTDeviceList] = useState([]);
+  const [groups, setgroups] = useState([]);
+  const [models, setModels] = useState([])
   const [AlarmTablevisible, setAlarmTablevisible] = useState(false);
   const [DeviceStatevisible, setDeviceStatevisible] = useState(false);
   const [DeviceSettingvisible, setDeviceSettingvisible] = useState(false);
@@ -74,7 +77,8 @@ const TopologyC = () => {
   const [SettingRecord, setSettingRecord] = useState([]);
   const [IoTRecord, setIoTRecord] = useState([]);
   const [MapRecord, setMapRecord] = useState([]);
-  const [DrawerDisplay, setDrawerDisplay] = useState()
+  const [IsUpdate, setIsUpdate] = useState(false)
+  // const [DrawerDisplay, setDrawerDisplay] = useState()
   const { t } = useTranslation();
 
   const EditableRow = ({ index, ...props }) => {
@@ -138,6 +142,7 @@ const TopologyC = () => {
             handleSave({ ...record, ...values });
             console.log(res);
             message.success("rename successfully.");
+            setIsUpdate(!IsUpdate)
             setUploading(false);
           })
           .catch((error) => {
@@ -200,11 +205,16 @@ const TopologyC = () => {
   };
 
   useEffect(() => {
-    if (NodeInfoResponse && NodeInfoResponse.response) {
-      let NodeInfo = [];
-      // console.log(responseData);
-      NodeInfoResponse.response.nodeInf.forEach((item, index) => {
-        NodeInfo.push({
+    if (NodeInfoResponse?.response) {
+      // console.log(NodeInfoResponse.response.nodeInf)
+      let groups = new Set()
+      let models = new Set()
+      let NodeInfo = NodeInfoResponse.response.nodeInf.map((item, index) => {
+        if(item.nodeInf.gid?.length){
+          item.nodeInf.gid.forEach(item=>groups.add(item))
+        }
+        models.add(item.nodeInf.model)
+        return ({
           key: index,
           id: item.nodeInf.id,
           name: item.nodeInf.name,
@@ -213,9 +223,16 @@ const TopologyC = () => {
           strength: item.nodeInf.sim,
           connection: item.nodeInf.connect,
           cid: item.nodeInf.cid,
+          gid:item.nodeInf.gid
         });
       });
+      groups = Array.from(groups)
+      models = Array.from(models)
       setDataSource(NodeInfo);
+      setModels(models);
+      setgroups(groups)
+    } else {
+      setDataSource(undefined);
     }
   }, [NodeInfoResponse]);
 
@@ -282,14 +299,13 @@ const TopologyC = () => {
         </Tooltip>
         <Tooltip title="View IoT">
           <a
-            // disabled={IoTDeviceList.includes(record.id) ? false : true}
             href="/#"
             key={index}
             onClick={(e) => {
               e.preventDefault();
               setIoTvisible(true);
               setIoTRecord(record);
-              console.log(record);
+              // console.log(record);
             }}
           >
             <MdCastConnected className={styles.IoT} />
@@ -393,85 +409,77 @@ const TopologyC = () => {
   });
 
   return (
-    <div style={{ position: "relative" }}>
-      <AlarmLogMC
-        setRecord={setAlarmRecord}
-        record={AlarmRecord}
-        AlarmTablevisible={AlarmTablevisible}
-        setAlarmTablevisible={setAlarmTablevisible}
-      />
+    <Fragment>
+    {/* <Tabs defaultActiveKey="1">
+      <TabPane tab="Devices" key="1"> */}
 
-      <DeviceStateMC
-        record={DeviceStatusRecord}
-        setRecord={setDeviceStatusRecord}
-        DeviceStatevisible={DeviceStatevisible}
-        setDeviceStatevisible={setDeviceStatevisible}
-      />
-
-      <TopoIoTMC
-        IoTvisible={IoTvisible}
-        setIoTvisible={setIoTvisible}
-        // setDeviceindex={setDeviceindex}
-        record={IoTRecord}
-        setRecord={setIoTRecord}
-      />
-
-      <TrackMap
-        // drawerVisible={drawerVisible}
-        // setDrawerVisible={setDrawerVisible}
-        setMapvisible={setMapvisible}
-        Mapvisible={Mapvisible}
-        record={MapRecord}
-        setRecord={setMapRecord}
-      />
-      <Drawer
-        title="Advance"
-        placement="right"
-        closable={false}
-        onClose={() => setAdvanceVisible(false)}
-        visible={AdvanceVisible}
-      >
-        <ul className={styles.Advance}>
-          <li className={styles.AdTitle}>View</li>
-          <li onClick={() => history.push("./allrouters")}>All Router Status</li>
-          {/* <li>All IoTs</li> */}
-          <li className={styles.AdTitle}>Setting</li>
-          <li onClick={() => history.push("./bulkconfig")}>Bulk Config</li>
-        </ul>
-      </Drawer>
-
-      <DeviceSettingMC
-        DeviceSettingvisible={DeviceSettingvisible}
-        setDeviceSettingvisible={setDeviceSettingvisible}
-        // NodeInfoLoading={NodeInfoLoading}
-        record={SettingRecord}
-        setRecord={setSettingRecord}
-      />
-      <Button
-        onClick={() => setAdvanceVisible(true)}
-        className={styles.advanceIcon}
-        type="primary"
-        icon={<FiMoreHorizontal />}
-      ></Button>
-      <Card style={{ marginBottom: "10px" }} className={styles.TopoTableCard}>
-        <TopoFilterMC
-          setDataSource={setDataSource}
-          dataSource={dataSource}
-          uploading={NodeInfoLoading}
+        <AlarmLogMC
+          setRecord={setAlarmRecord}
+          record={AlarmRecord}
+          AlarmTablevisible={AlarmTablevisible}
+          setAlarmTablevisible={setAlarmTablevisible}
         />
-      </Card>
-      <Card bodyStyle={{ padding: "2px" }}>
-        <Table
-          className={styles.TopoTable}
-          components={components}
-          rowClassName={() => "editable-row"}
-          bordered
-          loading={NodeInfoLoading || uploading}
-          dataSource={dataSource}
-          columns={columns}
+
+        <DeviceStateMC
+          record={DeviceStatusRecord}
+          setRecord={setDeviceStatusRecord}
+          DeviceStatevisible={DeviceStatevisible}
+          setDeviceStatevisible={setDeviceStatevisible}
         />
-      </Card>
-    </div>
+
+        <TopoIoTMC
+          IoTvisible={IoTvisible}
+          setIoTvisible={setIoTvisible}
+          // setDeviceindex={setDeviceindex}
+          record={IoTRecord}
+          setRecord={setIoTRecord}
+        />
+
+        <TrackMap
+          // drawerVisible={drawerVisible}
+          // setDrawerVisible={setDrawerVisible}
+          setMapvisible={setMapvisible}
+          Mapvisible={Mapvisible}
+          record={MapRecord}
+          setRecord={setMapRecord}
+        />
+
+        <DeviceSettingMC
+          DeviceSettingvisible={DeviceSettingvisible}
+          setDeviceSettingvisible={setDeviceSettingvisible}
+          record={SettingRecord}
+          setRecord={setSettingRecord}
+        />
+
+        <Card style={{ marginBottom: "10px" }} className={styles.TopoTableCard}>
+          <TopoFilterMC
+            setDataSource={setDataSource}
+            groups={groups}
+            dataSource={dataSource}
+            uploading={NodeInfoLoading}
+          />
+        </Card>
+        <Card bodyStyle={{ padding: "2px" }}>
+          <Table
+            className={styles.TopoTable}
+            components={components}
+            rowClassName={() => "editable-row"}
+            bordered
+            loading={NodeInfoLoading || uploading}
+            dataSource={dataSource}
+            columns={columns}
+          />
+        </Card>
+
+      {/* </TabPane>
+      <TabPane tab="Routers Status" key="2">
+        <ViewAllStatusMC groups={groups} models={models}/>
+      </TabPane>
+      <TabPane tab="Bulk Config" key="3">
+      <BulkConfigMC IsUpdate={IsUpdate}/>
+      </TabPane>
+    </Tabs> */}
+    </Fragment>
   );
 };
 

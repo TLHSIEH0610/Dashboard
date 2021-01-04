@@ -27,12 +27,9 @@ const DeviceSettingC = ({
   const [uploading, setUploading] = useState(false);
   const [haveContent, setHaveContent] = useState(false);
   const [IsUpdate, setIsUpdate] = useState(false);
-  const [CurrentPage, setCurrentPage] = useState("1");
-  const [LANform] = Form.useForm();
-  const [WANform] = Form.useForm();
-  const [LTEform] = Form.useForm();
-  const [PERIODform] = Form.useForm();
-
+  // const [CurrentPage, setCurrentPage] = useState("1");
+  const [form] = Form.useForm();
+  const level = localStorage.getItem("authUser.level");
   useEffect(() => {
     if (record.id) {
       // console.log(record)
@@ -70,9 +67,9 @@ const DeviceSettingC = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [record.id, IsUpdate]);
 
-  const callback = (page) => {
-    setCurrentPage(page);
-  };
+  // const callback = (page) => {
+  //   setCurrentPage(page);
+  // };
 
   return (
     <Modal
@@ -87,57 +84,28 @@ const DeviceSettingC = ({
       centered={true}
       width={'50%'}
       footer={[
-        CurrentPage === "1" && (
-          <Button
-            key="LANform"
-            type="primary"
-            onClick={() => LANform.submit()}
-            loading={uploading}
-          >
-            Submit
-          </Button>
-        ),
-        CurrentPage === "2" && (
-          <Button
-            key="WANform"
-            type="primary"
-            onClick={() => WANform.submit()}
-            loading={uploading}
-          >
-            Submit
-          </Button>
-        ),
-        CurrentPage === "3" && (
-          <Button
-            key="LTEform"
-            type="primary"
-            onClick={() => LTEform.submit()}
-            loading={uploading}
-          >
-            Submit
-          </Button>
-        ),
-        CurrentPage === "4" && (
           <Button
             key="PERIODform"
             type="primary"
-            onClick={() => PERIODform.submit()}
+            // onClick={() => PERIODform.submit()}
+            onClick={() => form.submit()}
             loading={uploading}
+            disabled={level==='get'}
           >
             Submit
           </Button>
-        ),
       ]}
     >
       {DeviceConfig && !loading ? (
-        <Tabs defaultActiveKey="1" onChange={callback}>
-          <TabPane tab="LAN" key="1" className={styles.tabpane}>
+        <Tabs defaultActiveKey="1" >
+          <TabPane tab="LAN" key="1" className={styles.tabpane}> 
             <LanSettingMF
               setIsUpdate={setIsUpdate}
               IsUpdate={IsUpdate}
               DeviceConfig={DeviceConfig}
               id={record.id}
-              form={LANform}
+              // form={LANform}
+              form={form}
               uploading={uploading}
               setUploading={setUploading}
             />
@@ -148,7 +116,8 @@ const DeviceSettingC = ({
               IsUpdate={IsUpdate}
               DeviceConfig={DeviceConfig}
               id={record.id}
-              form={WANform}
+              // form={WANform}
+              form={form}
               uploading={uploading}
               setUploading={setUploading}
             />
@@ -159,7 +128,8 @@ const DeviceSettingC = ({
               setIsUpdate={setIsUpdate}
               IsUpdate={IsUpdate}
               DeviceConfig={DeviceConfig}
-              form={LTEform}
+              // form={LTEform}
+              form={form}
               uploading={uploading}
               setUploading={setUploading}
             />
@@ -170,7 +140,8 @@ const DeviceSettingC = ({
               setIsUpdate={setIsUpdate}
               IsUpdate={IsUpdate}
               DeviceConfig={DeviceConfig}
-              form={PERIODform}
+              // form={PERIODform}
+              form={form}
               uploading={uploading}
               setUploading={setUploading}
             />

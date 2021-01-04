@@ -12,15 +12,15 @@ import {
   Popconfirm,
   Tooltip,
   Spin,
-  Alert 
+  Alert,
 } from "antd";
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import axios from "axios";
 import styles from "../management.module.scss";
 import { Translator } from "../../../../i18n/index";
-import { FcDeleteRow } from 'react-icons/fc'
-import { UserLogOut } from '../../../../Utility/Fetch'
-import { useHistory } from 'react-router-dom'
+import { FcDeleteRow } from "react-icons/fc";
+import { UserLogOut } from "../../../../Utility/Fetch";
+import { useHistory } from "react-router-dom";
 import Context from "../../../../Utility/Reduxx";
 
 const { TabPane } = Tabs;
@@ -36,6 +36,7 @@ const UserForm = ({
   record,
   CreateUservisible,
   setCreateUservisible,
+  level,
 }) => {
   const [CreateUserform] = Form.useForm();
   const [EditUserform] = Form.useForm();
@@ -44,7 +45,7 @@ const UserForm = ({
   const [GroupList, setGroupList] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [IsUpdate, setIsUpdate] = useState(false);
-  const history = useHistory()
+  const history = useHistory();
   const { dispatch } = useContext(Context);
 
   useEffect(() => {
@@ -52,17 +53,17 @@ const UserForm = ({
       console.log("有執行");
       setUploading(true);
       const config1 = {
-        method: 'post',
-        headers: { 'Content-Type': 'application/json' },
-        url: '/user_mgnt',
+        method: "post",
+        headers: { "Content-Type": "application/json" },
+        url: "/user_mgnt",
         data: JSON.parse(`{"list_user":{"cid":"${record.cid}"}}`),
-      }
+      };
       const config2 = {
-        method: 'post',
-        headers: { 'Content-Type': 'application/json' },
-        url: '/device_mgnt/group',
+        method: "post",
+        headers: { "Content-Type": "application/json" },
+        url: "/device_mgnt/group",
         data: JSON.parse(`{"list_group":{"cid":"${record.cid}"}}`),
-      }
+      };
       function UserListUrl() {
         return axios(config1);
       }
@@ -99,8 +100,8 @@ const UserForm = ({
           if (error.response && error.response.status === 401) {
             dispatch({ type: "setLogin", payload: { IsLogin: false } });
             UserLogOut();
-            history.push("/userlogin");                                                                         
-          } 
+            history.push("/userlogin");
+          }
           console.error(error);
           setUploading(false);
         });
@@ -120,32 +121,33 @@ const UserForm = ({
     setCurrentPage(`${page}`);
   };
 
-  const deleteUser = (Deleterecord) =>{
+  const deleteUser = (Deleterecord) => {
     setUploading(true);
     // const deleteUserUrl = `/user_mgnt?delete_user={"cid":"${record.cid}", "user_list":[{"name":"${Deleterecord.name}"}]}`
     // console.log(deleteUserUrl)
     const config = {
-      method: 'post',
-      headers: { 'Content-Type': 'application/json' },
-      url: '/user_mgnt',
-      data: JSON.parse(`{"delete_user":{"cid":"${record.cid}", "user_list":[{"name":"${Deleterecord.name}"}]}}`),
-    }
+      method: "post",
+      headers: { "Content-Type": "application/json" },
+      url: "/user_mgnt",
+      data: JSON.parse(
+        `{"delete_user":{"cid":"${record.cid}", "user_list":[{"name":"${Deleterecord.name}"}]}}`
+      ),
+    };
     axios(config)
-    .then((res) => {
-      setUploading(false);
-      message.success("Delete successfully.");
-      console.log(res);
-      setIsUpdate(!IsUpdate);
-      CreateUserform.resetFields();
-    })
-    .catch((error) => {
-      console.log(error);
-      setUploading(false);
-      message.error("Delete fail.");
-      CreateUserform.resetFields();
-    });
-
-  }
+      .then((res) => {
+        setUploading(false);
+        message.success("Delete successfully.");
+        console.log(res);
+        setIsUpdate(!IsUpdate);
+        CreateUserform.resetFields();
+      })
+      .catch((error) => {
+        console.log(error);
+        setUploading(false);
+        message.error("Delete fail.");
+        CreateUserform.resetFields();
+      });
+  };
 
   const CreateUseronFinish = (values) => {
     console.log("Received values of form:", values);
@@ -157,13 +159,20 @@ const UserForm = ({
     // }", "user_list":${JSON.stringify(values.users)}}`;
     // console.log(values, url);
     const config = {
-      method: 'post',
-      headers: { 'Content-Type': 'application/json' },
-      url: '/user_mgnt',
-      data: JSON.parse(`{"create_user":{"cid":"${
-        record.cid
-      }", "user_list":${JSON.stringify(values.users)}}}`),
-    }
+      method: "post",
+      headers: { "Content-Type": "application/json" },
+      url: "/user_mgnt",
+      data: JSON.parse(
+        `{"create_user":{"cid":"${record.cid}", "user_list":${JSON.stringify(
+          values.users
+        )}}}`
+      ),
+    };
+    console.log(
+      `{"create_user":{"cid":"${record.cid}", "user_list":${JSON.stringify(
+        values.users
+      )}}}`
+    );
     axios(config)
       .then((res) => {
         setUploading(false);
@@ -177,8 +186,8 @@ const UserForm = ({
         if (error.response && error.response.status === 401) {
           dispatch({ type: "setLogin", payload: { IsLogin: false } });
           UserLogOut();
-          history.push("/userlogin");                                                                         
-        } 
+          history.push("/userlogin");
+        }
         setUploading(false);
         message.error("Create fail.");
         // CreateUserform.resetFields();
@@ -200,13 +209,15 @@ const UserForm = ({
     // }", "user_list":${JSON.stringify(values.EditUser)}}`;
     // console.log(EditUserUrl);
     const config = {
-      method: 'post',
-      headers: { 'Content-Type': 'application/json' },
-      url: '/user_mgnt',
-      data: JSON.parse(`{"modify_user":{"cid":"${
-        record.cid
-      }", "user_list":${JSON.stringify(values.EditUser)}}}`),
-    }
+      method: "post",
+      headers: { "Content-Type": "application/json" },
+      url: "/user_mgnt",
+      data: JSON.parse(
+        `{"modify_user":{"cid":"${record.cid}", "user_list":${JSON.stringify(
+          values.EditUser
+        )}}}`
+      ),
+    };
     axios(config)
       .then((res) => {
         setUploading(false);
@@ -220,8 +231,8 @@ const UserForm = ({
         if (error.response && error.response.status === 401) {
           dispatch({ type: "setLogin", payload: { IsLogin: false } });
           UserLogOut();
-          history.push("/userlogin");                                                                         
-        } 
+          history.push("/userlogin");
+        }
         setUploading(false);
         EditUserform.resetFields();
         message.error("Edit fail.");
@@ -233,6 +244,7 @@ const UserForm = ({
       title: "name",
       dataIndex: ["name"],
       render: (_, record, index) => {
+        console.log(record);
         return (
           <div
             style={{
@@ -249,21 +261,23 @@ const UserForm = ({
               rules={[{ required: true, message: "Group is required!" }]}
               initialValue={record.name}
             >
-              <Input disabled={true}  style={{ width: "300px"}}/>
+              <Input disabled={true} style={{ width: "300px" }} />
             </Form.Item>
-            <Tooltip title="Delete User">
-              <Popconfirm
-                title="Sure to delete?"
-                onConfirm={() => {
-                  deleteUser(record);
-                }}
-              > 
-                <FcDeleteRow
-                  className={styles.DeleteGroupIcon}
-                  style={{ fontSize: "2rem", cursor: "pointer" }}
-                />
-              </Popconfirm>
-            </Tooltip>
+            {level === "super_super" || record.level !== "super" ? (
+              <Tooltip title="Delete User">
+                <Popconfirm
+                  title="Sure to delete?"
+                  onConfirm={() => {
+                    deleteUser(record);
+                  }}
+                >
+                  <FcDeleteRow
+                    className={styles.DeleteGroupIcon}
+                    style={{ fontSize: "2rem", cursor: "pointer" }}
+                  />
+                </Popconfirm>
+              </Tooltip>
+            ) : null}
           </div>
         );
       },
@@ -274,7 +288,7 @@ const UserForm = ({
       render: (_, __, index) => {
         return (
           <Form.Item
-            style={{ marginBottom: "10px"}}
+            style={{ marginBottom: "10px" }}
             // className={styles.formitem}
             name={["EditUser", index, "password"]}
             rules={[
@@ -291,7 +305,7 @@ const UserForm = ({
               },
             ]}
           >
-            <Input placeholder={'Password'}  style={{ width: "200px"}}/>
+            <Input placeholder={"Password"} style={{ width: "200px" }} />
           </Form.Item>
         );
       },
@@ -313,6 +327,7 @@ const UserForm = ({
               style={{ width: "100px" }}
               className={styles.deviceinput}
               loading={uploading}
+              disabled={record.level === "super"}
             >
               <Option key={1} value={"super"}>
                 super
@@ -348,7 +363,7 @@ const UserForm = ({
               showArrow
               // tagRender={tagRender}
               style={{ width: "300px" }}
-              // className={styles.deviceinput}
+              disabled={record.level === "super"}
               loading={uploading}
             >
               {GroupList.map((item, index) => {
@@ -372,6 +387,7 @@ const UserForm = ({
       onCancel={() => {
         setCreateUservisible(false);
         setRecord({ cid: null });
+        CreateUserform.resetFields();
       }}
       className={styles.modal}
       destroyOnClose={true}
@@ -404,159 +420,169 @@ const UserForm = ({
         // </Fragment>
       ]}
     >
-      {uploading? <Spin tip="Loading...">
+      {uploading ? (
+        <Spin tip="Loading...">
           <Alert
             message="Getting Data"
             description="We are now getting data from server, please wait for a few seconds"
           />
-        </Spin> : <Tabs defaultActiveKey="1" onChange={ChangeTabs}>
-        <TabPane tab="Create User" key="1">
-          <Form
-            name="CreateUser"
-            form={CreateUserform}
-            onFinish={CreateUseronFinish}
-          >
-            <Form.Item
-              name="cid"
-              rules={[{ required: true, message: "" }]}
-              label={"Customer"}
-              style={{ display: "none" }}
+        </Spin>
+      ) : (
+        <Tabs defaultActiveKey="1" onChange={ChangeTabs}>
+          <TabPane tab="Create User" key="1">
+            <Form
+              name="CreateUser"
+              form={CreateUserform}
+              onFinish={CreateUseronFinish}
             >
-              <Input disabled={true} />
-            </Form.Item>
+              <Form.Item
+                name="cid"
+                // rules={[{ required: true, message: "" }]}
+                label={"Customer"}
+                style={{ display: "none" }}
+              >
+                <Input disabled={true} />
+              </Form.Item>
 
-            <Form.List name="users">
-              {(fields, { add, remove }) => {
-                return (
-                  <div>
-                    {fields.map((field) => (
-                      <Space
-                        key={field.key}
-                        style={{
-                          display: "flex",
-                          marginBottom: 8,
-                          flexWrap: "wrap",
-                        }}
-                        align="start"
-                      >
-                        <Form.Item
-                          className={styles.name}
-                          {...field}
-                          name={[field.name, "name"]}
-                          fieldKey={[field.fieldKey, "name"]}
-                          rules={[
-                            {
-                              type: "email",
-                              required: true,
-                              message: "must be name@xxx.com",
-                            },
-                          ]}
-                        >
-                          <Input placeholder="Name@xxx.com" />
-                        </Form.Item>
-                        <Form.Item
-                          {...field}
-                          className={styles.password}
-                          style={{ width: 250 }}
-                          name={[field.name, "password"]}
-                          fieldKey={[field.fieldKey, "password"]}
-                          rules={[
-                            { required: true, message: "Missing password" },
-                            {
-                              whitespace: true,
-                              message: "spaces are not allow!",
-                            },
-                            {
-                              pattern: new RegExp(
-                                "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$"
-                              ),
-                              message:
-                                "Must contain  at leat a numeric digit/Uppercase and lowercase letter/special character, and at least 8 or more characters",
-                            },
-                          ]}
-                        >
-                          <Input placeholder="Password" type="password" />
-                        </Form.Item>
-                        <Form.Item
-                          {...field}
-                          className={styles.level}
-                          name={[field.name, "level"]}
-                          fieldKey={[field.fieldKey, "level"]}
-                          rules={[{ required: true, message: "Missing level" }]}
-                        >
-                          <Select
-                            // style={{ width: 120 }}
-                            //  onChange={handleChange}
-                            placeholder="Level  "
-                          >
-                            <Option value="super">super</Option>
-                            <Option value="admin">admin</Option>
-                            <Option value="get">get</Option>
-                            <Option value="set">set</Option>
-                          </Select>
-                        </Form.Item>
-                        <Form.Item
-                          {...field}
-                          className={styles.gid}
-                          name={[field.name, "gid"]}
-                          fieldKey={[field.fieldKey, "gid"]}
-                          initialValue={[]}
-                          // rules={[{ required: true, message: "Missin Group" }]}
-                        >
-                          <Select
-                            style={{ width: 150 }}
-                            // onChange={handleChange}
-                            mode={"multiple"}
-                            placeholder="Group"
-                          >
-                            {GroupList.map((item, index) => {
-                              return (
-                                <Option key={index} value={item.gid}>
-                                  {item.gid}
-                                </Option>
-                              );
-                            })}
-                          </Select>
-                        </Form.Item>
-
-                        <MinusCircleOutlined
-                          onClick={() => {
-                            remove(field.name);
+              <Form.List name="users">
+                {(fields, { add, remove }) => {
+                  return (
+                    <div>
+                      {fields.map((field) => (
+                        <Space
+                          key={field.key}
+                          style={{
+                            display: "flex",
+                            marginBottom: 8,
+                            flexWrap: "wrap",
                           }}
-                        />
-                        <br />
-                      </Space>
-                    ))}
+                          align="start"
+                        >
+                          <Form.Item
+                            className={styles.name}
+                            {...field}
+                            name={[field.name, "name"]}
+                            fieldKey={[field.fieldKey, "name"]}
+                            rules={[
+                              {
+                                type: "email",
+                                required: true,
+                                message: "must be name@xxx.com",
+                              },
+                            ]}
+                          >
+                            <Input placeholder="Name@xxx.com" />
+                          </Form.Item>
+                          <Form.Item
+                            {...field}
+                            className={styles.password}
+                            style={{ width: 250 }}
+                            name={[field.name, "password"]}
+                            fieldKey={[field.fieldKey, "password"]}
+                            rules={[
+                              { required: true, message: "Missing password" },
+                              {
+                                whitespace: true,
+                                message: "spaces are not allow!",
+                              },
+                              {
+                                pattern: new RegExp(
+                                  "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$"
+                                ),
+                                message:
+                                  "Must contain  at leat a numeric digit/Uppercase and lowercase letter/special character, and at least 8 or more characters",
+                              },
+                            ]}
+                          >
+                            <Input placeholder="Password" type="password" />
+                          </Form.Item>
+                          <Form.Item
+                            {...field}
+                            className={styles.level}
+                            name={[field.name, "level"]}
+                            fieldKey={[field.fieldKey, "level"]}
+                            rules={[
+                              { required: true, message: "Missing level" },
+                            ]}
+                          >
+                            <Select
+                              // style={{ width: 120 }}
+                              //  onChange={handleChange}
+                              placeholder="Level  "
+                            >
+                              <Option value="super">super</Option>
+                              <Option value="admin">admin</Option>
+                              <Option value="get">get</Option>
+                              <Option value="set">set</Option>
+                            </Select>
+                          </Form.Item>
+                          <Form.Item
+                            {...field}
+                            className={styles.gid}
+                            name={[field.name, "gid"]}
+                            fieldKey={[field.fieldKey, "gid"]}
+                            initialValue={[]}
+                            // rules={[{ required: true, message: "Missin Group" }]}
+                          >
+                            <Select
+                              style={{ width: 150 }}
+                              // onChange={handleChange}
+                              mode={"multiple"}
+                              placeholder="Group"
+                            >
+                              {GroupList.map((item, index) => {
+                                return (
+                                  <Option key={index} value={item.gid}>
+                                    {item.gid}
+                                  </Option>
+                                );
+                              })}
+                            </Select>
+                          </Form.Item>
 
-                    <Form.Item>
-                      <Button
-                        type="dashed"
-                        onClick={() => {
-                          add();
-                        }}
-                        block
-                      >
-                        <PlusOutlined /> Add User
-                      </Button>
-                    </Form.Item>
-                  </div>
-                );
-              }}
-            </Form.List>
-          </Form>
-        </TabPane>
-        <TabPane tab="Edit User" key="2">
-          <Form form={EditUserform} onFinish={EditUseronFinish} style={{overflowX:'auto'}}>
-            <Table
-              columns={columns}
-              dataSource={UserList}
-              pagination={false}
-              // loading={uploading}
-              // scroll={{ x: 1500, y: 600 }}
-            />
-          </Form>
-        </TabPane>
-      </Tabs>}
+                          <MinusCircleOutlined
+                            onClick={() => {
+                              remove(field.name);
+                            }}
+                          />
+                          <br />
+                        </Space>
+                      ))}
+
+                      <Form.Item>
+                        <Button
+                          type="dashed"
+                          onClick={() => {
+                            add();
+                          }}
+                          block
+                        >
+                          <PlusOutlined /> Add User
+                        </Button>
+                      </Form.Item>
+                    </div>
+                  );
+                }}
+              </Form.List>
+            </Form>
+          </TabPane>
+          <TabPane tab="Edit User" key="2">
+            <Form
+              form={EditUserform}
+              onFinish={EditUseronFinish}
+              style={{ overflowX: "auto" }}
+            >
+              <Table
+                columns={columns}
+                dataSource={UserList}
+                pagination={false}
+                // loading={uploading}
+                // scroll={{ x: 1500, y: 600 }}
+              />
+            </Form>
+          </TabPane>
+        </Tabs>
+      )}
     </Modal>
   );
 };
@@ -577,16 +603,22 @@ const CreateInfoForm = ({
     setUploading(true);
     // const CreateUserTokenUrl = `/user_mgnt?generate_token={}`;
     const config1 = {
-      method: 'post',
-      headers: { 'Content-Type': 'application/json' },
-      url: '/user_mgnt',
+      method: "post",
+      headers: { "Content-Type": "application/json" },
+      url: "/user_mgnt",
       data: JSON.parse(`{"generate_token":{}}`),
-    }
-
+    };
+    console.log(config1.data);
     let UserToken;
-    await axios(config1).then((res) => {
-      UserToken = res.data.response.token;
-    });
+    await axios(config1)
+      .then((res) => {
+        UserToken = res.data.response.token;
+      })
+      .catch((error) => {
+        console.log(error);
+        setUploading(false);
+        message.error("Create fail.");
+      });
     // const CreateInfo = ` /inf_mgnt?create_inf={"cid":"${UserToken}","inf_list":{"company":"${
     //   values.company ? values.company : ""
     // }", "contact":"${values.contact ? values.contact : ""}", "mail":"${
@@ -594,20 +626,26 @@ const CreateInfoForm = ({
     // }", "phone":"${values.phone ? values.phone : ""}"}}`;
     // console.log(CreateInfo);
     const config2 = {
-      method: 'post',
-      headers: { 'Content-Type': 'application/json' },
-      url: '/inf_mgnt',
-      data: JSON.parse(`{"create_inf":{"cid":"${UserToken}","inf_list":{"company":"${
-        values.company ? values.company : ""
-      }", "contact":"${values.contact ? values.contact : ""}", "mail":"${
-        values.mail ? values.mail : ""
-      }", "phone":"${values.phone ? values.phone : ""}"}}}`),
-    }
+      method: "post",
+      headers: { "Content-Type": "application/json" },
+      url: "/inf_mgnt",
+      data: JSON.parse(
+        `{"create_inf":{"cid":"${UserToken}","inf_list":{"company":"${
+          values.company ? values.company : ""
+        }", "contact":"${values.contact ? values.contact : ""}", "mail":"${
+          values.mail ? values.mail : ""
+        }", "phone":"${values.phone ? values.phone : ""}"}}}`
+      ),
+    };
+    console.log(config2.data);
     axios(config2)
       .then((res) => {
         setUploading(false);
         message.success("Create successfully.");
-        dispatch({ type: "setIsUpdate", payload: { IsUpdate: !state.Global.IsUpdate } });
+        dispatch({
+          type: "setIsUpdate",
+          payload: { IsUpdate: !state.Global.IsUpdate },
+        });
         setCreateVisible(false);
         setIsUpdate(!IsUpdate);
         console.log(res);
@@ -625,7 +663,7 @@ const CreateInfoForm = ({
       visible={CreateVisible}
       // onOk={() => setCreateVisible(false)}
       onCancel={() => {
-        setCreateVisible(false)
+        setCreateVisible(false);
       }}
       footer={[
         <Button
@@ -679,7 +717,7 @@ const EditCustomerInfo = ({
   const [form] = Form.useForm();
   const [uploading, setUploading] = useState(false);
   const { state, dispatch } = useContext(Context);
-  const history = useHistory()
+  const history = useHistory();
 
   useEffect(() => {
     if (record.inf_list) {
@@ -699,24 +737,29 @@ const EditCustomerInfo = ({
     setUploading(true);
     // const EditCustInfiUrl = `/inf_mgnt?modify_inf={"cid":"${record.cid}", "inf_list":{"company":"${values.company}", "contact":"${values.contact}", "mail":"${values.mail}", "phone":"${values.phone}"}}`;
     const config = {
-      method: 'post',
-      headers: { 'Content-Type': 'application/json' },
-      url: '/inf_mgnt',
-      data: JSON.parse(`{"modify_inf":{"cid":"${record.cid}", "inf_list":{"company":"${values.company}", "contact":"${values.contact}", "mail":"${values.mail}", "phone":"${values.phone}"}}}`),
-    }
+      method: "post",
+      headers: { "Content-Type": "application/json" },
+      url: "/inf_mgnt",
+      data: JSON.parse(
+        `{"modify_inf":{"cid":"${record.cid}", "inf_list":{"company":"${values.company}", "contact":"${values.contact}", "mail":"${values.mail}", "phone":"${values.phone}"}}}`
+      ),
+    };
     axios(config)
       .then(() => {
         setUploading(false);
         message.success("update successfully.");
-        dispatch({ type: "setIsUpdate", payload: { IsUpdate: !state.Global.IsUpdate } });
+        dispatch({
+          type: "setIsUpdate",
+          payload: { IsUpdate: !state.Global.IsUpdate },
+        });
         setIsUpdate(!IsUpdate);
       })
       .catch((error) => {
         if (error.response && error.response.status === 401) {
           dispatch({ type: "setLogin", payload: { IsLogin: false } });
           UserLogOut();
-          history.push("/userlogin");                                                                         
-        } 
+          history.push("/userlogin");
+        }
         console.log(error);
         setUploading(false);
         message.error("update fail.");
@@ -729,7 +772,7 @@ const EditCustomerInfo = ({
       visible={EditCustomerInfovisible}
       onCancel={() => {
         setEditCustomerInfovisible(false);
-        setRecord({inf_list:null})
+        setRecord({ inf_list: null });
         // form.resetFields()
       }}
       footer={[
@@ -774,149 +817,3 @@ const EditCustomerInfo = ({
 };
 
 export const EditCustomerInfoMC = React.memo(EditCustomerInfo);
-
-
-
-// const EditUserForm = ({
-//   GroupList,
-//   UserEditRecord,
-//   onEditcid,
-//   setUploading,
-//   setEditVisible,
-//   EditVisible,
-//   uploading,
-// }) => {
-//   const [form] = Form.useForm();
-//   // const [uploading, setUploading] = useState(false)
-//   const EditUseronFinish = (values) => {
-//     setUploading(true);
-//     const EditUserUrl =
-//       values.password === undefined
-//         ? `/user_mgnt?modify_user={"cid":"${onEditcid}", "user_list":[{"name":"${
-//             values.name
-//           }", "level":"${values.level}", "gid":${JSON.stringify(values.gid)}}]}`
-//         : `/user_mgnt?modify_user={"cid":"${onEditcid}", "user_list":[{"name":"${
-//             values.name
-//           }", "password":"${values.password}", "level":"${
-//             values.level
-//           }", "gid":${JSON.stringify(values.gid)}}]}`;
-//     axios
-//       .get(EditUserUrl)
-//       .then((res) => {
-//         console.log(res);
-//         setUploading(false);
-//         message.success("update successfully.");
-//         form.resetFields();
-//         setEditVisible(false);
-//       })
-//       .catch((error) => {
-//         console.log(error);
-//         setUploading(false);
-//         message.error("update fail.");
-//         form.resetFields();
-//       });
-//     console.log(EditUserUrl);
-//   };
-
-//   useEffect(() => {
-//     form.setFieldsValue({
-//       name: UserEditRecord.name,
-//       level: UserEditRecord.level,
-//       gid: UserEditRecord.gid,
-//     });
-//   }, [UserEditRecord]);
-
-//   return (
-//     <Modal
-//       title="EditUser"
-//       visible={EditVisible}
-//       // onOk={() => setEditVisible(false)}
-//       okButtonProps={{ form: "EditUser", key: "submit", htmlType: "submit" }}
-//       onCancel={() => setEditVisible(false)}
-//       destroyOnClose={true}
-//       footer={[
-//         <Button
-//           key="submit"
-//           type="primary"
-//           loading={uploading}
-//           onClick={() => {
-//             form.submit();
-//           }}
-//         >
-//           {Translator("ISMS.Submit")}
-//         </Button>,
-//       ]}
-//     >
-//       <Form
-//         name="EditUser"
-//         autoComplete="off"
-//         form={form}
-//         onFinish={EditUseronFinish}
-//         {...layout}
-//       >
-//         <Form.Item
-//           label="name"
-//           name="name"
-//           rules={[
-//             {
-//               type: "email",
-//               required: true,
-//               message: "name@xxx.com is required",
-//             },
-//           ]}
-//         >
-//           <Input placeholder="name" disabled={true} />
-//         </Form.Item>
-//         <Form.Item
-//           label="password"
-//           name="password"
-//           rules={[
-//             // { required: true, message: "Missing password" },
-//             {
-//               whitespace: true,
-//               message: "spaces are not allow!",
-//             },
-//             {
-//               pattern: new RegExp(
-//                 "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$"
-//               ),
-//               message:
-//                 "Must contain  at leat a numeric digit/Uppercase and lowercase letter/special character, and at least 8 or more characters",
-//             },
-//           ]}
-//         >
-//           <Input placeholder="password" />
-//         </Form.Item>
-//         <Form.Item
-//           label="level"
-//           name="level"
-//           rules={[{ required: true, message: "Missing level" }]}
-//         >
-//           <Select>
-//             <Option value="super">super</Option>
-//             <Option value="admin">admin</Option>
-//             <Option value="get">get</Option>
-//             <Option value="set">set</Option>
-//           </Select>
-//         </Form.Item>
-//         <Form.Item name="gid" label="Group" initialValue={[]}>
-//           <Select mode={"multiple"}>
-//             {GroupList.map((item, index) => {
-//               if (item.cid === onEditcid) {
-//                 return item.group.map((group, groupIndex) => {
-//                   return (
-//                     <Option key={`${index}_${groupIndex}_`} value={group.gid}>
-//                       {group.gid}
-//                     </Option>
-//                   );
-//                 });
-//               }
-//             })}
-//           </Select>
-//         </Form.Item>
-//       </Form>
-//     </Modal>
-//   );
-// };
-
-// export const EditUserModalMC = React.memo(EditUserForm);

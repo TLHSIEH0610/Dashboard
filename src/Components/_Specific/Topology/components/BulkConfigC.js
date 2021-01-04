@@ -1,21 +1,21 @@
 import React, { useEffect, useState, useContext } from "react";
-import { Modal, Table, Button, Tabs, Card, Form } from "antd";
-import styles from "../topology.module.scss";
-import axios from "axios";
-import { UserLogOut } from '../../../../Utility/Fetch'
-import { useHistory } from 'react-router-dom'
+import { Form } from "antd";
+// import styles from "../topology.module.scss";
+// import axios from "axios";
+// import { UserLogOut } from '../../../../Utility/Fetch'
+// import { useHistory } from 'react-router-dom'
 import Context from "../../../../Utility/Reduxx";
 import useURLloader from "../../../../hook/useURLloader";
 import { BulkConfigMF } from './BulkConfigF'
 
-const BulkConfigC = () => {
-  const [IsUpdate, setIsUpdate] = useState(false)
+const BulkConfigC = ({IsUpdate}) => {
+  // const [IsUpdate, setIsUpdate] = useState(false)
   const { state } = useContext(Context);
-  const [alarmLog, setAlarmLog] = useState([]);
-  const [currentAlarm, setCurrentAlarm] = useState([]);
-  const [uploading, setUploading] = useState(false);
-  const history = useHistory()
-  const { dispatch } = useContext(Context);
+  // const [alarmLog, setAlarmLog] = useState([]);
+  // const [currentAlarm, setCurrentAlarm] = useState([]);
+  // const [uploading, setUploading] = useState(false);
+  // const history = useHistory()
+  // const { dispatch } = useContext(Context);
   const [form] = Form.useForm();
   const [FileRepository, setFileRepository] = useState([]);
   // const [userModel, setUserModel] = useState([]);
@@ -50,16 +50,16 @@ const BulkConfigC = () => {
       setModelList(Allmodel);
       // console.log(new Set())
       form.resetFields()
-      console.log(NodeData,Allmodel)
+      // console.log(NodeData,Allmodel)
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps  
   }, [Noderesponse]);
 
   useEffect(() => {
-    console.log(Filereponse)
+    // console.log(Filereponse)
     if (Filereponse?.response.repository.length) {
       setFileRepository(Filereponse.response.repository[0].list);
-      console.log(Filereponse.response.repository[0].list)
+      // console.log(Filereponse.response.repository[0].list)
     }else{
       setFileRepository([])
     }
@@ -68,7 +68,7 @@ const BulkConfigC = () => {
 
   return (
 
-        <BulkConfigMF Nodeloading={Nodeloading} NodeData={NodeData} ModelList={ModelList} FileRepository={FileRepository}/>
+        <BulkConfigMF Nodeloading={Nodeloading} NodeData={NodeData} ModelList={ModelList} FileRepository={FileRepository} Fileloading={Fileloading}/>
 
   );
 };
