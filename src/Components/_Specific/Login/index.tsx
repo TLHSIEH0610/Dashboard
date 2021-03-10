@@ -49,6 +49,7 @@ const LoginInput = () => {
         });
         dispatch({ type: "setCid", payload: { Cid: "" } });
         dispatch({ type: "setLogin", payload: { IsLogin: true } });
+        dispatch({ type: "setLevel", payload: { Level: res.data.response.level } });
         if (state.Login.LogPath && state.Login.LogPath !== "/login") {
           history.push(state.Login.LogPath);
         } else {
@@ -57,12 +58,25 @@ const LoginInput = () => {
       })
       .catch((error) => {
         console.log(error);
-        Swal.fire({
-          title: t("ISMS.SignInError"),
-          icon: "error",
-          showConfirmButton: false,
-          timer: 1200,
-        });
+        console.log(error.response)
+        if( error.response){
+          Swal.fire({
+            title: t("ISMS.SignInError"),
+            icon: "error",
+            showConfirmButton: false,
+            timer: 1200,
+          });
+        }else{
+
+
+          Swal.fire({
+            title: t("ISMS.NetworkError"),
+            icon: "error",
+            showConfirmButton: false,
+            timer: 1200,
+          });
+        }
+
         setUploading(false);
         history.push("/userlogin");
       });
@@ -133,7 +147,7 @@ const LoginInput = () => {
             >
               <Input
                 prefix={<UserOutlined className="site-form-item-icon" />}
-                placeholder="Username"
+                placeholder="UserName"
               />
             </Form.Item>
           </Col>
@@ -158,6 +172,7 @@ const LoginInput = () => {
               ]}
             >
               <Input.Password
+              placeholder="Password"
                 prefix={<LockOutlined className="site-form-item-icon" />}
               />
             </Form.Item>

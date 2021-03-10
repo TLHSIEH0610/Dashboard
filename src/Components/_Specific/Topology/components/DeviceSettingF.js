@@ -1,14 +1,6 @@
 import React, { useEffect, useContext, useState, Fragment } from "react";
 import styles from "../topology.module.scss";
-import {
-  Form,
-  Input,
-  Row,
-  message,
-  Col,
-  Divider,
-  Select,
-} from "antd";
+import { Form, Input, Row, message, Col, Divider, Select } from "antd";
 import axios from "axios";
 import { UserLogOut } from "../../../../Utility/Fetch";
 import { useHistory } from "react-router-dom";
@@ -44,13 +36,11 @@ const LanSetting = ({
           values.LAN_ipv4_dhcpmode
         }","pool":[{"start":"${values.LAN_ipv4_dhcp_start}","end":"${
           values.LAN_ipv4_dhcp_end
-        }","fixed_ip":[{ "enabled":${
-          values.LAN_ipv4_fixed_enabled
-        }, "mac": "${values.LAN_ipv4_fixed_enabled ? values.LAN_ipv4_fixed_mac : ''}", "ip": "${
-          values.LAN_ipv4_fixed_enabled ? values.LAN_ipv4_fixed_IP : ''
-        }" }]}]}},"ipv6":{"type":"${
-          values.LAN_ipv6_type
-        }","static":{${
+        }","fixed_ip":[{ "enabled":${values.LAN_ipv4_fixed_enabled}, "mac": "${
+          values.LAN_ipv4_fixed_enabled ? values.LAN_ipv4_fixed_mac : ""
+        }", "ip": "${
+          values.LAN_ipv4_fixed_enabled ? values.LAN_ipv4_fixed_IP : ""
+        }" }]}]}},"ipv6":{"type":"${values.LAN_ipv6_type}","static":{${
           values.LAN_ipv6_type === "static"
             ? `"address":"${values.LAN_ipv6_adress}"`
             : ""
@@ -370,7 +360,19 @@ const WanSetting = ({
           WanPriority === "lte" ? `"mode":"${values.WAN_lte_mode}" ` : ""
         }}},"ethernet":{"type":"${values.WAN_ethernet_type}","dhcp":{${
           WanEthernetType === "dhcp"
-            ? `"dns":{"ipv4":[{"type":"${values.WAN_ipv4_type_1}", "address":"${ values.WAN_ipv4_type_1 ==='ISP' ? values.WAN_ipv4_address_1 : ''}"},{"type":"${values.WAN_ipv4_type_2}", "address":"${ values.WAN_ipv4_type_2 ==='ISP'  ? values.WAN_ipv4_address_2 : ''}"},{"type":"${values.WAN_ipv4_type_3}", "address":"${ values.WAN_ipv4_type_3 ==='ISP' ? values.WAN_ipv4_address_3 : ''}"}]}`
+            ? `"dns":{"ipv4":[{"type":"${values.WAN_ipv4_type_1}", "address":"${
+                values.WAN_ipv4_type_1 === "ISP"
+                  ? values.WAN_ipv4_address_1
+                  : ""
+              }"},{"type":"${values.WAN_ipv4_type_2}", "address":"${
+                values.WAN_ipv4_type_2 === "ISP"
+                  ? values.WAN_ipv4_address_2
+                  : ""
+              }"},{"type":"${values.WAN_ipv4_type_3}", "address":"${
+                values.WAN_ipv4_type_3 === "ISP"
+                  ? values.WAN_ipv4_address_3
+                  : ""
+              }"}]}`
             : ""
         }},"pppoe":{${
           WanEthernetType === "pppoe"
@@ -861,7 +863,9 @@ const LteSetting = ({
           values.LTE_recovery_apn_enabled ? values.LTE_recovery_down_time : 0
         },"recover_apn":{"enabled":${
           values.LTE_recovery_apn_enabled
-        },"action":"${values.LTE_recovery_apn_enabled ? values.LTE_recovery_apn_action : ''}"}}}}}}}}}`
+        },"action":"${
+          values.LTE_recovery_apn_enabled ? values.LTE_recovery_apn_action : ""
+        }"}}}}}}}}}`
       ),
     };
     console.log(config.data);
@@ -1180,10 +1184,8 @@ const PeriodSetting = ({
   }, [Period]);
 
   const onFinish = (values) => {
+    console.log(values)
     setUploading(true);
-    // const SetPeriodUrl = `/cmd?set={"device_cfg":{"filter":{"id":"${id}"},"obj":{"report_period":{"alive":${values.alive},"timeout":${values.timeout},
-    // "status":${values.status},"iot":${values.iot},"gps":${values.gps}}}}}`;
-    // console.log(SetPeriodUrl);
     const config = {
       method: "post",
       headers: { "Content-Type": "application/json" },
@@ -1213,45 +1215,200 @@ const PeriodSetting = ({
   return (
     <Form onFinish={onFinish} form={form} layout="vertical">
       <div className={styles.FormWrapper}>
-      <Row gutter={24} >
-        <Col xs={10} sm={10} md={10} lg={8} xl={8}>
-          <Form.Item name={"alive"} label="Alive">
-            <Input />
-          </Form.Item>
-        </Col>
-        <Col xs={10} sm={10} md={10} lg={8} xl={8}>
-          <Form.Item name={"status"} label="Status">
-            <Input />
-          </Form.Item>
-        </Col>
-        <Col xs={10} sm={10} md={10} lg={8} xl={8}>
-          <Form.Item name={"iot"} label="IoT">
-            <Input />
-          </Form.Item>
-        </Col>
-        <Col xs={10} sm={10} md={10} lg={8} xl={8}>
-          <Form.Item name={"gps"} label="GPS">
-            <Input />
-          </Form.Item>
-        </Col>
-        <Col xs={10} sm={10} md={10} lg={8} xl={8}>
-          <Form.Item name={"timeout"} label="Timeout">
-            <Input />
-          </Form.Item>
-        </Col>
-        {/* <Form.Item  wrapperCol={{ span: 6, offset: 18 }}>
-        <Button
-          type="primary"
-          htmlType="submit"
-          loading={uploading}
-        >
-          Submit
-        </Button>
-      </Form.Item> */}
-      </Row>
+        <Row gutter={24}>
+          <Col xs={24} sm={24} md={24} lg={24} xl={8}>
+            <Form.Item name={"alive"} label="Alive">
+              <Input />
+            </Form.Item>
+          </Col>
+          <Col xs={24} sm={24} md={24} lg={24} xl={8}>
+            <Form.Item name={"status"} label="Status">
+              <Input />
+            </Form.Item>
+          </Col>
+          <Col xs={24} sm={24} md={24} lg={24} xl={8}>
+            <Form.Item name={"iot"} label="IoT">
+              <Input />
+            </Form.Item>
+          </Col>
+          <Col xs={24} sm={24} md={24} lg={24} xl={8}>
+            <Form.Item name={"gps"} label="GPS">
+              <Input />
+            </Form.Item>
+          </Col>
+          <Col xs={24} sm={24} md={24} lg={24} xl={8}>
+            <Form.Item name={"timeout"} label="Timeout">
+              <Input />
+            </Form.Item>
+          </Col>
+        </Row>
       </div>
     </Form>
   );
 };
 
 export const PeriodSettingMF = React.memo(PeriodSetting);
+
+const GPSSetting = ({
+  DeviceConfig,
+  id,
+  setIsUpdate,
+  IsUpdate,
+  form,
+  setUploading,
+}) => {
+  const { dispatch } = useContext(Context);
+  const history = useHistory();
+  const Period = DeviceConfig.report_period;
+  const [GPSEnable, setGPSEnable] = useState("");
+  const [GPSReference, setGPSReference] = useState("");
+
+  // useEffect(() => {
+  //   if (Period) {
+  //     form.setFieldsValue({
+  //       alive: Period.alive,
+  //       gps: Period.gps,
+  //       iot: Period.iot,
+  //       status: Period.status,
+  //       timeout: Period.timeout,
+  //     });
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [Period]);
+
+  const GPSonFinish = (values) => {
+    console.log(values);
+    const testData = `"geofence": {
+      "alarm_enabled": ${values.gps_enabled},
+      "radius_m": ${values.gps_radius},
+      "latitude": ${values.gps_latitude},
+      "longitude": ${values.gps_latitude},
+      "auto_detect": ${values.gps_reference},
+    }`;
+    console.log(testData);
+    useEffect(()=>{
+      form.setFieldsValue({
+        gps_enabled: false,
+        gps_reference: false
+      })
+    },[])
+    // setUploading(true);
+    // const config = {
+    //   method: "post",
+    //   headers: { "Content-Type": "application/json" },
+    //   url: "/cmd",
+    //   data: JSON.parse(`{"set":{"device_cfg":{"filter":{"id":"${id}"},"obj":{"report_period":{"alive":${values.alive},"timeout":${values.timeout},
+    //   "status":${values.status},"iot":${values.iot},"gps":${values.gps}}}}}}`),
+    // };
+    // axios(config)
+    //   .then((res) => {
+    //     console.log(res);
+    //     setUploading(false);
+    //     setIsUpdate(!IsUpdate);
+    //     message.success("update successfully.");
+    //   })
+    //   .catch((error) => {
+    //     if (error.response && error.response.status === 401) {
+    //       dispatch({ type: "setLogin", payload: { IsLogin: false } });
+    //       UserLogOut();
+    //       history.push("/userlogin");
+    //     }
+    //     console.log(error);
+    //     setUploading(false);
+    //     message.error("update fail.");
+    //   });
+  };
+
+  return (
+    <Form onFinish={GPSonFinish} form={form} layout="vertical">
+      <div className={styles.FormWrapper}>
+        <h2>GPS Alarm Setting</h2>
+        <Divider className={styles.divider} />
+        <Row gutter={24}>
+          <Col xs={24} sm={24} md={24} lg={24} xl={8}>
+            <Form.Item
+              name={"gps_enabled"}
+              label="Detection Enable"
+              rules={[{ required: true, message: "required!" }]}
+              initialValue={false}
+            >
+              <Select
+                onChange={(value) => {
+                  setGPSEnable(value);
+                }}
+              >
+                <Option key={0} value={true}>
+                  ON
+                </Option>
+                <Option key={1} value={false}>
+                  OFF
+                </Option>
+              </Select>
+            </Form.Item>
+          </Col>
+          <Col xs={24} sm={24} md={24} lg={24} xl={8}>
+            <Form.Item
+              name={"gps_radius"}
+              label="Radius(m)"
+              placeholder="100~100000"
+              rules={[{ required: true, message: "required!" }]}
+              initialValue={150}
+            >
+              <Input disabled={!GPSEnable} />
+            </Form.Item>
+          </Col>
+          <Col xs={24} sm={24} md={24} lg={24} xl={8}>
+            <Form.Item
+              name="gps_reference"
+              label="Reference"
+              rules={[{ required: true, message: "required!" }]}
+              initialValue={true}
+            >
+              <Select
+                disabled={!GPSEnable}
+                onChange={(value) => {
+                  setGPSReference(value);
+                }}
+              >
+                <Option key={0} value={true}>
+                  Auto Detect
+                </Option>
+                <Option key={1} value={false}>
+                  Self Define
+                </Option>
+              </Select>
+            </Form.Item>
+          </Col>
+          {GPSReference === false && (
+            <Fragment>
+              <Col xs={24} sm={24} md={24} lg={24} xl={8}>
+                <Form.Item
+                  name={"gps_latitude"}
+                  label="Latitude"
+                  placeholder="11.111111"
+                  rules={[{ required: true, message: "required!" }]}
+                  initialValue={''}
+                >
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={24} md={24} lg={24} xl={8}>
+                <Form.Item
+                  name={"gps_longitude"}
+                  label="Longitude"
+                  placeholder="11.111111"
+                  rules={[{ required: true, message: "required!" }]}
+                  initialValue={''}
+                >
+                  <Input />
+                </Form.Item>
+              </Col>
+            </Fragment>
+          )}
+        </Row>
+      </div>
+    </Form>
+  );
+};
+
+export const GPSSettingMF = React.memo(GPSSetting);

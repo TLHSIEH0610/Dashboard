@@ -7,6 +7,7 @@ import { Map, Marker, Popup, TileLayer } from "react-leaflet";
 import { Icon } from "leaflet";
 import Context from "../../../../Utility/Reduxx";
 import { useHistory } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 interface Igpslist{
     latitude: number;
@@ -38,6 +39,7 @@ const DashboardMapC = () => {
   const cid = localStorage.getItem("authUser.cid");
   const level = localStorage.getItem("authUser.level");
   const history = useHistory();
+  const { t } = useTranslation();
   // const StatusUrl = `/cmd?get={"device_status":{"filter":{${
   //   level === "super_super"
   //     ? state.Login.Cid
@@ -54,15 +56,12 @@ const DashboardMapC = () => {
   
 
   const [Statusloading, StatusResponse] = useURLloader(StatusUrl, Urldata);
-  // const [currentZoom, setCurrentZoom] = useState(13);
   const currentZoom = 8
-  // const [centerPosition, setCenterPosition] = useState([40.692646, -74.033839]);
   const centerPosition:[number, number] = [24.793256, 121.013987]
   const [GPSList, setGPSList] = useState<Igpslist[] | undefined>(undefined);
 
   useEffect(() => {
-    if (StatusResponse && StatusResponse.response) {
-      // console.log(StatusResponse);
+    if (StatusResponse?.response) {
       let GPSList :Igpslist[] = [];
       StatusResponse.response.device_status.forEach((item:any) => {
         GPSList.push({
@@ -75,28 +74,21 @@ const DashboardMapC = () => {
           lastUpdate: item.nodeInf.lastUpdate,
         });
       });
-      // console.log(GPSList);
       setGPSList(GPSList);
-      // setCenterPosition([GPSList[0].latitude, GPSList[0].longitude]);
     }
   }, [StatusResponse]);
 
   const onPopCkick = (item:Igpslist) => {
-    console.log(item);
+    // console.log(item);
     dispatch({
       type: "setMaptoTopo",
       payload: { device: `${item.name === "" ? item.id : item.name}` },
     });
-    // if(params.data.name===('excellent' || 'good' || 'fair' || 'poor')){
-    //   dispatch({ type: "setPietoTopo", payload: { strength: `${params.data.name}` }});
-    // }else{
-    //   dispatch({ type: "setPietoTopo", payload: { health: `${params.data.name}` }});
-    // }
     history.push("./topology");
   };
 
   return (
-    <Card bodyStyle={{ padding: "6px" }} className={styles.Card}>
+    <Card bodyStyle={{ padding: "6px" }} className={`${styles.Card} ${styles.MapCard}`} >
       {Statusloading ? (
         <Spin>
           <Map
@@ -109,6 +101,10 @@ const DashboardMapC = () => {
               attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
             />
           </Map>
+          <div className={styles.markerWrapper}>
+              <img className={styles.markerIcon} src="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png" alt=""/><p>{t("ISMS.Up")}</p>
+              <img className={styles.markerIcon} src="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png" alt=""/>  <p>{t("ISMS.Alarm")}</p>
+            </div>
         </Spin>
       ) : (
         <Fragment>
@@ -163,8 +159,8 @@ const DashboardMapC = () => {
           </MarkerClusterGroup>
         </Map>
             <div className={styles.markerWrapper}>
-              <img className={styles.markerIcon} src="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png" alt=""/><p>Up</p>
-              <img className={styles.markerIcon} src="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png" alt=""/>  <p>Alarm</p>
+              <img className={styles.markerIcon} src="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png" alt=""/><p>{t("ISMS.Up")}</p>
+              <img className={styles.markerIcon} src="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png" alt=""/>  <p>{t("ISMS.Alarm")}</p>
             </div>
         </Fragment>
       )}

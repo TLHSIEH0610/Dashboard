@@ -6,7 +6,6 @@ import {
   Button,
   Modal,
   message,
-  DatePicker
 } from "antd";
 import axios from "axios";
 import styles from "../management.module.scss";
@@ -14,6 +13,8 @@ import useURLloader from "../../../../hook/useURLloader";
 import { UserLogOut } from '../../../../Utility/Fetch'
 import { useHistory } from '../../Dashboard/node_modules/react-router-dom'
 import Context from "../../../../Utility/Reduxx";
+
+
 
 const layout = {
   labelCol: {
@@ -33,16 +34,17 @@ const CreateSchemeF = ({CreateSchemevisible, setCreateSchemevisible, uploading, 
   const [SchemeLisloading, SchemeLisresponse] = useURLloader(SchemeListUrl);
   const history = useHistory()
   const { dispatch } = useContext(Context);
-  
+
+
   const CreateSchemeOnFinish = (values) =>{
       setUploading(true)
-
+      console.log(values)
       // const CreateSchemeUrl = `scheme_mgnt?create_scheme={"cid":"${values.cid}", "scheme_list":{"user":${values.user},"group":${values.group},"device":${values.device},"expire":${values.expire._d.getTime()},"tracking":${values.tracking},"tracking_pool":${values.tracking_pool},"iot":${values.iot},"iot_poor":${values.iot_poor},"period_status":${values.period_status},"period_gps":${values.period_gps},"period_alive":${values.period_alive},"period_iot":${values.period_iot},"alive_timeout":${values.alive_timeout}}}`
       const config = {
         method: 'post',
         headers: { 'Content-Type': 'application/json' },
         url: '/scheme_mgnt',
-        data: JSON.parse(`{"create_scheme":{"cid":"${values.cid}", "scheme_list":{"user":${values.user},"group":${values.group},"device":${values.device},"expire":${values.expire._d.getTime()},"tracking":${123},"tracking_pool":${123},"iot":${123},"iot_poor":${123},"period_status":${values.period_status},"period_gps":${values.period_gps},"period_alive":${values.period_alive},"period_iot":${values.period_iot},"alive_timeout":${values.alive_timeout}}}}`),
+        data: JSON.parse(`{"create_scheme":{"cid":"${values.cid}", "scheme_list":{"user":${values.user || 10},"group":${values.group || 50},"device":${values.device || 1000},"expire":${values.expire._d.getTime()},"tracking":${123},"tracking_pool":${123},"iot":${123},"iot_poor":${123},"period_status":${values.period_status},"period_gps":${values.period_gps},"period_alive":${values.period_alive},"period_iot":${values.period_iot},"alive_timeout":${values.period_alive + 30}}}}`),
       }
       axios(config).then((res)=>{
         console.log(res.data)
@@ -93,7 +95,7 @@ const CreateSchemeF = ({CreateSchemevisible, setCreateSchemevisible, uploading, 
                 })}
             </Select>
           </Form.Item >
-          <Form.Item label="user" name="user" rules={[{ required: true, message: "Required!!" }]}>
+          {/* <Form.Item label="user" name="user" rules={[{ required: true, message: "Required!!" }]}>
             <Input />
           </Form.Item>
           <Form.Item label="group" name="group" rules={[{ required: true, message: "Required!!" }]}>
@@ -104,33 +106,20 @@ const CreateSchemeF = ({CreateSchemevisible, setCreateSchemevisible, uploading, 
           </Form.Item>
           <Form.Item label="expire" name="expire" rules={[{ required: true, message: "Required xxxx-xx-xx!!" }]}>
             <Input placeholder='2020-12-12' />
-            {/* <DatePicker /> */}
-          </Form.Item>
-          {/* <Form.Item label="tracking" name="tracking" rules={[{ required: true, message: "Required!!" }]}>
-            <Input />
-          </Form.Item>
-          <Form.Item label="tracking_pool" name="tracking_pool" rules={[{ required: true, message: "Required!!" }]}>
-            <Input />
-          </Form.Item>
-          <Form.Item label="iot" name="iot" rules={[{ required: true, message: "Required!!" }]}>
-            <Input />
-          </Form.Item>
-          <Form.Item label="iot_poor" name="iot_poor" rules={[{ required: true, message: "Required!!" }]}>
-            <Input />
           </Form.Item> */}
-          <Form.Item label="period_alive" name="period_alive" rules={[{ required: true, message: "Required!!" }]}>
+          <Form.Item label="Alive Period(s)" name="period_alive" rules={[{ required: true, message: "Required!!" }]}>
             <Input />
           </Form.Item>
-          <Form.Item label="period_status" name="period_status" rules={[{ required: true, message: "Required!!" }]}>
+          <Form.Item label="Status Period(s)" name="period_status" rules={[{ required: true, message: "Required!!" }]}>
             <Input />
           </Form.Item>
-          <Form.Item label="period_iot" name="period_iot" rules={[{ required: true, message: "Required!!" }]}>
+          <Form.Item label="IoT Period(s)" name="period_iot" rules={[{ required: true, message: "Required!!" }]}>
             <Input />
           </Form.Item>
-          <Form.Item label="period_gps" name="period_gps" rules={[{ required: true, message: "Required!!" }]}>
+          <Form.Item label="GPS Period(s)" name="period_gps" rules={[{ required: true, message: "Required!!" }]}>
             <Input />
           </Form.Item>
-          <Form.Item label="alive_timeout" name="alive_timeout" rules={[{ required: true, message: "Required!!" }]}>
+          <Form.Item style={{display:'none'}} label="alive_timeout" name="alive_timeout" rules={[{ required: true, message: "Required!!" }]}>
             <Input />
           </Form.Item>
         </Form>

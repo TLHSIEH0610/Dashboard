@@ -1,10 +1,4 @@
-import React, {
-  useEffect,
-  useState,
-  useRef,
-  useContext,
-  Fragment,
-} from "react";
+import React, { useEffect, useState, useContext, Fragment } from "react";
 import {
   Form,
   Input,
@@ -12,10 +6,17 @@ import {
   Table,
   Tooltip,
   message,
-  Popconfirm,
+  Row,
   Menu,
   Dropdown,
   Tabs,
+  Select,
+  Button,
+  Col,
+  Modal,
+  Checkbox,
+  Divider,
+  Tag
 } from "antd";
 import Context from "../../../Utility/Reduxx";
 import useURLloader from "../../../hook/useURLloader";
@@ -25,212 +26,176 @@ import { DownOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { TopoIoTMC } from "./components/TopoIoTC";
 import { RiAlarmWarningFill, RiEdit2Fill } from "react-icons/ri";
-import { FcDocument, FcSettings } from "react-icons/fc";
-import { FaMapMarkerAlt } from "react-icons/fa";
+import { FcDocument, FcSettings, FcSynchronize } from "react-icons/fc";
+import { FaMapMarkerAlt, FaAutoprefixer } from "react-icons/fa";
 import { AlarmLogMC } from "./components/AlarmLogC";
 import { DeviceStateMC } from "./components/DeviceStateC";
-import { DeviceSettingMC } from "./components/DeviceSettingC";
 import { healthIcon, strengthIcon } from "./components/TopologyF";
 import { TopoFilterMC } from "./components/Filter";
 import TrackMap from "../Track_Map/TrackerMap";
+import { UserLogOut } from "../../../Utility/Fetch";
+// import { useTranslation } from "react-i18next";
+import { useHistory } from "react-router-dom";
+import { ViewAllStatusMC } from "./components/ViewAllStatusC";
+import { BulkConfigMC } from "./components/BulkConfigC";
 import { useTranslation } from "react-i18next";
-// import { useHistory } from "react-router-dom";
-import { ViewAllStatusMC } from './components/ViewAllStatusC'
-import { BulkConfigMC } from './components/BulkConfigC'
+import { BsBootstrapReboot } from "react-icons/bs";
 
 
 const { TabPane } = Tabs;
+const { Option } = Select;
+const { Column } = Table;
 
 const TopologyC = () => {
-  const { state } = useContext(Context);
+  const { state, dispatch } = useContext(Context);
+  const history = useHistory();
   const [uploading, setUploading] = useState(false);
+  const [IsUpdate, setIsUpdate] = useState(false);
+  const [DeviceTableIsUPdate, setDeviceTableIsUPdate] = useState(false)
   const cid = localStorage.getItem("authUser.cid");
   const level = localStorage.getItem("authUser.level");
-  // const history = useHistory();
+  const [form] = Form.useForm();
   const NodeInfoUrl = "/cmd";
-  const Urldata = `{"get":{"nodeInf":{"filter":{${
+  const Urldata = `{"get":{"device_status":{"filter":{${
     level === "super_super" ? state.Login.Cid : `"cid":"${cid}"`
-  }}}}}`;
-
-  // const NodeInfoUrl =
-  // level === "super_super"
-  //     ? `/cmd?get={"nodeInf":{"filter":{${state.Login.Cid}}}}`
-  //     : `/cmd?get={"nodeInf":{"filter":{"cid":"${cid}"}}}`;
+  }},"nodeInf":{},"obj":{}}}}`;
   const [NodeInfoLoading, NodeInfoResponse] = useURLloader(
     NodeInfoUrl,
     Urldata,
-    uploading
+    IsUpdate, 
+    DeviceTableIsUPdate
   );
+  const { t } = useTranslation();
+    // console.log(IsUpdate, DeviceTableIsUPdate)
+  const [EditCityVisible, setEditCityVisible] = useState(false);
+  // const [CreateAPIVisible, setCreateAPIVisible] = useState(false);
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [CityAction, setCityAction] = useState("");
+  const [Editable, setEditable] = useState(false);
+  const [RebootEditable, setRebootEditable] = useState(false);
+  const [cityform] = Form.useForm();
+  const [AutoRefresh, setAutoRefresh] = useState(false)
+  // const [apiform] = Form.useForm();
   const [dataSource, setDataSource] = useState([]);
+  const [restore, setRestore] = useState([]);
   const [groups, setgroups] = useState([]);
-  const [models, setModels] = useState([])
+  const [cities, setcities] = useState([]);
+  const [models, setModels] = useState([]);
   const [AlarmTablevisible, setAlarmTablevisible] = useState(false);
   const [DeviceStatevisible, setDeviceStatevisible] = useState(false);
-  const [DeviceSettingvisible, setDeviceSettingvisible] = useState(false);
   const [IoTvisible, setIoTvisible] = useState(false);
   const [Mapvisible, setMapvisible] = useState(false);
-  // const [deviceindex, setDeviceindex] = useState(0);
-  const EditableContext = React.createContext();
-  // const [drawerVisible, setDrawerVisible] = useState(false);
+  // const EditableContext = React.createContext();
   const [AlarmRecord, setAlarmRecord] = useState([]);
   const [DeviceStatusRecord, setDeviceStatusRecord] = useState([]);
-  const [SettingRecord, setSettingRecord] = useState([]);
+  const [SettingRecord, setSettingRecord] = useState(undefined);
   const [IoTRecord, setIoTRecord] = useState([]);
   const [MapRecord, setMapRecord] = useState([]);
-  const [IsUpdate, setIsUpdate] = useState(false)
-  // const [DrawerDisplay, setDrawerDisplay] = useState()
-  const { t } = useTranslation();
+  const [count, setCount] = useState(0);
+  const [Tab, setTab] = useState("1");
+  const [editingKey, setEditingKey] = useState("");
 
-  const EditableRow = ({ index, ...props }) => {
-    const [form] = Form.useForm();
-    return (
-      <Form form={form} component={false}>
-        <EditableContext.Provider value={form}>
-          <tr {...props} />
-        </EditableContext.Provider>
-      </Form>
-    );
+  useEffect(()=>{
+    if(!AutoRefresh){
+      return
+    }
+      console.log('有執行')
+      // setIsUpdate(!IsUpdate)
+      setDeviceTableIsUPdate(!DeviceTableIsUPdate)
+      const stateInterval = setInterval(() => {
+        setCount((prevState) => prevState + 1);
+      }, 10000);
+
+    return () => clearInterval(stateInterval);
+          // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[AutoRefresh, count])
+
+  const edit = (index) => {
+    // console.log(record.key)
+    setEditingKey(index);
   };
 
-  const EditableCell = ({
-    title,
-    editable,
-    children,
-    dataIndex,
-    record,
-    handleSave,
-    ...restProps
-  }) => {
-    const [editing, setEditing] = useState(false);
-    const inputRef = useRef();
-    const form = useContext(EditableContext);
+  const cancel = () => {
+    setEditingKey("");
+  };
 
-    useEffect(() => {
-      if (editing) {
-        inputRef.current.focus();
-      }
-    }, [editing]);
+  const RenameOnFinish = (value, record) => {
+    console.log(value, record);
 
-    const toggleEdit = () => {
-      setEditing(!editing);
-      form.setFieldsValue({
-        [dataIndex]: record[dataIndex],
-      });
+    setUploading(true);
+    const config = {
+      method: "post",
+      headers: { "Content-Type": "application/json" },
+      url: "/cmd",
+      data: JSON.parse(
+        `{"set":{"node_name":{"filter":{"cid":"${record.cid}"},"list":[{"id":"${record.id}","name":"${value.name}"}]}}}`
+      ),
     };
-
-    const save = async (e) => {
-      try {
-        const values = await form.validateFields();
-        toggleEdit();
-        if (record.name === values.name) {
-          return;
-        }
-        setUploading(true);
-
-        // const cid = localStorage.getItem("authUser.cid");
-        // const RenameUrl = `/cmd?set={"node_name":{"filter":{"cid":"${record.cid}"},"list":[{"id":"${record.id}","name":"${values.name}"}]}}`;
-        const config = {
-          method: "post",
-          headers: { "Content-Type": "application/json" },
-          url: "/cmd",
-          data: JSON.parse(
-            `{"set":{"node_name":{"filter":{"cid":"${record.cid}"},"list":[{"id":"${record.id}","name":"${values.name}"}]}}}`
-          ),
-        };
-        axios(config)
-          .then((res) => {
-            handleSave({ ...record, ...values });
-            console.log(res);
-            message.success("rename successfully.");
-            setIsUpdate(!IsUpdate)
-            setUploading(false);
-          })
-          .catch((error) => {
-            console.log(error);
-            message.error("rename fail.");
-          });
-      } catch (errInfo) {
-        console.log("Save failed:", errInfo);
+    console.log(config.data)
+    axios(config)
+      .then((res) => {
+        console.log(res);
+        message.success("rename successfully.");
+        setIsUpdate(!IsUpdate);
+        setUploading(false);
+        cancel();
+      })
+      .catch((error) => {
+        console.log(error);
         message.error("rename fail.");
         setUploading(false);
-      }
-    };
-
-    let childNode = children;
-
-    if (editable) {
-      childNode = editing ? (
-        <Form.Item
-          style={{
-            margin: 0,
-          }}
-          name={dataIndex}
-          rules={[
-            {
-              required: true,
-              message: `${title} is required.`,
-            },
-          ]}
-        >
-          <Input ref={inputRef} onPressEnter={save} onBlur={save} />
-        </Form.Item>
-      ) : (
-        <Popconfirm
-          placement="bottom"
-          title="sure to rename?"
-          onConfirm={() => toggleEdit()}
-          okText="Yes"
-          cancelText="No"
-        >
-          <div
-            className="editable-cell-value-wrap"
-            style={{
-              paddingRight: 24,
-            }}
-            // onClick={toggleEdit}
-          >
-            {children}
-          </div>
-        </Popconfirm>
-      );
-    }
-    return <td {...restProps}>{childNode}</td>;
-  };
-
-  const components = {
-    body: {
-      row: EditableRow,
-      cell: EditableCell,
-    },
+        cancel();
+        if (error.response.status === 401) {
+          dispatch({ type: "setLogin", payload: { IsLogin: false } });
+          UserLogOut();
+          history.push("/userlogin");
+          message.error("update failed");
+        }
+      });
   };
 
   useEffect(() => {
     if (NodeInfoResponse?.response) {
-      // console.log(NodeInfoResponse.response.nodeInf)
-      let groups = new Set()
-      let models = new Set()
-      let NodeInfo = NodeInfoResponse.response.nodeInf.map((item, index) => {
-        if(item.nodeInf.gid?.length){
-          item.nodeInf.gid.forEach(item=>groups.add(item))
+      console.log(NodeInfoResponse.response);
+      let groups = new Set();
+      let models = new Set();
+      let cities = new Set();
+      let NodeInfo = NodeInfoResponse.response.device_status.map(
+        (item, index) => {
+          if (item.nodeInf.gid?.length) {
+            item.nodeInf.gid.forEach((item) => groups.add(item));
+          }
+          models.add(item.nodeInf.model);
+          if (item.nodeInf.city) {
+            cities.add(item.nodeInf.city);
+          }
+
+          return {
+            city: item.nodeInf.city,
+            key: index,
+            id: item.nodeInf.id,
+            name: item.nodeInf.name,
+            health: item.nodeInf.health,
+            model: item.nodeInf.model,
+            lastupdate: item.nodeInf.lastUpdate,
+            strength: item.nodeInf.sim,
+            connection: item.nodeInf.connect,
+            cid: item.nodeInf.cid,
+            gid: item.nodeInf.gid,
+            lat: item.obj?.status?.gps?.latitude,
+            log: item.obj?.status?.gps?.longitude,
+          };
         }
-        models.add(item.nodeInf.model)
-        return ({
-          key: index,
-          id: item.nodeInf.id,
-          name: item.nodeInf.name,
-          health: item.nodeInf.health,
-          model: item.nodeInf.model,
-          strength: item.nodeInf.sim,
-          connection: item.nodeInf.connect,
-          cid: item.nodeInf.cid,
-          gid:item.nodeInf.gid
-        });
-      });
-      groups = Array.from(groups)
-      models = Array.from(models)
+      );
+      groups = Array.from(groups);
+      models = Array.from(models);
+      cities = Array.from(cities);
+      // console.log(NodeInfo);
       setDataSource(NodeInfo);
+      setRestore(NodeInfo);
       setModels(models);
-      setgroups(groups)
+      setgroups(groups);
+      setcities(cities);
     } else {
       setDataSource(undefined);
     }
@@ -245,16 +210,17 @@ const TopologyC = () => {
   };
 
   function IconforGenerator(record, index) {
+    // console.log(record)
     return (
       <div className={styles.RWDwrapper}>
-        <Tooltip title={`health: ${record.health}`}>
+        <Tooltip title={`${t("ISMS.health")}: ${record.health}`}>
           {healthIcon(record.health)}
         </Tooltip>
-        <Tooltip title={`signal: ${record.strength}`}>
+        <Tooltip title={`${t("ISMS.signal")}: ${record.strength}`}>
           {strengthIcon(record.strength)}
         </Tooltip>
 
-        <Tooltip title="Alarm">
+        <Tooltip title={t("ISMS.Alarm")}>
           <a
             href="/#"
             key={index}
@@ -270,12 +236,12 @@ const TopologyC = () => {
             />
           </a>
         </Tooltip>
-        <Tooltip title="Device Status">
+        <Tooltip title={t("ISMS.DeviceStatus")}>
           <a
             href="/#"
             key={index}
             onClick={(e) => {
-              console.log(record);
+              // console.log(record);
               e.preventDefault();
               setDeviceStatevisible(true);
               setDeviceStatusRecord(record);
@@ -284,7 +250,7 @@ const TopologyC = () => {
             <FcDocument className={styles.Status} />
           </a>
         </Tooltip>
-        <Tooltip title="Map">
+        <Tooltip title={t("ISMS.Map")}>
           <a
             href="/#"
             key={index}
@@ -297,7 +263,7 @@ const TopologyC = () => {
             <FaMapMarkerAlt className={styles.Map} />
           </a>
         </Tooltip>
-        <Tooltip title="View IoT">
+        <Tooltip title={t("ISMS.ViewIoT")}>
           <a
             href="/#"
             key={index}
@@ -311,174 +277,625 @@ const TopologyC = () => {
             <MdCastConnected className={styles.IoT} />
           </a>
         </Tooltip>
-        <Tooltip title="Setting">
+        <Tooltip
+          title={
+            record.health === "offline"
+              ? t("ISMS.Setting(Offline)")
+              : t("ISMS.Setting")
+          }
+        >
           <a
             href="/#"
             key={index}
+            style={{ position: "relative" }}
             onClick={(e) => {
               e.preventDefault();
-              setDeviceSettingvisible(true);
-              setSettingRecord(record);
+              if (record.health !== "offline") {
+                setTab("3");
+                setSettingRecord(record);
+              } else {
+                return;
+              }
             }}
           >
-            <FcSettings className={styles.Setting} />
+            <FcSettings
+              className={`${styles.Setting} ${
+                record.health === "offline" && styles.inhibit
+              }`}
+            />
           </a>
         </Tooltip>
       </div>
     );
   }
-  const title = (content) => t(content);
-  let columns = [
-    {
-      title: title("ISMS.Device"),
-      dataIndex: "name",
-      width: "35%",
-      editable: true,
-      key: "name",
-      render: (_, record) => {
-        return (
-          <div className={styles.rename}>
-            <div style={{ display: "flex" }}>
-              <Tooltip title={record.id}>
-                {record.name ? <p>{record.name}</p> : <p>{record.id}</p>}
-              </Tooltip>
-              <Tooltip title="rename">
-                <RiEdit2Fill className={styles.renameIcon} />
-              </Tooltip>
-            </div>
-          </div>
-        );
-      },
-    },
-    {
-      title: title("ISMS.Model"),
-      dataIndex: "model",
-      width: "15%",
-      key: "2",
-      responsive: ["sm"],
-    },
-    {
-      title:
-        state.Global.innerWidth > 576
-          ? title("ISMS.Information")
-          : title("ISMS.Info"),
-      dataIndex: "information",
-      key: "information",
-      render: (_, record, index) => {
-        return (
-          <Fragment>
-            {state.Global.innerWidth > 500 ? (
-              IconforGenerator(record, index)
-            ) : (
-              <Dropdown
-                overlay={menu(record, index)}
-                key={index}
-                overlayClassName={styles.iconDrop}
-              >
-                <DownOutlined />
-              </Dropdown>
-            )}
-          </Fragment>
-        );
-      },
-    },
-  ];
 
-  const handleSave = (row) => {
-    const newData = [...dataSource];
-    const index = newData.findIndex((item) => row.key === item.key);
-    const item = newData[index];
-    newData.splice(index, 1, { ...item, ...row });
-    setDataSource(newData);
+  const Tabcallback = (value) => {
+    setTab(value);
+    setSettingRecord(undefined);
   };
 
-  columns = columns.map((col) => {
-    if (!col.editable) {
-      return col;
+  function UpdateCityonFinish(value) {
+    // console.log(value);
+    setUploading(true);
+    let ActionURL;
+    if (value.action === "Self Define") {
+      const str = value.devices.map((item) => {
+        return `{"id":"${item}", "city":"${value.city_name}"}`;
+      });
+
+      ActionURL = `{"set":{"city":{"filter":{},"list":[${str}]}}}`;
+    } else {
+      ActionURL = `{"set":{"geocoding":{"filter":{${
+        level === "super_super"
+          ? state.Login.Cid === ""
+            ? `"cid":"o-smart"`
+            : state.Login.Cid
+          : `"cid":"${cid}"`
+      }, "id":${JSON.stringify(value.devices)}}, "action":"${value.action}"}}}`;
     }
-    return {
-      ...col,
-      onCell: (record) => ({
-        record,
-        editable: col.editable,
-        dataIndex: col.dataIndex,
-        title: col.title,
-        handleSave: handleSave,
-      }),
+
+    const config = {
+      method: "post",
+      headers: { "Content-Type": "application/json" },
+      url: "/cmd",
+      data: JSON.parse(ActionURL),
     };
-  });
+
+    // console.log(config.data);
+
+    axios(config)
+      .then((res) => {
+        console.log(res.data);
+        setUploading(false);
+        setIsUpdate(!IsUpdate);
+        setEditCityVisible(false);
+        setEditable(false);
+        message.success("update successfully, data is now refeshing");
+      })
+      .catch((error) => {
+        console.error(error);
+        setUploading(false);
+        if (error.response.status === 401) {
+          dispatch({ type: "setLogin", payload: { IsLogin: false } });
+          UserLogOut();
+          history.push("/userlogin");
+          message.error("update failed");
+        }
+      });
+  }
+
+  const handleSelect = (record, selected) => {
+    if (selected) {
+      setSelectedRowKeys((keys) => [...keys, record.id]);
+    } else {
+      setSelectedRowKeys((keys) => {
+        const index = keys.indexOf(record.id);
+        return [...keys.slice(0, index), ...keys.slice(index + 1)];
+      });
+    }
+  };
+
+  const toggleSelectAll = () => {
+    setSelectedRowKeys((keys) =>
+      keys.length === dataSource.length ? [] : dataSource.map((r) => r.id)
+    );
+  };
+
+  const headerCheckbox = (
+    <Checkbox
+      checked={selectedRowKeys.length}
+      indeterminate={
+        selectedRowKeys.length > 0 && selectedRowKeys.length < dataSource.length
+      }
+      onChange={toggleSelectAll}
+    />
+  );
+
+  const [ResultList, setResultList] = useState(undefined);
+  const [Rebootvisible, setRebootvisible] = useState(false);
+  function RebootDevices(selectedRowKeys) {
+    setUploading(true);
+
+    const config = {
+      method: "post",
+      headers: { "Content-Type": "application/json" },
+      url: "/cmd",
+      data: JSON.parse(
+        `{"reboot":{"device_cfg":{"filter":{"id":${JSON.stringify(
+          selectedRowKeys
+        )}},"nodeInf":{}}}}`
+      ),
+    };
+    // console.log(config);
+    axios(config)
+      .then((res) => {
+        let rebootfailDevices = res.data.response?.device_cfg;
+        console.log(res.data);
+        message.success("submit reboot command");
+        if (res.data.response?.device_cfg) {
+          rebootfailDevices = rebootfailDevices
+            .filter((item) => item.obj === "No Response!")
+            .map((item) => item.nodeInf.id);
+        }
+
+        if (rebootfailDevices?.length) {
+          setRebootvisible(true);
+          setResultList(rebootfailDevices);
+        }
+        setUploading(false);
+        setIsUpdate(!IsUpdate);
+      })
+      .catch((error) => {
+        console.log(error);
+        if (error.response && error.response.status === 401) {
+          dispatch({ type: "setLogin", payload: { IsLogin: false } });
+          UserLogOut();
+          history.push("/userlogin");
+        }
+        setUploading(false);
+        message.error("reboot fail.");
+      });
+  }
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   return (
     <Fragment>
-    {/* <Tabs defaultActiveKey="1">
-      <TabPane tab="Devices" key="1"> */}
+      <Modal
+        visible={Rebootvisible}
+        onCancel={() => {
+          setRebootvisible(false);
+          setResultList([]);
+        }}
+        destroyOnClose={true}
+        className={styles.modal}
+        centered={true}
+        width={"50%"}
+        title="Result"
+        footer={[
+          <Button key="Confirm" onClick={() => setRebootvisible(false)}>
+            Confirm
+          </Button>,
+        ]}
+      >
+        {ResultList?.length && (
+          <div className={styles.rebootWording}>
+            <h2>No Response</h2>
+            <p>
+              Device:
+              {ResultList?.map((item, index) => (
+                <span key={index} className={styles.rebootdevice}>
+                  {item}
+                </span>
+              ))}
+            </p>
+            <Divider />
+          </div>
+        )}
+      </Modal>
 
-        <AlarmLogMC
-          setRecord={setAlarmRecord}
-          record={AlarmRecord}
-          AlarmTablevisible={AlarmTablevisible}
-          setAlarmTablevisible={setAlarmTablevisible}
-        />
+      <Modal
+        visible={EditCityVisible}
+        onCancel={() => {
+          setEditCityVisible(false);
+          cityform.resetFields();
+        }}
+        destroyOnClose={true}
+        className={`${styles.modal} ${styles.Citymodal}`}
+        centered={true}
+        title={t("ISMS.Edit Location")}
+        footer={[
+          <Button
+            loading={uploading}
+            key="Cancel"
+            onClick={() => setEditCityVisible(false)}
+          >
+            {t("ISMS.Cancel")}
+          </Button>,
+          <Button
+            key="Save"
+            type="primary"
+            loading={uploading}
+            onClick={() => cityform.submit()}
+          >
+            {t("ISMS.Submit")}
+          </Button>,
+        ]}
+      >
+        <Form
+          form={cityform}
+          layout="vertical"
+          onFinish={(value) => UpdateCityonFinish(value)}
+        >
+          <div className={`${styles.FormWrapper} ${styles.BulkFormWrapper}`}>
+            <Row gutter={24} justify="flex-start">
+              <Col xs={24} sm={24} md={24} lg={24} xl={24}>
+                <Form.Item
+                  name={"devices"}
+                  label={t("ISMS.SelectDevice")}
+                  rules={[
+                    {
+                      required: true,
+                    },
+                  ]}
+                >
+                  <Select
+                    placeholder={t("ISMS.Device")}
+                    maxTagCount={1}
+                    mode={"multiple"}
+                  >
+                    {restore?.map((item, index) => (
+                      <Option key={index} value={item.id}>
+                        {item.name !== "" ? item.name : item.id}
+                      </Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+                <Form.Item
+                  name={"action"}
+                  label={t("ISMS.Updatewith")}
+                  rules={[
+                    {
+                      required: true,
+                    },
+                  ]}
+                >
+                  <Select
+                    placeholder={t("ISMS.SelectaMethod")}
+                    onChange={(value) => {
+                      setCityAction(value);
+                    }}
+                    // disabled={value !== "Import"}
+                  >
+                    <Option value={"Self Define"}>
+                      {" "}
+                      {t("ISMS.ManualInput")}
+                    </Option>
+                    <Option value={"renew"}>{t("ISMS.AutoInput")}</Option>
+                  </Select>
+                </Form.Item>
+                {CityAction === "Self Define" && (
+                  <Form.Item
+                    name={"city_name"}
+                    label={t("ISMS.Location")}
+                    rules={[
+                      {
+                        required: true,
+                        message: "required!",
+                      },
+                    ]}
+                  >
+                    <Input
+                      placeholder={t("ISMS.InputaLocation")}
+                      disabled={CityAction !== "Self Define"}
+                    />
+                  </Form.Item>
+                )}
+              </Col>
+            </Row>
+          </div>
+        </Form>
+      </Modal>
 
-        <DeviceStateMC
-          record={DeviceStatusRecord}
-          setRecord={setDeviceStatusRecord}
-          DeviceStatevisible={DeviceStatevisible}
-          setDeviceStatevisible={setDeviceStatevisible}
-        />
+      <Tabs onChange={(value) => Tabcallback(value)} activeKey={Tab}>
+        <TabPane tab={t("ISMS.Device")} key="1">
+          <AlarmLogMC
+            setRecord={setAlarmRecord}
+            record={AlarmRecord}
+            AlarmTablevisible={AlarmTablevisible}
+            setAlarmTablevisible={setAlarmTablevisible}
+          />
 
-        <TopoIoTMC
-          IoTvisible={IoTvisible}
-          setIoTvisible={setIoTvisible}
-          // setDeviceindex={setDeviceindex}
-          record={IoTRecord}
-          setRecord={setIoTRecord}
-        />
+          <DeviceStateMC
+            record={DeviceStatusRecord}
+            setRecord={setDeviceStatusRecord}
+            DeviceStatevisible={DeviceStatevisible}
+            setDeviceStatevisible={setDeviceStatevisible}
+          />
 
-        <TrackMap
-          // drawerVisible={drawerVisible}
-          // setDrawerVisible={setDrawerVisible}
-          setMapvisible={setMapvisible}
-          Mapvisible={Mapvisible}
-          record={MapRecord}
-          setRecord={setMapRecord}
-        />
+          <TopoIoTMC
+            IoTvisible={IoTvisible}
+            setIoTvisible={setIoTvisible}
+            // setDeviceindex={setDeviceindex}
+            record={IoTRecord}
+            setRecord={setIoTRecord}
+          />
 
-        <DeviceSettingMC
-          DeviceSettingvisible={DeviceSettingvisible}
-          setDeviceSettingvisible={setDeviceSettingvisible}
-          record={SettingRecord}
-          setRecord={setSettingRecord}
-        />
+          <TrackMap
+            // drawerVisible={drawerVisible}
+            // setDrawerVisible={setDrawerVisible}
+            setMapvisible={setMapvisible}
+            Mapvisible={Mapvisible}
+            record={MapRecord}
+            setRecord={setMapRecord}
+          />
 
-        <Card style={{ marginBottom: "10px" }} className={styles.TopoTableCard}>
-          <TopoFilterMC
-            setDataSource={setDataSource}
+          <Card
+            style={{ marginBottom: "10px" }}
+            className={styles.TopoTableCard}
+            title={t("ISMS.Filter")}
+          >
+            <TopoFilterMC
+              setDataSource={setDataSource}
+              groups={groups}
+              dataSource={dataSource}
+              uploading={NodeInfoLoading}
+              cities={cities}
+              restore={restore}
+            />
+          </Card>
+          {/* setAutoRefreshVisible setRebootVisible */}
+          <Card
+            bodyStyle={{ padding: "2px" }}
+            title={t("ISMS.DevicesOverview")}
+            extra={
+              <div className={styles.IconWrapper}>
+                <Tooltip title={t("ISMS.Refresh")}>
+                  <Button
+                    icon={<FcSynchronize style={{fontSize:'1.7rem'}} />}
+                    onClick={() => setDeviceTableIsUPdate(!DeviceTableIsUPdate)}
+                  />
+                </Tooltip>
+
+                <Tooltip title={t("ISMS.AutoRefresh")}>
+                  <Button style={AutoRefresh ? {background:'#FFEFD5'} : null} onClick={()=>setAutoRefresh(!AutoRefresh)} icon={<div className={styles.autoRefresh}> <FcSynchronize style={{fontSize:'1.7rem'}}/><FaAutoprefixer className={styles.alphet}/></div>} />
+                </Tooltip>
+
+                {level !=='get' && <Tooltip title={t("ISMS.Reboot")}>
+                  {RebootEditable ? (
+                    <div className={styles.RebootWrapper}>
+                      <Tag
+                        className={styles.editcity}
+                        style={!selectedRowKeys?.length ?{cursor:'not-allowed'} : null}
+                        onClick={() => {
+                          if(!selectedRowKeys?.length){
+                            return
+                          }
+                          RebootDevices(selectedRowKeys);
+                          setRebootEditable(false)
+                        }}
+                      >
+                        {t("ISMS.Reboot")}
+                      </Tag>
+                      <Tag
+                        className={styles.editcity}
+                        onClick={() =>{ setRebootEditable(false); setSelectedRowKeys([])}}
+                      >
+                        {t("ISMS.Cancel")}
+                      </Tag>
+                    </div>
+                  ) : (
+                    <Button
+                      icon={<BsBootstrapReboot className={styles.RebootIcon}/>}
+                      onClick={() => setRebootEditable(true)}
+                    />
+                  )}
+                </Tooltip>}
+              </div>
+            }
+          >
+            <Table
+              className={styles.TopoTable}
+              rowClassName={() => "editable-row"}
+              bordered
+              loading={NodeInfoLoading || uploading}
+              dataSource={dataSource}
+              // columns={columns}
+              rowKey={(record) => record.id}
+              rowSelection={
+                Editable || RebootEditable
+                  ? {
+                      selectedRowKeys,
+                      onSelect: handleSelect,
+                      columnTitle: headerCheckbox,
+                    }
+                  : null
+              }
+            >
+              <Column
+                title={
+                  <Fragment>
+                    {t("ISMS.Location")}
+                    {Editable ? (
+                      <Fragment>
+                        <p
+                          className={styles.editcity}
+                          onClick={() => {
+                            setEditCityVisible(true);
+                            cityform.setFieldsValue({
+                              devices: selectedRowKeys,
+                            });
+                          }}
+                        >
+                          {t("ISMS.Update")}
+                        </p>
+                        <p
+                          className={styles.editcity}
+                          onClick={() => setEditable(false)}
+                        >
+                          {t("ISMS.Cancel")}
+                        </p>
+                      </Fragment>
+                    ) : (
+                      level !== "get" && (
+                        <span
+                          style={{ marginLeft: "3px" }}
+                          className={styles.editcity}
+                          onClick={() => setEditable(true)}
+                        >
+                          {t("ISMS.edit")}
+                        </span>
+                      )
+                    )}
+                  </Fragment>
+                }
+                dataIndex="city"
+                render={(text, record) => {
+                  // console.log(record)
+                  if (record.city) {
+                    return text;
+                  } else if (record.lat) {
+                    return `${record.lat},${record.log}`;
+                  } else {
+                    return "No GPS Data";
+                  }
+                }}
+              />
+
+              <Column
+                title={t("ISMS.Device")}
+                dataIndex="name"
+                editable={level !== "get"}
+                render={(_, record, index) => {
+                  return (
+                    // <div className={styles.rename}>
+                    <Fragment>
+                      {editingKey !== index ? (
+                        <div className={styles.rename}>
+                          <Tooltip title={record.id}>
+                            {record.name ? (
+                              <p>{record.name}</p>
+                            ) : (
+                              <p>{record.id}</p>
+                            )}
+                          </Tooltip>
+                          <Tooltip title={t("ISMS.rename")}>
+                            <RiEdit2Fill
+                              className={styles.renameIcon}
+                              style={level === "get" && { display: "none" }}
+                              onClick={() => {
+                                form.setFieldsValue({
+                                  name: record.name ? record.name : record.id,
+                                });
+                                edit(index);
+                              }}
+                            />
+                          </Tooltip>
+                        </div>
+                      ) : (
+                        <Form
+                          form={form}
+                          onFinish={(value) => RenameOnFinish(value, record)}
+                        >
+                          <Row>
+                            <Col span={18}>
+                              <Form.Item
+                                style={{ margin: 0 }}
+                                name={"name"}
+                                rules={[{ required: true }]}
+                                // initialValue={record.name ? record.name : record.id}
+                              >
+                                <Input placeholder="New Device Name" />
+                              </Form.Item>
+                            </Col>
+                            <Col span={3}>
+                              <a
+                                href="/#"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  form.submit();
+                                }}
+                              >
+                                {t("ISMS.Save")}
+                              </a>
+                            </Col>
+                            <Col span={3}>
+                              <a
+                                href="/#"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  cancel();
+                                }}
+                              >
+                                {t("ISMS.Cancel")}
+                              </a>
+                            </Col>
+                          </Row>
+                        </Form>
+                      )}
+                    </Fragment>
+                    // </div>
+                  );
+                }}
+              />
+
+              <Column
+                title={t("ISMS.Model")}
+                dataIndex="model"
+                responsive={["sm"]}
+              />
+
+              <Column
+                title={t("ISMS.LastUpdate")}
+                dataIndex="lastupdate"
+                responsive={["sm"]}
+                render={(text) => {
+                  let date = new Date(text * 1000);
+                  return (
+                    date.getFullYear() +
+                    "/" +
+                    (date.getMonth() + 1) +
+                    "/" +
+                    date.getDate() +
+                    " " +
+                    date.getHours() +
+                    ":" +
+                    date.getMinutes()
+                  );
+                }}
+              />
+
+              <Column
+                title={
+                  state.Global.innerWidth > 576
+                    ? t("ISMS.Information")
+                    : t("ISMS.Info")
+                }
+                dataIndex="information"
+                render={(_, record, index) => {
+                  // console.log(record)
+                  return (
+                    // <Fragment>
+                    state.Global.innerWidth > 500 ? (
+                      IconforGenerator(record, index)
+                    ) : (
+                      <Dropdown
+                        overlay={menu(record, index)}
+                        key={index}
+                        overlayClassName={styles.iconDrop}
+                      >
+                        <DownOutlined />
+                      </Dropdown>
+                    )
+                    // </Fragment>
+                  );
+                }}
+              />
+            </Table>
+          </Card>
+        </TabPane>
+        <TabPane tab={t("ISMS.RoutersStatus")} key="2">
+          <ViewAllStatusMC
             groups={groups}
-            dataSource={dataSource}
-            uploading={NodeInfoLoading}
+            models={models}
+            cities={cities}
+            IsUpdate={IsUpdate}
+            setIsUpdate={setIsUpdate}
           />
-        </Card>
-        <Card bodyStyle={{ padding: "2px" }}>
-          <Table
-            className={styles.TopoTable}
-            components={components}
-            rowClassName={() => "editable-row"}
-            bordered
-            loading={NodeInfoLoading || uploading}
-            dataSource={dataSource}
-            columns={columns}
+        </TabPane>
+        <TabPane tab={t("ISMS.Setting")} key="3">
+          <BulkConfigMC
+            IsUpdate={IsUpdate}
+            setIsUpdate={setIsUpdate}
+            groups={groups}
+            models={models}
+            cities={cities}
+            dataSource={restore?.filter((item) => item.health !== "offline")}
+            record={SettingRecord}
+            setSettingRecord={setSettingRecord}
           />
-        </Card>
-
-      {/* </TabPane>
-      <TabPane tab="Routers Status" key="2">
-        <ViewAllStatusMC groups={groups} models={models}/>
-      </TabPane>
-      <TabPane tab="Bulk Config" key="3">
-      <BulkConfigMC IsUpdate={IsUpdate}/>
-      </TabPane>
-    </Tabs> */}
+        </TabPane>
+      </Tabs>
     </Fragment>
   );
 };

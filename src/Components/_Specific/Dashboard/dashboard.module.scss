@@ -11,7 +11,7 @@
   margin-top: 15px;
 }
 .RouterCardWrapper{
-  cursor: pointer;
+  // cursor: pointer;
   :global(.ant-card-body){
     height: calc((100vh - 120px) / 2 - 70px) !important;
   }
@@ -19,18 +19,31 @@
 
 .Card {
   width: 100%;
-  // margin-bottom:10px !important;
-  // height: 395px;
   height: calc((100vh - 100px) / 2);
   box-sizing: border-box !important;
   text-align: center;
   padding: 5px !important;
+  position: relative;
   .PieChart {
     margin-top: 15px;
     height: calc((100vh - 120px) / 2 - 146px) !important;
+    // height: 100% !important;
+    width:100%;
     padding: 0px !important;
+    position: absolute;
+    // top: 20px;
+    top: 33%;
+    left: 50%;
+    transform: translate(-50%, 0%);
+    
   }
-
+  &.MapCard{
+    margin-top: 5px;
+    // width: calc(100vw - 235px)
+  }
+  .DashboardMap{
+    height: calc((100vh - 120px) / 2 - 40px);
+  }
   .RouterWrapper {
     // height: calc((100vh - 120px) / 2 - 125px) !important;
     display: flex;
@@ -43,18 +56,12 @@
     left: 3%;
     font-weight: bold;
     font-size: 0.9rem;
-
     }
-
     h2 {
       font-size: 3rem;
       color: #002FA7;
       font-weight: bold;
 
-    //   margin: 0 !important;
-      // margin-top: 30%;
-
-      // line-height: 100%;
     }
   }
 
@@ -62,36 +69,22 @@
     font-size: 1.5rem !important;
   }
 }
-// .subCard{
-//     // height :calc((100vh - 100px)/4);
-//     h2{
-//         text-align: left;
-//         margin: 0;
-//         font-size: 1rem;
-//         font-weight: bold;
-//         color: gray;
-//     }
-//     p{
-//         font-weight: bold;
-//         font-size: 1rem;
-//         &.MainNum{
-//          font-size: 1.5rem;
-//          margin:1%;
-//         }
-//     }
-//     span{
 
-//     }
-// }
+@media(max-width: 576px){
+  .Card {
+    .PieChart {
+      top: 40%;
+    }
+  }
+
+}
+
+
 .donC {
   width: 100%;
   height: 30%;
 }
-.DashboardMap {
-  width: 100%;
-  // height: calc(100vh - 430px);
-  height: calc((100vh - 120px) / 2 - 40px);
-}
+
 
 .col {
   // border: 1px black solid;
@@ -103,12 +96,14 @@
   height: 235px !important;
   width: 100%;
   margin-bottom: -10%;
+
 }
 .guageTag {
   display: flex;
   justify-content: center;
   align-items: center;
   margin-bottom: 10% !important;
+  margin-top: 5px;
   p {
     margin: 0 !important;
     font-weight: bold;
@@ -153,20 +148,45 @@
     font-weight: bold;
   }
 }
+.btn{
+  // width:24px !important;
+  // height:24px !important;
+}
+.autoRefresh {
+  position: relative;
+  // font-size: 1.6rem !important;
+  .alphet{
+    font-weight: bold;
+    color:#002fa7;
+    display: inline-block;
+    font-size: 14px;
+    position: absolute;
+    right: 8px;
+    top:6px;
+    z-index: 50;
+  }
+}
+.settingIcon{
+  cursor: pointer;
+}
+.iconBackground{
+  display: flex;
+  justify-content: space-around;
+  flex-direction: column;
+  // min-height:80px;
+  // min-width: 110px;
+  position: absolute;
+  right: -26px;
+  top:4px;
+}
 
 .alarmtable {
   th {
     background: white !important;
   }
 }
-// .StatisticHeader{
-//     display: flex;
-//     align-items: center;
-//     justify-content: space-around;
-//     span{
-//         font-weight: bold;
-//     }
-// }
+
+
 .legendWrapper{
   display: flex;
   justify-content: flex-start;
@@ -198,17 +218,49 @@
   color:#002FA7;
 }
 
-@media (max-width: 960px) {
-  .PieWrapper {
-    flex-wrap: wrap;
+.CardList{
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  .CardItem{
+    width: 25%;;
+    height: calc((100vh - 100px) / 2);
+    box-sizing: border-box !important;
+    text-align: center;
+    padding: 5px !important;
   }
-  .Card {
-    height: auto;
-    &.IoTCard {
-      height: auto;
-    }
-    .subCard {
-      width: 100%;
+  .CardItemMap{
+    height: calc((100vh - 100px) / 2);
+    width: 100% !important;
+  }
+}
+
+@media(min-width: 768px) and(max-width: 1450px){
+  .CardList{
+    .CardItem{
+      width: 50% !important;
     }
   }
 }
+@media(max-width: 768px){
+  .CardList{
+    .CardItem{
+      width: 100% !important;
+    }
+  }
+}
+
+// @media (max-width: 960px) {
+//   .PieWrapper {
+//     flex-wrap: wrap;
+//   }
+//   .Card {
+//     height: auto;
+//     &.IoTCard {
+//       height: auto;
+//     }
+//     .subCard {
+//       width: 100%;
+//     }
+//   }
+// }

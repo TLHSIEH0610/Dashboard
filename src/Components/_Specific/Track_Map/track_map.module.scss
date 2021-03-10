@@ -1,3 +1,33 @@
+.IconWrapper{
+  align-items: center;
+  min-width: 80px;
+  display: flex;
+  justify-content: space-around;
+}
+.autoRefresh {
+  position: relative;
+  // font-size: 1.6rem !important;
+  .alphet{
+    font-weight: bold;
+    color:#002fa7;
+    display: inline-block;
+    font-size: 17px;
+    position: absolute;
+    right: 7px;
+    top:5px;
+    z-index: 50;
+  }
+}
+.rowClass{
+  background: gold;
+  font-weight: bold;
+  // :hover{
+  //   background: gold;
+  // }
+}
+.rowClass:hover{
+  background: gold;
+}
 .marker {
     position: absolute;
     top: 50%;
@@ -13,6 +43,28 @@
       z-index: 1;
     }
   }
+  .maptransfer{
+    transform: translateX(12%);
+  }
+  .drawer{
+    width:20% !important;
+    &.hide{
+      transform: translateX(-100%) !important;
+    }
+  }
+  @media(min-width: 300px) and(max-width: 1040px){
+    .maptransfer{
+      transform: translateX(0%);
+      transform: translateY(5%);
+    }
+    .drawer{
+      width:100% !important;
+      &.hide{
+        transform: translateX(-100%) !important;
+      }
+    }
+  }
+
   .circle {
     background: #d83b01;
     border-radius: 50%;

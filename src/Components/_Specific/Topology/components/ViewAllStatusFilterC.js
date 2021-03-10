@@ -1,17 +1,23 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styles from "../topology.module.scss";
 import { Form, Select, Tag, Button, Row, Col, Card } from "antd";
 // import Context from "../../../../Utility/Reduxx";
-import { Translator } from "../../../../i18n/index";
-
+import { useTranslation } from "react-i18next";
 const { Option } = Select;
 
 
-const ViewAllStatusFilterC = ({ setDeviceStatus, uploading, groups, Restore, models }) => {
+const ViewAllStatusFilterC = ({ setDeviceStatus, uploading, groups, Restore, models, cities }) => {
   const [form] = Form.useForm();
+  const [value, setvalue] = useState([])
   // const { state, dispatch } = useContext(Context);
-
-  console.log(models)
+  const { t } = useTranslation();
+  // console.log(cities)
+  useEffect(()=>{
+    console.log(value)
+    form.setFieldsValue(value);
+    form.submit();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[Restore])
 
 
   const healthoptions = [
@@ -29,6 +35,7 @@ const ViewAllStatusFilterC = ({ setDeviceStatus, uploading, groups, Restore, mod
 
   const onFinish = (values) => {
     console.log(values)
+    setvalue(values)
     let NewData = Restore;
     // if (
     //   !values.health.length ||
@@ -40,7 +47,7 @@ const ViewAllStatusFilterC = ({ setDeviceStatus, uploading, groups, Restore, mod
     //   setDeviceStatus(Restore);
     // }
     
-    NewData = NewData.filter((item) => {
+    NewData = NewData?.filter((item) => {
       let groupfilter
       if(values.groups?.length){
         groupfilter = item.gid.filter(g=> values.groups.indexOf(g) > -1)
@@ -51,7 +58,7 @@ const ViewAllStatusFilterC = ({ setDeviceStatus, uploading, groups, Restore, mod
         (values.model.length ? values.model.includes(item.model) : true) &&
         (values.health.length ? values.health.includes(item.health) : true) &&
         (values.strength.length? values.strength.includes(item.strength): true) &&
-        (groupfilter?.length ? true : (!values.groups?.length))
+        (groupfilter?.length ? true : (!values.groups?.length)) && (values.cities.length? values.cities.includes(item.city): true)
       );
     });
     setDeviceStatus(NewData);
@@ -88,14 +95,14 @@ const ViewAllStatusFilterC = ({ setDeviceStatus, uploading, groups, Restore, mod
   }
 
   return (
-    <Card style={{ marginBottom: "10px" }} className={styles.TopoTableCard}>
+    <Card style={{ marginBottom: "10px" }} className={styles.TopoTableCard} title={t("ISMS.Filter")}>
     <Form onFinish={onFinish} form={form} layout={"vertical"}>
       <div className={styles.FormWrapper}>
         <Row gutter={24}>
-          <Col xs={24} sm={24} md={12} lg={9} xl={9}>
+          <Col xs={24} sm={24} md={12} lg={9} xl={9} xxl={5}  className={styles.colum}>
             <Form.Item
               name="device"
-              label={Translator("ISMS.Device")}
+              label={t("ISMS.Device")}
               // className={styles.FilterDevice}
               initialValue={[]}
             >
@@ -105,7 +112,7 @@ const ViewAllStatusFilterC = ({ setDeviceStatus, uploading, groups, Restore, mod
                 maxTagCount={1}
                 mode="multiple"
                 // mode="tags"
-                placeholder={Translator("ISMS.Search")}
+                placeholder={t("ISMS.Search")}
                 showArrow
                 tagRender={tagRender}
                 onChange={() => form.submit()}
@@ -113,7 +120,7 @@ const ViewAllStatusFilterC = ({ setDeviceStatus, uploading, groups, Restore, mod
               >
                 {Restore?.map((item, index) => {
                   return (
-                    <Option key={index} value={item.name ? item.name : item.id}>
+                    <Option key={index} value={ item.id}>
                       {item.name ? item.name : item.id}
                     </Option>
                   );
@@ -121,11 +128,11 @@ const ViewAllStatusFilterC = ({ setDeviceStatus, uploading, groups, Restore, mod
               </Select>
             </Form.Item>
           </Col>
-          <Col xs={24} sm={24} md={10} lg={5}>
+          <Col xs={24} sm={24} md={10} lg={5} xl={5} xxl={3} className={styles.colum}>
             <Form.Item
             initialValue={[]}
               name="model"
-              label={Translator("ISMS.Model")}
+              label={t("ISMS.Model")}
               className={styles.FilterModel}
             >
               <Select
@@ -134,7 +141,7 @@ const ViewAllStatusFilterC = ({ setDeviceStatus, uploading, groups, Restore, mod
                 mode="multiple"
                 maxTagCount={1}
                 showArrow
-                placeholder={Translator("ISMS.Search")}
+                placeholder={t("ISMS.Search")}
                 tagRender={tagRender}
                 onChange={() => form.submit()}
               >
@@ -146,11 +153,11 @@ const ViewAllStatusFilterC = ({ setDeviceStatus, uploading, groups, Restore, mod
               </Select>
             </Form.Item>
           </Col>
-          <Col xs={24} sm={24} md={10} lg={5}>
+          <Col xs={24} sm={24} md={10} lg={5} xl={5} xxl={3} className={styles.colum}>
             <Form.Item
             initialValue={[]}
               name="health"
-              label={Translator("ISMS.Health")}
+              label={t("ISMS.Health")}
               className={styles.FilterHealth}
             >
               <Select
@@ -158,7 +165,7 @@ const ViewAllStatusFilterC = ({ setDeviceStatus, uploading, groups, Restore, mod
                 disabled={uploading}
                 maxTagCount={1}
                 mode="multiple"
-                placeholder={Translator("ISMS.Search")}
+                placeholder={t("ISMS.Search")}
                 showArrow
                 tagRender={tagRender}
                 // style={{ width: "100%" }}
@@ -167,18 +174,18 @@ const ViewAllStatusFilterC = ({ setDeviceStatus, uploading, groups, Restore, mod
               />
             </Form.Item>
           </Col>
-          <Col xs={24} sm={24} md={10} lg={5}>
+          <Col xs={24} sm={24} md={10} lg={5} xl={5} xxl={3} className={styles.colum}>
             <Form.Item
             initialValue={[]}
               name="strength"
-              label={Translator("ISMS.Strength")}
+              label={t("ISMS.Strength")}
               className={styles.FilterStrength}
             >
               <Select
                 loading={uploading}
                 disabled={uploading}
                 mode="multiple"
-                placeholder={Translator("ISMS.Search")}
+                placeholder={t("ISMS.Search")}
                 showArrow
                 maxTagCount={1}
                 tagRender={tagRender}
@@ -188,13 +195,13 @@ const ViewAllStatusFilterC = ({ setDeviceStatus, uploading, groups, Restore, mod
               />
             </Form.Item>
           </Col>
-          <Col xs={24} sm={24} md={10} lg={5}>
-            <Form.Item name="groups" label={"Group"} initialValue={[]}>
+          <Col xs={24} sm={24} md={10} lg={5} xl={5} xxl={4} className={styles.colum}>
+            <Form.Item name="groups" label={t("ISMS.Group")} initialValue={[]}>
               <Select
                 loading={uploading}
                 disabled={uploading}
                 mode="multiple"
-                placeholder={Translator("ISMS.Search")}
+                placeholder={t("ISMS.Search")}
                 showArrow
                 maxTagCount={1}
                 tagRender={tagRender}
@@ -210,7 +217,29 @@ const ViewAllStatusFilterC = ({ setDeviceStatus, uploading, groups, Restore, mod
               </Select>
             </Form.Item>
           </Col>
-          <Col xs={24} sm={4} md={3} lg={3}>
+          <Col xs={24} sm={24} md={10} lg={5} xl={5} xxl={4} className={styles.colum}>
+            <Form.Item name="cities" label={t("ISMS.Location")} initialValue={[]}>
+              <Select
+                loading={uploading}
+                disabled={uploading}
+                mode="multiple"
+                placeholder={t("ISMS.Search")}
+                showArrow
+                maxTagCount={1}
+                tagRender={tagRender}
+                onChange={() => form.submit()}
+              >
+                {cities?.map((item, index) => {
+                  return (
+                    <Option key={index} value={item}>
+                      {item}
+                    </Option>
+                  );
+                })}
+              </Select>
+            </Form.Item>
+          </Col>
+          <Col xs={24} sm={4} md={3} lg={3} xl={3} xxl={2} className={styles.colum}>
             <Form.Item style={{ marginLeft: "15px" }}>
               <Button
                 type={"primary"}
@@ -224,10 +253,13 @@ const ViewAllStatusFilterC = ({ setDeviceStatus, uploading, groups, Restore, mod
                     model: [],
                     health: [],
                     strength: [],
+                    groups:[],
+                    cities:[]
                   });
+                  setvalue([])
                 }}
               >
-                {Translator("ISMS.Reset")}
+                {t("ISMS.Clear")}
               </Button>
             </Form.Item>
           </Col>

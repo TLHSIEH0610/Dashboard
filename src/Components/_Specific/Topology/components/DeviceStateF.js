@@ -8,7 +8,10 @@ import "echarts/lib/component/tooltip";
 import "echarts/lib/component/title";
 import "echarts/lib/component/legend";
 
+
 const IdentityTable = ({ DeviceIdentity }) => {
+
+
   return (
     DeviceIdentity && (
       <Descriptions
@@ -19,28 +22,28 @@ const IdentityTable = ({ DeviceIdentity }) => {
         <Descriptions.Item label="IMEI">
           {DeviceIdentity.IMEI}
         </Descriptions.Item>
-        <Descriptions.Item label="bootloader_version">
+        <Descriptions.Item label="Bootloader Version">
           {DeviceIdentity.bootloader_version}
         </Descriptions.Item>
-        <Descriptions.Item label="hardware_mcsv">
+        <Descriptions.Item label="Hardware MCSV">
           {DeviceIdentity.hardware_mcsv}
         </Descriptions.Item>
-        <Descriptions.Item label="hostname">
+        <Descriptions.Item label="Hostname">
           {DeviceIdentity.hostname}
         </Descriptions.Item>
-        <Descriptions.Item label="lan_eth_mac">
+        <Descriptions.Item label="LAN Eth Mac">
           {DeviceIdentity.lan_eth_mac}
         </Descriptions.Item>
-        <Descriptions.Item label="modem_firmware_version">
+        <Descriptions.Item label="Modem Firmware Version">
           {DeviceIdentity.modem_firmware_version}
         </Descriptions.Item>
-        <Descriptions.Item label="serial_number">
+        <Descriptions.Item label="Serial Number">
           {DeviceIdentity.serial_number}
         </Descriptions.Item>
-        <Descriptions.Item label="wan_eth_mac">
+        <Descriptions.Item label="WAN Eth Mac">
           {DeviceIdentity.wan_eth_mac}
         </Descriptions.Item>
-        <Descriptions.Item label="wifi_ap_mac">
+        <Descriptions.Item label="Wifi AP Mac">
           {DeviceIdentity.wifi_ap_mac}
         </Descriptions.Item>
       </Descriptions>
@@ -52,32 +55,57 @@ export const IdentityTableMF = React.memo(IdentityTable);
 
 const StatusStrength = ({ DeviceStatus }) => {
   const statistic = DeviceStatus.status.sim[0];
+  const statistic2 = DeviceStatus.status?.sim?.[1];
   console.log(statistic.roaming);
   return (
     <div>
+      
       <Descriptions
         // title="Signal Cofiguration"
         column={{ xxl: 3, xl: 2, lg: 2, md: 2, sm: 2, xs: 1 }}
         bordered
         className={styles.desc}
+        title='* SIM1 / SIM2'
       >
-        <Descriptions.Item label="EARFCN">{statistic.EARFCN}</Descriptions.Item>
-        <Descriptions.Item label="IMSI">{statistic.IMSI}</Descriptions.Item>
-        <Descriptions.Item label="PLMN">{statistic.PLMN}</Descriptions.Item>
-        <Descriptions.Item label="access">{statistic.access}</Descriptions.Item>
-        <Descriptions.Item label="active">{`${statistic.active}`}</Descriptions.Item>
-        <Descriptions.Item label="band">{statistic.band}</Descriptions.Item>
-        <Descriptions.Item label="operator">
-          {statistic.operator}
+        <Descriptions.Item label="EARFCN">
+          {statistic.EARFCN} {statistic2 ? `/${statistic2.EARFCN}` : ""}
         </Descriptions.Item>
-        <Descriptions.Item label="phone_number">
-          {statistic.phone_number}
+        <Descriptions.Item label="IMSI">
+          {statistic.IMSI} {statistic2 ? `/${statistic2.IMSI}` : ""}
         </Descriptions.Item>
-        <Descriptions.Item label="roaming">{`${statistic.roaming}`}</Descriptions.Item>
-        <Descriptions.Item label="rssi_dbm">
-          {statistic.rssi_dbm}
+        <Descriptions.Item label="ICCID">
+          {statistic.ICCID} {statistic2 ? `/${statistic2.ICCID}` : ""}
         </Descriptions.Item>
-        <Descriptions.Item label="status">{statistic.status}</Descriptions.Item>
+        {/* <Descriptions.Item label="ICCID(SIM2)">{Sim2ICCID? Sim2ICCI }`D: ''} </Descriptions.Item> */}
+        <Descriptions.Item label="PLMN">
+          {statistic.PLMN} {statistic2 ? `/${statistic2.PLMN}` : ""}
+        </Descriptions.Item>
+        <Descriptions.Item label="Access">
+          {statistic.access} {statistic2 ? `/${statistic2.access}` : ""}
+        </Descriptions.Item>
+        <Descriptions.Item label="Active">
+          {`${statistic.active}`}{" "}
+          {`${statistic2 ? `/${statistic2.active}` : ""}`}
+        </Descriptions.Item>
+        <Descriptions.Item label="Band">
+          {statistic.band} {statistic2 ? `/${statistic2.band}` : ""}
+        </Descriptions.Item>
+        <Descriptions.Item label="Operator">
+          {statistic.operator} {statistic2 ? `/${statistic2.operator}` : ""}
+        </Descriptions.Item>
+        <Descriptions.Item label="Phone Number">
+          {statistic.phone_number}{" "}
+          {statistic2 ? `/${statistic2.phone_number}` : ""}
+        </Descriptions.Item>
+        <Descriptions.Item label="Roaming">
+          {`${statistic.roaming}`} {statistic2 ? `/${statistic2.roaming}` : ""}
+        </Descriptions.Item>
+        <Descriptions.Item label="RSSI (dbm)">
+          {statistic.rssi_dbm} {statistic2 ? `/${statistic2.rssi_dbm}` : ""}
+        </Descriptions.Item>
+        <Descriptions.Item label="Status">
+          {statistic.status} {statistic2 ? `/${statistic2.status}` : ""}
+        </Descriptions.Item>
       </Descriptions>
     </div>
   );
@@ -94,15 +122,15 @@ const StatusGPS = ({ DeviceStatus }) => {
         className={styles.desc}
         column={{ xxl: 3, xl: 2, lg: 2, md: 2, sm: 2, xs: 1 }}
       >
-        <Descriptions.Item label="altitude">{gps.altitude}</Descriptions.Item>
-        <Descriptions.Item label="date">{gps.date}</Descriptions.Item>
+        <Descriptions.Item label="Altitude">{gps.altitude}</Descriptions.Item>
+        <Descriptions.Item label="Date">{gps.date}</Descriptions.Item>
         <Descriptions.Item label="horizontal">
           {gps.horizontal}
         </Descriptions.Item>
-        <Descriptions.Item label="latitude">{gps.latitude}</Descriptions.Item>
-        <Descriptions.Item label="longitude">{gps.longitude}</Descriptions.Item>
-        <Descriptions.Item label="satellite">{gps.satellite}</Descriptions.Item>
-        <Descriptions.Item label="utc-time">
+        <Descriptions.Item label="Latitude">{gps.latitude}</Descriptions.Item>
+        <Descriptions.Item label="Longitude">{gps.longitude}</Descriptions.Item>
+        <Descriptions.Item label="Satellite">{gps.satellite}</Descriptions.Item>
+        <Descriptions.Item label="UTC-time">
           {gps["utc-time"]}
         </Descriptions.Item>
       </Descriptions>
@@ -121,23 +149,24 @@ const StatusDNS = ({ DeviceStatus }) => {
         bordered
         className={styles.desc}
         column={{ xxl: 3, xl: 2, lg: 2, md: 2, sm: 2, xs: 1 }}
+        title='WAN'
       >
-        <Descriptions.Item label="wan_ip4">
+        <Descriptions.Item label="IPv4_1">
           {dns.wan[0].ipv4[0]}
         </Descriptions.Item>
-        <Descriptions.Item label="wan_ip4">
+        <Descriptions.Item label="IPv4_2">
           {dns.wan[0].ipv4[1]}
         </Descriptions.Item>
-        <Descriptions.Item label="wan_ip4">
+        <Descriptions.Item label="IPv4_3">
           {dns.wan[0].ipv4[2]}
         </Descriptions.Item>
-        <Descriptions.Item label="wan_ip6">
+        <Descriptions.Item label="IPv6_1">
           {dns.wan[0].ipv6[0]}
         </Descriptions.Item>
-        <Descriptions.Item label="wan_ip6">
+        <Descriptions.Item label="IPv6_2">
           {dns.wan[0].ipv6[1]}
         </Descriptions.Item>
-        <Descriptions.Item label="wan_ip6">
+        <Descriptions.Item label="IPv6_3">
           {dns.wan[0].ipv6[2]}
         </Descriptions.Item>
       </Descriptions>
@@ -151,108 +180,115 @@ const StatusConnection = ({ DeviceStatus }) => {
   const connection = DeviceStatus.status.connection;
 
   return (
-    <Descriptions
-      bordered
-      className={[styles.desc, styles["override-ant-descriptions-view"]]}
-      column={{ xxl: 3, xl: 2, lg: 2, md: 2, sm: 2, xs: 1 }}
-    >
-      <Descriptions.Item label="LAN_ip4_adress">
-        {connection.lan?.ipv4.adress}
-      </Descriptions.Item>
-      <Descriptions.Item label="LAN_ip4_netmask">
-        {connection.lan?.ipv4.netmask}
-      </Descriptions.Item>
-      <Descriptions.Item label="LAN_ip6_adress">
-        {connection.lan?.ipv6.address}
-      </Descriptions.Item>
-      <Descriptions.Item label="LAN_ip6_up_time">
-        {connection.lan?.ipv6.uptime}{" "}
-      </Descriptions.Item>
-      {/* </Descriptions> */}
-      {/* <Descriptions
-          bordered
-           className={[styles.desc,styles['override-ant-descriptions-view']]}
-          column={{ xxl: 3, xl: 2, lg: 2, md: 2, sm: 2, xs: 1 }}
-        > */}
-      <Descriptions.Item label="LTE_active">
-        {connection.lte?.active}
-      </Descriptions.Item>
-      <Descriptions.Item label="LTE_ip4_apn_address">
-        {connection.lte?.apn[0].ipv4.address}
-      </Descriptions.Item>
-      <Descriptions.Item label="LTE_ip4_apn_gateway">
-        {connection.lte?.apn[0].ipv4.gateway}
-      </Descriptions.Item>
-      <Descriptions.Item label="LTE_ip4_apn_netmask">
-        {connection.lte?.apn[0].ipv4.netmask}
-      </Descriptions.Item>
-      <Descriptions.Item label="LTE_ip4_apn_uptime">
-        {connection.lte?.apn[0].ipv4.uptime}
-      </Descriptions.Item>
-      <Descriptions.Item label="LTE_ip4_address">
-        {connection.lte?.ipv4.address}
-      </Descriptions.Item>
-      <Descriptions.Item label="LTE_ip4_gateway">
-        {connection.lte?.ipv4.gateway}
-      </Descriptions.Item>
-      <Descriptions.Item label="LTE_ip4_netmask">
-        {connection.lte?.ipv4.netmask}
-      </Descriptions.Item>
-      <Descriptions.Item label="LTE_ip4_uptime">
-        {connection.lte?.ipv4.uptime}
-      </Descriptions.Item>
-      {/* // </Descriptions>
-        // <Descriptions */}
-      {/* //   bordered
-        //    className={[styles.desc,styles['override-ant-descriptions-view']]}
-        //   column={{ xxl: 3, xl: 2, lg: 2, md: 2, sm: 2, xs: 1 }}
-        // > */}
-      <Descriptions.Item label="WAN_active">
-        {connection.wan?.active}
-      </Descriptions.Item>
-      <Descriptions.Item label="WAN_ip4_address">
-        {connection.wan?.ipv4.address}
-      </Descriptions.Item>
-      <Descriptions.Item label="WAN_ip4_gateway">
-        {connection.wan?.ipv4.gateway}
-      </Descriptions.Item>
-      <Descriptions.Item label="WAN_ip4_netmask">
-        {connection.wan?.ipv4.netmask}{" "}
-      </Descriptions.Item>
-      <Descriptions.Item label="WAN_ip4_up_time">
-        {connection.wan?.ipv4.uptime}{" "}
-      </Descriptions.Item>
-      {/* // </Descriptions>
-        // <Descriptions */}
-      {/* //   bordered
-        //    className={[styles.desc,styles['override-ant-descriptions-view']]}
-        //   column={{ xxl: 3, xl: 2, lg: 2, md: 2, sm: 2, xs: 1 }}
-        // > */}
-      <Descriptions.Item label="WWAN_active">
-        {connection.wwan?.active}
-      </Descriptions.Item>
-      <Descriptions.Item label="WWAN_ip4_MAC">
-        {connection.wwan?.ipv4.MAC}
-      </Descriptions.Item>
-      <Descriptions.Item label="WWAN_ip4_SSID">
-        {connection.wwan?.ipv4.SSID}
-      </Descriptions.Item>
-      <Descriptions.Item label="WWAN_ip4_address">
-        {connection.wwan?.ipv4.address}{" "}
-      </Descriptions.Item>
-      <Descriptions.Item label="WWAN_ip4_channel">
-        {connection.wwan?.ipv4.channel}{" "}
-      </Descriptions.Item>
-      <Descriptions.Item label="WWAN_ip4_gateway">
-        {connection.wwan?.ipv4.gateway}{" "}
-      </Descriptions.Item>
-      <Descriptions.Item label="WWAN_ip4_netmask">
-        {connection.wwan?.ipv4.netmask}{" "}
-      </Descriptions.Item>
-      <Descriptions.Item label="WWAN_ip4_up_time">
-        {connection.wwan?.ipv4.uptime}{" "}
-      </Descriptions.Item>
-    </Descriptions>
+    <Fragment>
+      <Descriptions
+        bordered
+        className={styles.desc}
+        column={{ xxl: 3, xl: 2, lg: 2, md: 2, sm: 2, xs: 1 }}
+        title={'LAN'}
+      >
+        <Descriptions.Item label="IPv4 Address">
+          {connection.lan?.ipv4.address}
+        </Descriptions.Item>
+        <Descriptions.Item label="IPv4 Netmask">
+          {connection.lan?.ipv4.netmask}
+        </Descriptions.Item>
+        <Descriptions.Item label="IPv6 Address">
+          {connection.lan?.ipv6.address}
+        </Descriptions.Item>
+        <Descriptions.Item label="IPv6 Uptime">
+          {connection.lan?.ipv6.uptime}
+        </Descriptions.Item>
+      </Descriptions>
+    
+      <Descriptions
+        bordered
+        className={styles.desc}
+        column={{ xxl: 3, xl: 2, lg: 2, md: 2, sm: 2, xs: 1 }}
+        title={'LTE'}
+      >
+        <Descriptions.Item label="Active">
+          {connection.lte?.active === true ? 'true' : 'false'}
+        </Descriptions.Item>
+        <Descriptions.Item label="IPv4 APN Address">
+          {connection.lte?.apn[0].ipv4.address}
+        </Descriptions.Item>
+        <Descriptions.Item label="IPv4 APN Gateway">
+          {connection.lte?.apn[0].ipv4.gateway}
+        </Descriptions.Item>
+        <Descriptions.Item label="IPv4 APN Netmask">
+          {connection.lte?.apn[0].ipv4.netmask}
+        </Descriptions.Item>
+        <Descriptions.Item label="IPv4 APN Uptime">
+          {connection.lte?.apn[0].ipv4.uptime}
+        </Descriptions.Item>
+        <Descriptions.Item label="IPv4 Address">
+          {connection.lte?.ipv4.address}
+        </Descriptions.Item>
+        <Descriptions.Item label="IPv4 Gateway">
+          {connection.lte?.ipv4.gateway}
+        </Descriptions.Item>
+        <Descriptions.Item label="IPv4 Netmask">
+          {connection.lte?.ipv4.netmask}
+        </Descriptions.Item>
+        <Descriptions.Item label="IPv4 Uptime">
+          {connection.lte?.ipv4.uptime}
+        </Descriptions.Item>
+      </Descriptions>
+      <Descriptions
+        bordered
+        className={styles.desc}
+        column={{ xxl: 3, xl: 2, lg: 2, md: 2, sm: 2, xs: 1 }}
+        title={'WAN'}
+      >
+        <Descriptions.Item label="Active">
+          {connection.wan?.active === true ? 'true' : 'false' }
+        </Descriptions.Item>
+        <Descriptions.Item label="IPv4 Address">
+          {connection.wan?.ipv4.address}
+        </Descriptions.Item>
+        <Descriptions.Item label="IPv4 Gateway">
+          {connection.wan?.ipv4.gateway}
+        </Descriptions.Item>
+        <Descriptions.Item label="IPv4 Netmask">
+          {connection.wan?.ipv4.netmask}
+        </Descriptions.Item>
+        <Descriptions.Item label="IPv4 Uptime">
+          {connection.wan?.ipv4.uptime}
+        </Descriptions.Item>
+      </Descriptions>
+      <Descriptions
+        bordered
+        className={styles.desc}
+        column={{ xxl: 3, xl: 2, lg: 2, md: 2, sm: 2, xs: 1 }}
+        title={'WWAN'}
+      >
+        <Descriptions.Item label="Active">
+          {connection.wwan?.active === true ? 'true' : 'false' }
+        </Descriptions.Item>
+        <Descriptions.Item label="IPv4 MAC">
+          {connection.wwan?.ipv4.MAC}
+        </Descriptions.Item>
+        <Descriptions.Item label="IPv4 SSID">
+          {connection.wwan?.ipv4.SSID}
+        </Descriptions.Item>
+        <Descriptions.Item label="IPv4 Address">
+          {connection.wwan?.ipv4.address}
+        </Descriptions.Item>
+        <Descriptions.Item label="IPv4 Channel">
+          {connection.wwan?.ipv4.channel}
+        </Descriptions.Item>
+        <Descriptions.Item label="IPv4 Gateway">
+          {connection.wwan?.ipv4.gateway}
+        </Descriptions.Item>
+        <Descriptions.Item label="IPv4 Netmask">
+          {connection.wwan?.ipv4.netmask}
+        </Descriptions.Item>
+        <Descriptions.Item label="IPv4 Uptime">
+          {connection.wwan?.ipv4.uptime}
+        </Descriptions.Item>
+      </Descriptions>
+    </Fragment>
   );
 };
 
@@ -295,14 +331,26 @@ const TxRxStatistic = ({ DeviceStatus }) => {
       option.dataset = {
         source: [
           ["product", "tx", "rx"],
-          ["LTE", statistic?.lte.tx_dropped_pkts, statistic?.lte.rx_dropped_pkts],
+          [
+            "LTE",
+            statistic?.lte.tx_dropped_pkts,
+            statistic?.lte.rx_dropped_pkts,
+          ],
           [
             "LTE(APN)",
             statistic?.lan.tx_dropped_pkts,
             statistic?.lan.rx_dropped_pkts,
           ],
-          ["WAN", statistic?.lan.tx_dropped_pkts, statistic?.lan.rx_dropped_pkts],
-          ["LAN", statistic?.lan.tx_dropped_pkts, statistic?.lan.rx_dropped_pkts],
+          [
+            "WAN",
+            statistic?.lan.tx_dropped_pkts,
+            statistic?.lan.rx_dropped_pkts,
+          ],
+          [
+            "LAN",
+            statistic?.lan.tx_dropped_pkts,
+            statistic?.lan.rx_dropped_pkts,
+          ],
         ],
       };
       option.series = [{ type: "bar" }, { type: "bar" }];

@@ -6,12 +6,12 @@ import { Translator } from "../../../../i18n/index";
 
 const { Option } = Select;
 
-const TopoFilterC = ({ setDataSource, dataSource, uploading, groups }) => {
+const TopoFilterC = ({ setDataSource, dataSource, uploading, groups, cities, restore }) => {
   const [form] = Form.useForm();
   const { state, dispatch } = useContext(Context);
-  const [restore, setRestore] = useState([]);
+  // const [restore, setRestore] = useState([]);
   const [modelOptions, setModelOptions] = useState("");
-
+  const [value, setvalue] = useState([])
   let count = useRef(0);
 
 
@@ -19,8 +19,8 @@ const TopoFilterC = ({ setDataSource, dataSource, uploading, groups }) => {
     if (count.current !== 0 && !uploading) {
       return;
     }
-    setRestore(dataSource);
-    form.setFieldsValue({ device: [], model: [], health: [], strength: [] });
+    // setRestore(dataSource);
+    form.setFieldsValue({ device: [], model: [], health: [], strength: [], groups:[], cities:[] });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [count.current, dataSource, uploading]);
 
@@ -67,11 +67,15 @@ const TopoFilterC = ({ setDataSource, dataSource, uploading, groups }) => {
         form.submit();
         dispatch({ type: "setMaptoTopo", payload: { device: "" } });
       }
+      //記住value 避免refresh後重新整理
+      form.setFieldsValue(value);
+      form.submit();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [restore, state.Topology.device]);
-
+  // console.log(value)
   const onFinish = (values) => {
+    setvalue(values)
     count.current++;
     let NewData = restore;
     if (
@@ -79,7 +83,8 @@ const TopoFilterC = ({ setDataSource, dataSource, uploading, groups }) => {
       !values.strength.length ||
       !values.model.length ||
       !values.device.length ||
-      !values.groups.length
+      !values.groups.length ||
+      !values.cities.length
     ) {
       setDataSource(restore);
     }
@@ -92,10 +97,11 @@ const TopoFilterC = ({ setDataSource, dataSource, uploading, groups }) => {
       }
 
       return (
-        (values.device.length ? values.device.includes(item.name) || values.device.includes(item.id): true) &&
+        (values.device.length ? (values.device.includes(item.name) || values.device.includes(item.id)): true) &&
         (values.model.length ? values.model.includes(item.model) : true) &&
         (values.health.length ? values.health.includes(item.health) : true) &&
         (values.strength.length? values.strength.includes(item.strength): true) &&
+        (values.cities.length? values.cities.includes(item.city): true) &&
         (groupfilter?.length ? true : (!values.groups?.length))
       );
     });
@@ -136,7 +142,7 @@ const TopoFilterC = ({ setDataSource, dataSource, uploading, groups }) => {
     <Form onFinish={onFinish} form={form} layout={"vertical"}>
       <div className={styles.FormWrapper}>
         <Row gutter={24}>
-          <Col xs={24} sm={24} md={12} lg={9} xl={9}>
+          <Col xs={24} sm={24} md={12} lg={9} xl={9} xxl={5} className={styles.colum}>
             <Form.Item
               name="device"
               label={Translator("ISMS.Device")}
@@ -156,7 +162,7 @@ const TopoFilterC = ({ setDataSource, dataSource, uploading, groups }) => {
               >
                 {restore?.map((item, index) => {
                   return (
-                    <Option key={index} value={item.name ? item.name : item.id}>
+                    <Option key={index} value={item.id}>
                       {item.name ? item.name : item.id}
                     </Option>
                   );
@@ -164,7 +170,7 @@ const TopoFilterC = ({ setDataSource, dataSource, uploading, groups }) => {
               </Select>
             </Form.Item>
           </Col>
-          <Col xs={24} sm={24} md={10} lg={5}>
+          <Col xs={24} sm={24} md={10} lg={5} xl={5} xxl={3} className={styles.colum}>
             <Form.Item
               name="model"
               label={Translator("ISMS.Model")}
@@ -184,7 +190,7 @@ const TopoFilterC = ({ setDataSource, dataSource, uploading, groups }) => {
               />
             </Form.Item>
           </Col>
-          <Col xs={24} sm={24} md={10} lg={5}>
+          <Col xs={24} sm={24} md={10} lg={5} xl={5} xxl={3} className={styles.colum}>
             <Form.Item
               name="health"
               label={Translator("ISMS.Health")}
@@ -204,7 +210,7 @@ const TopoFilterC = ({ setDataSource, dataSource, uploading, groups }) => {
               />
             </Form.Item>
           </Col>
-          <Col xs={24} sm={24} md={10} lg={5}>
+          <Col xs={24} sm={24} md={10} lg={5} xl={5} xxl={3} className={styles.colum}>
             <Form.Item
               name="strength"
               label={Translator("ISMS.Strength")}
@@ -224,8 +230,8 @@ const TopoFilterC = ({ setDataSource, dataSource, uploading, groups }) => {
               />
             </Form.Item>
           </Col>
-          <Col xs={24} sm={24} md={10} lg={5}>
-            <Form.Item name="groups" label={"Group"}>
+          <Col xs={24} sm={24} md={10} lg={5} xl={5} xxl={4} className={styles.colum}>
+            <Form.Item name="groups" label={Translator("ISMS.Group")}>
               <Select
                 loading={uploading}
                 disabled={uploading}
@@ -246,7 +252,29 @@ const TopoFilterC = ({ setDataSource, dataSource, uploading, groups }) => {
               </Select>
             </Form.Item>
           </Col>
-          <Col xs={24} sm={4} md={3} lg={3}>
+          <Col xs={24} sm={24} md={10} lg={5} xl={5} xxl={4} className={styles.colum}>
+            <Form.Item name="cities" label={Translator("ISMS.Location")}>
+              <Select
+                loading={uploading}
+                disabled={uploading}
+                mode="multiple"
+                placeholder={Translator("ISMS.Search")}
+                showArrow
+                maxTagCount={1}
+                tagRender={tagRender}
+                onChange={() => form.submit()}
+              >
+                {cities?.map((item, index) => {
+                  return (
+                    <Option key={index} value={item}>
+                      {item}
+                    </Option>
+                  );
+                })}
+              </Select>
+            </Form.Item>
+          </Col>
+          <Col xs={24} sm={4} md={3} lg={3} xl={3} xxl={2} className={styles.colum}>
             <Form.Item style={{ marginLeft: "15px" }}>
               <Button
                 type={"primary"}
@@ -260,10 +288,13 @@ const TopoFilterC = ({ setDataSource, dataSource, uploading, groups }) => {
                     model: [],
                     health: [],
                     strength: [],
+                    groups: [],
+                    cities: [],
                   });
+                  setvalue([])
                 }}
               >
-                {Translator("ISMS.Reset")}
+                {Translator("ISMS.Clear")}
               </Button>
             </Form.Item>
           </Col>

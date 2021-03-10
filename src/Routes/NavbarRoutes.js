@@ -14,7 +14,7 @@ export const NavRoutes = [
         path: '/',
         icon: <FaChartLine style={{fontSize:'1.5rem'}}/>,
         cName: 'NavText',
-        auth: true,
+        level:['super','super_super','admin','set','get'],
         component: Dashboard
     },
     {
@@ -22,7 +22,7 @@ export const NavRoutes = [
         path: '/topology',
         icon: <MdCastConnected style={{fontSize:'1.5rem'}}/>,
         cName: 'NavText',
-        auth: true,
+        level:['super','super_super','admin','set','get'],
         component: Topology
     },
     {
@@ -30,8 +30,7 @@ export const NavRoutes = [
         path: '/backuprestore',
         icon: <FaFileUpload style={{fontSize:'1.5rem'}}/>,
         cName: 'NavText',
-        auth: true,
-        super:true,
+        level:['super','super_super','admin','set'],
         component: Backup
     },
     {
@@ -39,8 +38,7 @@ export const NavRoutes = [
         path: '/management',
         icon: <AiFillSetting style={{fontSize:'1.6rem'}}/>,
         cName: 'NavText',
-        auth: true,
-        super:true,
+        level:['super','super_super','admin'],
         component: Management
 
     },

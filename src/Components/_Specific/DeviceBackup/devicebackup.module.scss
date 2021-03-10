@@ -43,18 +43,52 @@ table {
   width: 100%;
 }
 
-// .fileinput {
-//   width: 230px !important;
-// }
-// .actioninput {
-//   width: 150px !important;
-// }
-// .deviceinput {
-//   width: 230px !important;
-// }
-// .modelinput {
-//   width: 150px !important;
-// }
+.rename {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  p {
+    margin-bottom: 0;
+  }
+  .renameIcon {
+    color: #1890ff;
+    margin-left: 3px;
+    cursor: pointer;
+  }
+}
+
+.autoRefresh {
+  position: relative;
+  // font-size: 1.6rem !important;
+  .alphet{
+    font-weight: bold;
+    color:#002fa7;
+    display: inline-block;
+    font-size: 17px;
+    position: absolute;
+    right: 7px;
+    top:5px;
+    z-index: 50;
+  }
+}
+.RebootWrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.RebootIcon{
+  color:#002fa7;
+  font-size: 1.4rem !important;
+}
+
+.IconWrapper{
+  align-items: center;
+  // min-width: 90px;
+  display: flex;
+  justify-content: space-around;
+}
+
 
 .formwrap {
   :global(.ant-form-item-label) {
@@ -110,6 +144,7 @@ table {
   overflow-x: auto;
   th {
     text-align: center !important;
+    transform: translate(0, 0);
   }
   td {
     border-top: 1px #d3d3d3 solid;
@@ -117,19 +152,36 @@ table {
     text-align: center;
   }
 }
+.noResponseWording{
+  h2{
+    font-weight: bolder;
+    font-size: 1rem;
+  }
+  .noResponsedevice{
+    background:gray;
+    border-radius: 5px;
+    padding:1px 5px;
+    margin-right: 3px;
+    color:white;
+
+  }
+}
 .clickBtn {
-  margin: 0 20px 20px 0;
+  // margin: 0 20px 20px 0;
   display: flex;
   align-items: center;
   height: auto !important;
+  span{
+    margin-top:3px;
+  }
 }
 
 .card {
   max-width: 100% !important;
 }
 
-.actionCol {
-  display: flex;
-  // min-width: 200px;
-  text-align: center;
-}
+// .actionCol {
+//   display: flex;
+//   // min-width: 200px;
+//   text-align: center;
+// }

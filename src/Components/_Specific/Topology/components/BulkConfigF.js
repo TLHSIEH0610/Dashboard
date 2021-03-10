@@ -1,173 +1,334 @@
-import React, {
-  useEffect,
-  useState,
-  useRef,
-  useContext,
-  Fragment,
-} from "react";
+import React, { useState, useContext, Fragment, useEffect } from "react";
 import styles from "../topology.module.scss";
 import {
   Form,
-  Select,
-  Radio,
   Button,
   Row,
   Col,
-  Tag,
   Input,
   message,
   Card,
   Divider,
+  Modal,
 } from "antd";
 import Context from "../../../../Utility/Reduxx";
-import { Translator } from "../../../../i18n/index";
 import { ImCross } from "react-icons/im";
 import { FcPlus } from "react-icons/fc";
 import axios from "axios";
 import { UserLogOut } from "../../../../Utility/Fetch";
 import { useHistory } from "react-router";
+import BulkConfigFLan, { LanJSON } from "./BulkConfigF_Lan";
+import BulkConfigFWan, { WanJSON } from "./BulkConfigF_Wan";
+import BulkConfigFLte, { LteJSON } from "./BulkConfigF_Lte";
+import BulkConfigFPeriod, { PeriodJSON } from "./BulkConfigF_Period";
+import BulkConfigFAlarm, { AlarmJSON } from "./BulkConfigF_Alarm";
+import BulkConfigFilter from "./BulkConfigF_Filter";
+import BulkConfigFWifi, { WifiJSON } from './BulkConfigF_Wifi'
+import { useTranslation } from "react-i18next";
 
-const { Option } = Select;
-
-const BulkConfigF = ({ NodeData, ModelList, FileRepository, Nodeloading, Fileloading }) => {
+const BulkConfigF = ({
+  models,
+  FileRepository,
+  Nodeloading,
+  Fileloading,
+  groups,
+  cities,
+  dataSource,
+  record,
+  setRecord,
+  setIsUpdate,
+  IsUpdate,
+}) => {
   const [form] = Form.useForm();
-  const { dispatch } = useContext(Context);
-  // const [restore, setRestore] = useState([]);
-  // const [modelOptions, setModelOptions] = useState("");
+  const { state, dispatch } = useContext(Context);
   const [loading, setLoading] = useState(false);
-  const [value, setValue] = React.useState("New");
   const history = useHistory();
-  const [NodebyModel, setNodebyModel] = useState(null);
+  const [Rebootvisible, setRebootvisible] = useState(false);
+  const [Savevisible, setSavevisible] = useState(false);
+  const level = localStorage.getItem("authUser.level");
+  const cid = localStorage.getItem("authUser.cid");
+  const [resultList, setResultList] = useState({
+    failureDevices: [],
+    rebootDevices: [],
+  });
+  const [filterData, setFilterData] = useState({
+    models: "",
+    groups: [],
+    cities: [],
+  });
   const [ImportFrom, setImportFrom] = useState("");
-  const [showLan, setShowLan] = useState(true);
-  const [showWan, setShowWan] = useState(true);
-  const [showLte, setShowLte] = useState(true);
-
+  const [showLan, setShowLan] = useState(false);
+  const [showWan, setShowWan] = useState(false);
+  const [showLte, setShowLte] = useState(false);
+  const [showAlarm, setShowAlarm] = useState(false);
+  const [showPeriod, setShowPeriod] = useState(false);
+  const [showWifi, setShowWifi]  = useState(false);
+  const [NodeList, setNodeList] = useState([]);
   const [LANIPV6Static, setLANIPV6Static] = useState("");
-  const [LanStatisticIPEnable, setLanStatisticIPEnable] = useState("");
-  const [LanDHCServerEnable, setLanDHCServerEnable] = useState("");
-
+  // const [LanStatisticIPEnable, setLanStatisticIPEnable] = useState("");
   const [WanPriority, setWanPriority] = useState("");
   const [WanEthernetType, setWanEthernetType] = useState("");
   const [WanDHCPServer1, setWanDHCPServer1] = useState("");
   const [WanDHCPServer2, setWanDHCPServer2] = useState("");
   const [WanDHCPServer3, setWanDHCPServer3] = useState("");
-  const [PriorityOrderOptions, setPriorityOrderOptions] = useState([
-    "LTE",
-    "ETH",
-    "WiFi",
-  ]);
-
-  const [LTEPinEnable, setLTEPinEnable] = useState("");
+  // const [PriorityOrderOptions, setPriorityOrderOptions] = useState({
+  //   "lte": false,
+  //   "eth": false,
+  //   "wifi-2.4G": false,
+  // });
+  const [LTE1PinEnable, setLTE1PinEnable] = useState("");
+  const [LTE2PinEnable, setLTE2PinEnable] = useState("");
   const [LTERecoverAPN1, setLTERecoverAPN1] = useState("");
-  const [LTEDataLimitEnable, setLTEDataLimitEnable] = useState("");
-  const [LTEIpv6Enable, setLTEIpv6Enable] = useState("");
-  const [LTERoamingEnable, setLTERoamingEnable] = useState("");
+  const [LTE1DataLimitEnable, setLTE1DataLimitEnable] = useState("");
+  const [LTE2DataLimitEnable, setLTE2DataLimitEnable] = useState("");
+  const [AlarmEnable, setAlarmEnable] = useState("");
+  const [AlarmType, setAlarmType] = useState([]);
+  const [GPSReference, setGPSReference] = useState("");
+  const [DeviceNum, setDeviceNum] = useState([]);
+  const [showDualSim, setShowDualSim] = useState(true)
+  const [SelectedSIM, setSelectedSIM] = useState("SIM1");
+  const [SelectedModel, setSelectedModel] = useState('')
+  const [SelectedWPS, setSelectedWPS] = useState('SSID-1')
+  const M300model = ['M300-G/M301-G','M301-GW','M301-G','M301','M300-G']
+  const { t } = useTranslation();
 
-  const PriorityOptionsChange = (value) => {
-    setPriorityOrderOptions(
-      PriorityOrderOptions.filter((item) => item !== value)
-    );
-  };
+  useEffect(() => {
+    if (record?.id) {
+      handleDeviceChange(record.id);
+    }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [record, IsUpdate]);
+
+  // console.log(form.isFieldTouched('LTE1_puk'))
 
   function setFields(data, nodeInf) {
-    if (data.wan.priority.order.length === 3) {
+    console.log(data, nodeInf, record);
+    setDeviceNum([1])
+    //jusge if dual sim
+    setSelectedSIM("SIM1")
+    if(data.lte?.sim?.length===1){
+      setShowDualSim(false)
+    }else{
+      setShowDualSim(true)
+    }
+    //judge data appearance
+    // if(!data.lan){
+      setShowLan(false);
+    // }else{
+    //   setShowLan(true);
+    // }
+    // if(!data.wan){
+      setShowWan(false);
+    // }else{
+    //   setShowWan(true);
+    // }
+    // if(!data.lte){
+      setShowLte(false);
+    // }else{
+    //   setShowLte(true);
+    // }
+    // if(!data.system){
+      setShowAlarm(false);
+    // }else{
+    //   setShowAlarm(true);
+    // }
+    // if(!data.wifi){
+      setShowWifi(false);
+    // }else{
+    //   setShowWifi(true);
+    // }
+    // if(!data.report_period){
+      setShowPeriod(false);
+    // }else{
+    //   setShowPeriod(true);
+    // }
+
+    //import Wan priority  
+    if (data?.wan?.priority?.order?.length === 3 ) {
       setWanPriority("Auto");
       form.setFieldsValue({ Priority: "Auto" });
-    } else {
-      setWanPriority(data.wan.priority.order[0]);
-      form.setFieldsValue({ Priority: data.wan.priority.order[0] });
+    }else if(data?.wan?.priority?.order?.length === 2 && M300model.includes(nodeInf.model)){
+      setWanPriority("Auto");
+      form.setFieldsValue({ Priority: "Auto" });
     }
+    else if (data?.wan?.priority?.order?.length) {
+      setWanPriority(data?.wan?.priority?.order?.[0]);
+      form.setFieldsValue({ Priority: data?.wan?.priority?.order?.[0] });
+    }
+    //import devices'
+    let Device_ID;
+    if (record?.id) {
+      Device_ID = [record.id];
+    } else if (ImportFrom === "Device") {
+      Device_ID = [nodeInf.id];
+    } else {
+      Device_ID = nodeInf.id;
+    }
+    setLANIPV6Static(data.lan?.ipv6?.type);
+    // setLanStatisticIPEnable(
+    //   data.lan?.ipv4?.dhcp?.pool?.[0]?.fixed_ip?.[0]?.enabled
+    // );
+    setWanEthernetType(data.wan?.ethernet?.type);
+    setWanDHCPServer1(data.wan?.ethernet?.dhcp?.dns?.ipv4?.[0].type);
+    setWanDHCPServer2(data.wan?.ethernet?.dhcp?.dns?.ipv4?.[1].type);
+    setWanDHCPServer3(data.wan?.ethernet?.dhcp?.dns?.ipv4?.[2].type);
+    setAlarmEnable(data.system?.alarm?.mode || false);
+    setGPSReference(data.system?.alarm?.geofence?.auto_detect);
+    setAlarmType(data.system?.alarm?.inputs);
+    setLTE1PinEnable(data.lte?.sim?.[0]?.pin_enabled || false);
+    setLTE2PinEnable(data.lte?.sim?.[1]?.pin_enabled || false);
+    setLTERecoverAPN1(data.lte?.policy.recovery?.recover_apn?.enabled);
+    setLTE1DataLimitEnable(data.lte?.limit?.[0]?.enabled);
+    setLTE2DataLimitEnable(data.lte?.limit?.[1]?.enabled || false);
 
-    setLANIPV6Static(data.lan.ipv6.type);
-    setLanStatisticIPEnable(data.lan.ipv4.dhcp.pool[0].fixed_ip?.[0]?.enabled);
-    setLanDHCServerEnable(data.lan.ipv4.dhcp.mode);
+    let NewfilterData = filterData;
+    NewfilterData.models = nodeInf.model;
+    setSelectedModel(nodeInf.model)
+    setFilterData(NewfilterData);
+    OnChangeFilter();
 
-    setWanEthernetType(data.wan.ethernet.type);
-    setWanDHCPServer1(data.wan.ethernet.dhcp.dns.ipv4[0].type);
-    setWanDHCPServer2(data.wan.ethernet.dhcp.dns.ipv4[1].type);
-    setWanDHCPServer3(data.wan.ethernet.dhcp.dns.ipv4[2].type);
-
-    setLTEPinEnable(data.lte.sim[0].pin_enabled);
-    setLTERecoverAPN1(data.lte.policy.recovery.recover_apn.enabled);
-    setLTEDataLimitEnable(data.lte.sim[0].apn[0].ipv6_enabled);
-    setLTEIpv6Enable(data.lte.sim[0].apn[0].ipv6_enabled);
-    setLTERoamingEnable(data.lte.policy.roaming);
-
-    filterNodebyModel(nodeInf.model);
     form.setFieldsValue({
-      Model: nodeInf.model,
-      LAN_ipv4_address: data.lan.ipv4.address,
-      LAN_ipv4_netmask: data.lan.ipv4.netmask,
-      LAN_ipv4_dhcpmode: data.lan.ipv4.dhcp.mode,
-      LAN_ipv4_dhcp_start: data.lan.ipv4.dhcp.pool[0].start,
-      LAN_ipv4_dhcp_end: data.lan.ipv4.dhcp.pool[0].end,
-      LAN_ipv6_type: data.lan.ipv6.type,
-      LAN_ipv6_adress: data.lan.ipv6.static.address,
-      LAN_ipv6_assignment: data.lan.ipv6.dhcp.assigment,
-      WAN_ipv4_type_1: data.wan.ethernet.dhcp.dns.ipv4[0].type,
-      WAN_ipv4_address_1: data.wan.ethernet.dhcp.dns.ipv4[0].address,
-      WAN_ipv4_type_2: data.wan.ethernet.dhcp.dns.ipv4[1].type,
-      WAN_ipv4_address_2: data.wan.ethernet.dhcp.dns.ipv4[1].address,
-      WAN_ipv4_type_3: data.wan.ethernet.dhcp.dns.ipv4[2].type,
-      WAN_ipv4_address_3: data.wan.ethernet.dhcp.dns.ipv4[2].address,
-      WAN_username: data.wan.ethernet.pppoe.username,
-      WAN_password: data.wan.ethernet.pppoe.password,
-      WAN_service_name: data.wan.ethernet.pppoe.service_name,
-      WAN_priority_1: data.wan.priority.order[0],
-      WAN_priority_2: data.wan.priority.order[1],
-      WAN_priority_3: data.wan.priority.order[2],
-      WAN_lte_mode: data.wan.priority.lte.mode,
-      WAN_ethernet_type: data.wan.ethernet.type,
-      WAN_static_ipv4_address: data.wan.ethernet.static.ipv4.address,
+      Device_ID: Device_ID,
+      models: nodeInf.model,
+      LAN_ipv4_address: data?.lan?.ipv4?.address,
+      StaticIP: data?.lan?.ipv4?.dhcp?.pool?.[0]?.fixed_ip,
+      LAN_ipv4_netmask: data?.lan?.ipv4?.netmask,
+      LAN_ipv4_dhcpmode: data?.lan?.ipv4?.dhcp?.mode,
+      LAN_ipv4_dhcp_start: data?.lan?.ipv4?.dhcp?.pool[0].start,
+      LAN_ipv4_dhcp_end: data?.lan?.ipv4?.dhcp?.pool[0].end,
+      LAN_ipv6_type: data?.lan?.ipv6?.type,
+      LAN_ipv6_adress: data?.lan?.ipv6?.static?.address,
+      LAN_ipv6_assignment: data?.lan?.ipv6?.dhcp?.assigment,
+      WAN_ipv4_type_1: data?.wan?.ethernet?.dhcp?.dns.ipv4[0].type,
+      WAN_ipv4_address_1: data?.wan?.ethernet?.dhcp?.dns.ipv4[0].address,
+      WAN_ipv4_type_2: data?.wan?.ethernet?.dhcp?.dns.ipv4[1].type,
+      WAN_ipv4_address_2: data?.wan?.ethernet?.dhcp?.dns.ipv4[1].address,
+      WAN_ipv4_type_3: data?.wan?.ethernet?.dhcp?.dns.ipv4[2].type,
+      WAN_ipv4_address_3: data?.wan?.ethernet?.dhcp?.dns.ipv4[2].address,
+      WAN_username: data?.wan?.ethernet?.pppoe?.username,
+      // WAN_password: data?.wan?.ethernet?.pppoe.password,
+      WAN_service_name: data?.wan?.ethernet?.pppoe?.service_name,
+      WAN_priority_1: data?.wan?.priority?.order[0],
+      WAN_priority_2: data?.wan?.priority?.order[1],
+      WAN_priority_3: data?.wan?.priority?.order[2],
+      WAN_lte_mode: data?.wan?.priority?.lte?.mode,
+      WAN_ethernet_type: data?.wan?.ethernet?.type,
+      WAN_static_ipv4_address: data?.wan?.ethernet?.static?.ipv4?.address,
       WAN_static_ipv4_dns_address1:
-        data.wan.ethernet.static.ipv4.dns[0].address,
+        data?.wan?.ethernet?.static?.ipv4?.dns?.[0]?.address,
       WAN_static_ipv4_dns_address2:
-        data.wan.ethernet.static.ipv4.dns[1].address,
+        data?.wan?.ethernet?.static?.ipv4?.dns?.[1]?.address,
       WAN_static_ipv4_dns_address3:
-        data.wan.ethernet.static.ipv4.dns[2].address,
-      WAN_static_gateway: data.wan.ethernet.static.ipv4.gateway,
-      WAN_static_netmask: data.wan.ethernet.static.ipv4.netmask,
-      LTE_mode: data.lte.config.mode,
-      LTE_mtu: data.lte.config.mtu,
-      LTE_pin: data.lte.sim[0].pin,
-      LTE_puk: data.lte.sim[0].puk,
-      LTE_pin_enabled: data.lte.sim[0].pin_enabled,
-      LTE_apn: data.lte.sim[0].apn[0].apn,
-      LTE_ipv6_enabled: data.lte.sim[0].apn[0].ipv6_enabled,
-      LTE_auth: data.lte.sim[0].apn[0].auth.type,
-      LTE_username: data.lte.sim[0].apn[0].auth.username,
-      LTE_password: data.lte.sim[0].apn[0].auth.password,
-      LTE_limit_mbyte: data.lte.limit[0].limit_mbyte,
-      LTE_limit_enabled: data.lte.limit[0].enabled,
-      LTE_reset_day: data.lte.limit[0].reset.day,
-      LTE_reset_hour: data.lte.limit[0].reset.hour,
-      LTE_reset_minute: data.lte.limit[0].reset.minute,
-      LTE_reset_second: data.lte.limit[0].reset.second,
-      LTE_roaming: data.lte.policy.roaming,
-      LTE_recovery_down_time: data.lte.policy.recovery.down_times,
-      LTE_recovery_apn_enabled: data.lte.policy.recovery.recover_apn.enabled,
-      LTE_recovery_apn_action: data.lte.policy.recovery.recover_apn.action,
+        data?.wan?.ethernet?.static?.ipv4?.dns?.[2]?.address,
+      WAN_static_gateway: data?.wan?.ethernet?.static?.ipv4?.gateway,
+      WAN_static_netmask: data?.wan?.ethernet?.static?.ipv4?.netmask,
+      LTE_mode: data?.lte?.config?.mode,
+      LTE_mtu: data?.lte?.config?.mtu,
+      LTE1_pin_enabled: data?.lte?.sim?.[0]?.pin_enabled || false,
+      LTE1_apn: data?.lte?.sim?.[0]?.apn?.[0]?.apn,
+      LTE1_ipv6_enabled: data?.lte?.sim?.[0]?.apn?.[0]?.ipv6_enabled,
+      LTE1_auth: data?.lte?.sim?.[0]?.apn?.[0]?.auth?.type,
+      LTE1_username: data?.lte?.sim?.[0]?.apn?.[0]?.auth?.username,
+
+      //auth只有一組
+      // LTE1_apn2: data?.lte?.sim?.[0]?.apn?.[1]?.apn,
+      // LTE1_ipv6_enabled2: data?.lte?.sim?.[0]?.apn?.[1]?.ipv6_enabled,
+      // LTE1_auth2: data?.lte?.sim?.[0]?.apn?.[1]?.auth?.type,
+      // LTE1_username2: data?.lte?.sim?.[0]?.apn?.[1]?.auth?.username,
+
+      LTE2_pin_enabled: data?.lte?.sim?.[1]?.pin_enabled || false,
+      LTE2_apn: data?.lte?.sim?.[1]?.apn?.[0]?.apn,
+      LTE2_ipv6_enabled: data?.lte?.sim?.[0]?.apn?.[0]?.ipv6_enabled,
+      LTE2_auth: data?.lte?.sim?.[1]?.apn?.[0]?.auth?.type,
+      LTE2_username: data?.lte?.sim?.[1]?.apn?.[0]?.auth?.username,
+
+      //auth只有一組
+      // LTE2_apn2: data?.lte?.sim?.[1]?.apn?.[1]?.apn,
+      // LTE2_ipv6_enabled2: data?.lte?.sim?.[1]?.apn?.[1]?.ipv6_enabled,
+      // LTE2_auth2: data?.lte?.sim?.[1]?.apn?.[1]?.auth?.type,
+      // LTE2_username2: data?.lte?.sim?.[1]?.apn?.[1]?.auth?.username,
+
+      LTE1_limit_mbyte: data?.lte?.limit?.[0]?.limit_mbyte,
+      LTE1_limit_enabled: data?.lte?.limit?.[0]?.enabled || false,
+      LTE1_reset_day: data?.lte?.limit?.[0]?.reset?.day,
+      LTE1_reset_hour: data?.lte?.limit?.[0]?.reset?.hour,
+      LTE1_reset_minute: data?.lte?.limit?.[0]?.reset?.minute,
+      LTE1_reset_second: data?.lte?.limit?.[0]?.reset?.second,
+      LTE2_limit_mbyte: data?.lte?.limit?.[1]?.limit_mbyte,
+      LTE2_limit_enabled: data?.lte?.limit?.[1]?.enabled || false,
+      LTE2_reset_day: data?.lte?.limit?.[1]?.reset?.day,
+      LTE2_reset_hour: data?.lte?.limit?.[1]?.reset?.hour,
+      LTE2_reset_minute: data?.lte?.limit?.[1]?.reset?.minute,
+      LTE2_reset_second: data?.lte?.limit?.[1]?.reset?.second,
+      LTE_roaming: data?.lte?.policy?.roaming || false,
+      LTE_recovery_down_time: data?.lte?.policy?.recovery?.down_times,
+      LTE_recovery_apn_enabled:
+        data?.lte?.policy?.recovery?.recover_apn.enabled,
+      LTE_recovery_apn_action: data?.lte?.policy?.recovery?.recover_apn.action,
+
+      Wifi1_ap_enable: data?.wifi?.wifi_config?.ap_enable,
+      Wifi1_txpower: data?.wifi?.wifi_config?.txpower,
+      Wifi1_btw: data?.wifi?.wifi_config?.btw,
+      Wifi1_CountryCode: data?.wifi?.wifi_config?.CountryCode,
+      Wifi1_bt_lwps: data?.wifi?.wifi_config?.bt_lwps,
+      Wifi1_enable: data?.wifi?.wifi_config?.port?.[0]?.basic?.enable,
+      Wifi1_ssid: data?.wifi?.wifi_config?.port?.[0]?.basic?.ssid,
+      Wifi1_hidden_ssid: data?.wifi?.wifi_config?.port?.[0]?.basic?.hidden_ssid,
+      Wifi1_channel_id: data?.wifi?.wifi_config?.port?.[0]?.basic?.channel_id,
+      Wifi1_ap_isolate: data?.wifi?.wifi_config?.port?.[0]?.basic?.ap_isolate,
+      Wifi1_vlan: data?.wifi?.wifi_config?.port?.[0]?.basic?.vlan,
+      Wifi1_auth: data?.wifi?.wifi_config?.port?.[0]?.security?.wpa?.auth,
+      Wifi1_rekey: data?.wifi?.wifi_config?.port?.[0]?.security?.wpa?.rekey,
+      Wifi1_passphrase: data?.wifi?.wifi_config?.port?.[0]?.security?.wpa?.passphrase,
+
+      Wifi2_enable: data?.wifi?.wifi_config?.port?.[1]?.basic?.enable,
+      Wifi2_ssid: data?.wifi?.wifi_config?.port?.[1]?.basic?.ssid,
+      Wifi2_hidden_ssid: data?.wifi?.wifi_config?.port?.[1]?.basic?.hidden_ssid,
+      Wifi2_channel_id: data?.wifi?.wifi_config?.port?.[1]?.basic?.channel_id,
+      Wifi2_ap_isolate: data?.wifi?.wifi_config?.port?.[1]?.basic?.ap_isolate,
+      Wifi2_vlan: data?.wifi?.wifi_config?.port?.[1]?.basic?.vlan,
+      Wifi2_auth: data?.wifi?.wifi_config?.port?.[1]?.security?.wpa?.auth,
+      Wifi2_rekey: data?.wifi?.wifi_config?.port?.[1]?.security?.wpa?.rekey,
+      Wifi2_passphrase: data?.wifi?.wifi_config?.port?.[1]?.security?.wpa?.passphrase,
+
+      alive: data?.report_period?.alive,
+      gps: data?.report_period?.gps,
+      iot: data?.report_period?.iot,
+      status: data?.report_period?.status,
+      timeout: data?.report_period?.timeout,
+      alarm_enabled: data?.system?.alarm?.mode,
+      alarm_input: data?.system?.alarm?.inputs,
+      gps_reference: data?.system?.alarm?.geofence?.auto_detect,
+      gps_radius: data?.system?.alarm?.geofence?.radius_m,
+      gps_latitude: data?.system?.alarm?.geofence?.latitude,
+      gps_longitude: data?.system?.alarm?.geofence?.longitude,
     });
+    setRecord(undefined);
   }
+
+
+
   function handleDeviceChange(value) {
-    console.log(value);
     setLoading(true);
-    // const DeviceCfgUrl = `/cmd?get={"device_cfg":{"filter":{"id":"${record.id}"},"nodeInf":{},"obj":{"report_period":{},"lan":{},"wan":{},"lte":{}}}}`;
     const config = {
       method: "post",
       headers: { "Content-Type": "application/json" },
       url: "/cmd",
       data: JSON.parse(
-        `{"get":{"device_cfg":{"filter":{"id":"${value}"},"nodeInf":{},"obj":{"report_period":{},"lan":{},"wan":{},"lte":{}}}}}`
+        `{"get":{"device_cfg":{"filter":{"id":"${value}"},"nodeInf":{},"obj":{"report_period":{},"lan":{},"wan":{},"lte":{},"wifi":{},"system":{}}}}}`
       ),
     };
     axios(config)
       .then((res) => {
-        if (res.data.response.device_cfg[0].obj !== "No Response!") {
+        if (res.data?.response?.device_cfg?.[0]?.obj !== "No Response!") {
           const data = res.data.response.device_cfg[0].obj;
           const nodeInf = res.data.response.device_cfg[0].nodeInf;
           setFields(data, nodeInf);
+          setImportFrom("");
+          form.resetFields(["ImportSelector"]);
+        } else {
+          form.resetFields();
+          message.error("No Response!");
         }
         setLoading(false);
       })
@@ -182,131 +343,140 @@ const BulkConfigF = ({ NodeData, ModelList, FileRepository, Nodeloading, Fileloa
       });
   }
 
-  function SelectAll(){
-    const allDevice = NodebyModel?.map((item)=>item.id)
-    form.setFieldsValue({
-      Device_ID: allDevice
-    })
-  }
-
-  function ClearAll(){
-    form.resetFields(['Device_ID'])
-  }
-
   function handleFileChange(value) {
     console.log(`selected ${value}`);
-    axios.get("api/BulkConfig.json").then((res) => {
-      let data = res.data.response.device_cfg[0].obj;
-      const nodeInf = res.data.response.device_cfg[0].nodeInf;
-      setFields(data, nodeInf);
-    });
-  }
-
-  const filterNodebyModel = (value) => {
-    let NodebyModel = NodeData.filter((item) => value === item.model);
-    setNodebyModel(NodebyModel);
-  };
-
-  const ImportonChange = (e) => {
-    console.log("radio checked", e.target.value);
-    setValue(e.target.value);
-    form.resetFields();
-    setImportFrom("");
-  };
-
-  const SubmitConfigonFinish = (values) => {
-    console.log(values);
     setLoading(true);
     const config = {
       method: "post",
       headers: { "Content-Type": "application/json" },
-      url: "/cmd",
+      url: "/repository",
       data: JSON.parse(
-        `{"set":{"device_cfg":{"filter":{"id":${JSON.stringify(
-          values.Device_ID
-        )}},"nodeInf":{},"obj":{
-          "lte":{"config":{"mode":"${values.LTE_mode}","mtu":${
-          values.LTE_mtu
-        }},"sim":[{${
-          LTEPinEnable
-            ? `"pin":"${values.LTE_pin}","puk":"${values.LTE_puk}",`
-            : ""
-        }"pin_enabled":${values.LTE_pin_enabled},"apn":[{"apn":"${
-          values.LTE_apn
-        }","ipv6_enabled":${values.LTE_ipv6_enabled},"auth":{"type":"${
-          values.LTE_auth
-        }","username":"${values.LTE_username}","password":"${
-          values.LTE_password
-        }"}}]}],"limit":[{"enabled":${values.LTE_limit_enabled} ${
-          LTEDataLimitEnable
-            ? `,"limit_mbyte":${values.LTE_limit_mbyte},"reset":{"day":${values.LTE_reset_day},"hour":${values.LTE_reset_hour},"minute":${values.LTE_reset_minute},"second":${values.LTE_reset_second}}`
-            : ""
-        }}],"policy":{"roaming":${
-          values.LTE_roaming
-        },"recovery":{"down_times":${
-          values.LTE_recovery_apn_enabled ? values.LTE_recovery_down_time : 0
-        },"recover_apn":{"enabled":${
-          values.LTE_recovery_apn_enabled
-        },"action":"${
-          values.LTE_recovery_apn_enabled ? values.LTE_recovery_apn_action : ""
-        }"}}}},
-        "wan":{"priority":{"order":[ ${
-          WanPriority === "Auto"
-            ? `"${values.WAN_priority_1}","${values.WAN_priority_2}","${values.WAN_priority_3}"`
-            : `"${WanPriority}"`
-        }],"lte":{${
-          WanPriority === "lte" ? `"mode":"${values.WAN_lte_mode}" ` : ""
-        }}},"ethernet":{"type":"${values.WAN_ethernet_type}","dhcp":{${
-          WanEthernetType === "dhcp"
-            ? `"dns":{"ipv4":[{"type":"${values.WAN_ipv4_type_1}", "address":"${
-                values.WAN_ipv4_type_1 === "ISP"
-                  ? values.WAN_ipv4_address_1
-                  : ""
-              }"},{"type":"${values.WAN_ipv4_type_2}", "address":"${
-                values.WAN_ipv4_type_2 === "ISP"
-                  ? values.WAN_ipv4_address_2
-                  : ""
-              }"},{"type":"${values.WAN_ipv4_type_3}", "address":"${
-                values.WAN_ipv4_type_3 === "ISP"
-                  ? values.WAN_ipv4_address_3
-                  : ""
-              }"}]}`
-            : ""
-        }},"pppoe":{${
-          WanEthernetType === "pppoe"
-            ? `"username":"${values.WAN_username}","password":"${values.WAN_password}","service_name":"${values.WAN_service_name}"`
-            : ""
-        } },"static":{ ${
-          WanEthernetType === "static"
-            ? `"ipv4":{"address":"${values.WAN_static_ipv4_address}","netmask":"${values.WAN_static_netmask}","gateway":"${values.WAN_static_gateway}","dns":[{"address":"${values.WAN_static_ipv4_dns_address1}"},{"address":"${values.WAN_static_ipv4_dns_address2}"},{"address":"${values.WAN_static_ipv4_dns_address3}"}]}`
-            : ""
-        } }}},
-          "lan":{"ipv4":{"address":"${values.LAN_ipv4_address}","netmask":"${
-          values.LAN_ipv4_netmask
-        }","dhcp":{"mode":"${values.LAN_ipv4_dhcpmode}","pool":[{"start":"${
-          values.LAN_ipv4_dhcp_start
-        }","end":"${values.LAN_ipv4_dhcp_end}","fixed_ip":[{ "enabled":${
-          values.LAN_ipv4_fixed_enabled
-        }, "mac": "${
-          values.LAN_ipv4_fixed_enabled ? values.LAN_ipv4_fixed_mac : ""
-        }", "ip": "${
-          values.LAN_ipv4_fixed_enabled ? values.LAN_ipv4_fixed_IP : ""
-        }" }]}]}},"ipv6":{"type":"${values.LAN_ipv6_type}","static":{${
-          values.LAN_ipv6_type === "static"
-            ? `"address":"${values.LAN_ipv6_adress}"`
-            : ""
-        }},"dhcp":{"assigment":"${values.LAN_ipv6_assignment}"}}}}}}}`
+        `{"download_file":{${
+          level === "super_super"
+            ? state.Login.Cid === ""
+              ? `"cid":"${cid}"`
+              : state.Login.Cid
+            : `"cid":"${cid}"`
+        },"name":"${value}","type":"json_yml"}}`
       ),
     };
-
-    console.log(config);
+    console.log(config.data);
 
     axios(config)
       .then((res) => {
-        console.log(res);
+        console.log(res.data);
+        setFields(
+          res.data.response.repository.set.device_cfg.obj,
+          res.data.response.repository.set.device_cfg.nodeInf
+        );
         setLoading(false);
-        // setIsUpdate(!IsUpdate);
-        message.success("update successfully.");
+      })
+      .catch((error) => {
+        console.log(error);
+        if (error.response && error.response.status === 401) {
+          dispatch({ type: "setLogin", payload: { IsLogin: false } });
+          UserLogOut();
+          history.push("/userlogin");
+        }
+        setLoading(false);
+        message.error("update fail.");
+      });
+  }
+
+  const OnChangeFilter = () => {
+    let NewData = dataSource;
+    NewData = NewData.filter((item) => {
+      let groupfilter;
+      if (filterData.groups?.length) {
+        groupfilter = item.gid.filter((g) => filterData.groups.indexOf(g) > -1);
+      }
+      return (
+        (filterData.models !== "" ? filterData.models === item.model : true) &&
+        (filterData.cities.length
+          ? filterData.cities.includes(item.city)
+          : true) &&
+        (groupfilter?.length ? true : !filterData.groups?.length)
+      );
+    });
+    setNodeList(NewData);
+  };
+
+  function GetJSON(values, nodeInf) {
+
+    const ConfigData = `{"set":{"device_cfg":{"filter":{"id":${JSON.stringify(
+      values.Device_ID
+    )}},"nodeInf":${nodeInf ? JSON.stringify(nodeInf) : "{}"},"obj":{
+      ${
+        showLte
+          ? `${LteJSON(values, showDualSim, form)} ${
+
+              showLan || showPeriod || showAlarm || showWan || showWifi ? `,` : ""
+            }`
+          : ""
+      }
+      ${
+        showWan
+          ? `${WanJSON(values, M300model, SelectedModel)} ${
+              showLan || showPeriod || showAlarm || showWifi ? `,` : ""
+            }`
+          : ""
+      }
+      ${
+        showWifi
+          ? `${WifiJSON(values)} ${
+              showLan || showPeriod || showAlarm ? `,` : ""
+            }`
+          : ""
+      }
+      ${
+        showAlarm
+          ? `${AlarmJSON(values)} ${showLan || showPeriod ? `,` : ""}`
+          : ""
+      }
+      ${showPeriod ? `${PeriodJSON(values)} ${showLan ? `,` : ""}` : ""}
+      ${showLan ? LanJSON(values) : ""} }}}}`;
+    return ConfigData;
+  }
+
+  const SubmitConfigonFinish = (values) => {
+    // console.log(values);
+    setLoading(true);
+
+    const config = {
+      method: "post",
+      headers: { "Content-Type": "application/json" },
+      url: "/cmd",
+      data: JSON.parse(GetJSON(values, undefined)),
+    };
+
+    console.log(config.data);
+
+    axios(config)
+      .then((res) => {
+        console.log(res.data)
+        setLoading(false);
+        setIsUpdate(!IsUpdate);
+        message.success("submit successfully.");
+        const failureDevices = res.data.response.device_cfg
+          .filter((item) => item.obj === "No Response!")
+          .map((item) =>
+            item.nodeInf.name !== "" ? item.nodeInf.name : item.nodeInf.id
+          );
+        // message.success("update successfully.");
+        const rebootDevices = res.data.response.device_cfg
+          .filter((item) => item.obj?.["$reboot"])
+          .map((item) =>
+            item.nodeInf.name !== "" ? item.nodeInf.name : item.nodeInf.id
+          );
+
+        if (rebootDevices.length || failureDevices.length) {
+          // console.log(failureDevices, rebootDevices);
+          setResultList({
+            failureDevices: failureDevices,
+            rebootDevices: rebootDevices,
+          });
+          setRebootvisible(true);
+        }
       })
       .catch((error) => {
         console.log(error);
@@ -320,219 +490,292 @@ const BulkConfigF = ({ NodeData, ModelList, FileRepository, Nodeloading, Fileloa
       });
   };
 
-  function tagRender(props) {
-    const { label, _, closable, onClose } = props; // eslint-disable-line no-unused-vars
-    return (
-      <Tag
-        color="black"
-        closable={closable}
-        onClose={onClose}
-        style={{ marginRight: 3 }}
-      >
-        {label}
-      </Tag>
-    );
+  function RebootDevices(action) {
+    setLoading(true);
+    let DeviceID;
+    if (action === "reboot") {
+      DeviceID = form.getFieldsValue().Device_ID;
+    } else if (action === "rebootByConfig") {
+      DeviceID = resultList.rebootDevices;
+    }
+    if (!DeviceID) {
+      return;
+    }
+
+    const config = {
+      method: "post",
+      headers: { "Content-Type": "application/json" },
+      url: "/cmd",
+      data: JSON.parse(
+        `{"reboot":{"device_cfg":{"filter":{"id":${JSON.stringify(
+          DeviceID
+        )}},"nodeInf":{}}}}`
+      ),
+    };
+    console.log(config);
+    axios(config)
+      .then((res) => {
+        let rebootfailDevices = res.data.response?.device_cfg;
+        // console.log(res.data)
+        message.success("submit reboot command");
+        if (res.data.response?.device_cfg) {
+          rebootfailDevices = rebootfailDevices
+            .filter((item) => item.obj === "No Response!")
+            .map((item) => item.nodeInf.id);
+        }
+
+        if (rebootfailDevices?.length) {
+          setRebootvisible(true);
+          let newResultList = resultList;
+          newResultList.failureDevices = []
+          newResultList.rebootDevices=[]
+          newResultList.rebootfailDevices = rebootfailDevices;
+          console.log(newResultList);
+          setResultList(newResultList);
+        }
+        setLoading(false);
+        setIsUpdate(!IsUpdate);
+      })
+      .catch((error) => {
+        console.log(error);
+        if (error.response && error.response.status === 401) {
+          dispatch({ type: "setLogin", payload: { IsLogin: false } });
+          UserLogOut();
+          history.push("/userlogin");
+        }
+        setLoading(false);
+        message.error("reboot fail.");
+      });
+  }
+
+  function SaveConfigonFinish() {
+    let FormData = form.getFieldsValue();
+    const FileList = FileRepository.map(item=>item.name)
+    if(FileList.includes(FormData.yml_filename)){
+      message.error("FileName is duplicated!");
+      return
+    }
+
+    setLoading(true);
+    
+    let nodeInf = { id: FormData.Device_ID, model: FormData.models, name: "" };
+    const config = {
+      method: "post",
+      headers: { "Content-Type": "application/json" },
+      url: "/repository",
+      data: JSON.parse(
+        `{"upload_file":{${
+          level === "super_super"
+            ? state.Login.Cid === ""
+              ? `"cid":"${cid}"`
+              : state.Login.Cid
+            : `"cid":"${cid}"`
+        },"name":"${FormData.yml_filename}","type":"json_yml","inf":{"model":"${
+          FormData.models
+        }"},"json":${GetJSON(FormData, nodeInf)}}}`
+      ),
+    };
+    console.log(config.data);
+
+    axios(config)
+      .then(() => {
+        // console.log(res.data)
+        setLoading(false);
+        setIsUpdate(!IsUpdate);
+        setSavevisible(false);
+        message.success("save successfully");
+      })
+      .catch((error) => {
+        console.log(error);
+        if (error.response && error.response.status === 401) {
+          dispatch({ type: "setLogin", payload: { IsLogin: false } });
+          UserLogOut();
+          history.push("/userlogin");
+        }
+        setLoading(false);
+        message.error("fail to save file");
+      });
   }
 
   return (
     <Fragment>
-      <Card className={styles.Card}>
-        <Form onFinish={SubmitConfigonFinish} form={form} layout="vertical">
-          <div className={styles.FormWrapper}>
+      <Modal
+        visible={Savevisible}
+        onCancel={() => {
+          setSavevisible(false);
+        }}
+        destroyOnClose={true}
+        className={styles.modal}
+        centered={true}
+        width={"50%"}
+        title= {t("ISMS.SaveconfigtoRepository")}
+        okText="Save"
+        footer={[
+          <Button key="Cancel" onClick={() => setSavevisible(false)}>
+             {t("ISMS.Cancel")}
+          </Button>,
+          <Button
+            key="Save"
+            type="primary"
+            loading={loading}
+            onClick={() => SaveConfigonFinish()}
+          >
+             {t("ISMS.Save")}
+          </Button>,
+        ]}
+      >
+        <Form form={form} layout="vertical">
+          <div className={`${styles.FormWrapper} ${styles.BulkFormWrapper}`}>
             <Row gutter={24} justify="flex-start">
-              <Col
-                xs={24}
-                sm={24}
-                md={24}
-                lg={3}
-                className={styles.ImportRadio}
-              >
-                <Radio.Group onChange={ImportonChange} value={value}>
-                  <Radio value={"New"}>New Config</Radio>
-                  <Radio value={"Import"}>Import</Radio>
-                </Radio.Group>
-              </Col>
-
-              <Col xs={24} sm={24} md={24} lg={5}>
-                <Form.Item name="ImportSelector" label="Source">
-                  <Select
-                    placeholder="Select"
-                    onChange={(value) => {
-                      setImportFrom(value);
-                    }}
-                    disabled={value !== "Import"}
-                  >
-                    <Option value={"Device"}>Device</Option>
-                    <Option value={"FileRepository"}>FileRepository</Option>
-                  </Select>
-                </Form.Item>
-              </Col>
-
-              {ImportFrom === "Device" && (
-                <Col xs={24} sm={24} md={24} lg={7}>
-                  <Form.Item name="device" label="Import Device">
-                    <Select
-                      placeholder="Select a Device"
-                      onChange={handleDeviceChange}
-                      disabled={value !== "Import"}
-                      loading={loading}
-                      disabled={loading}
-                    >
-                      {NodeData?.map((item, index) => {
-                        return (
-                          <Option key={index} value={item.id}>
-                            {item.name !== "" ? item.name : item.id}
-                          </Option>
-                        );
-                      })}
-                    </Select>
-                  </Form.Item>
-                </Col>
-              )}
-
-              {ImportFrom === "FileRepository" && (
-                <Col xs={24} sm={24} md={24} lg={7}>
-                  <Form.Item name="FileRepository" label='Import File'>
-                    <Select
-                      placeholder="Select a File"
-                      onChange={handleFileChange}
-                      loading={loading || Fileloading}
-                      disabled={loading || Fileloading}
-                    >
-                      <Option value={"demo"}>Bulk_Demo.yaml</Option>
-                      {/* {FileRepository.map((item, index)=>{
-                    return(
-                    <Option value={item.name} key={index}>{item.name}</Option>
-                    )
-                })} */}
-                    </Select>
-                  </Form.Item>
-                </Col>
-              )}
-            </Row>
-
-            <Row gutter={24}>
-              <Col xs={24} sm={24} md={24} lg={6}>
+              <Col xs={24} sm={24} md={24} lg={12} xl={12}>
                 <Form.Item
-                  label={Translator("ISMS.Model")}
-                  name="Model"
-                  // className={styles.formitem}
-                  rules={[{ required: true, message: "Model is required" }]}
-                >
-                  <Select
-                    loading={Nodeloading || loading}
-                    showSearch
-                    showArrow
-                    disabled={Nodeloading || loading || value !== "New"}
-                    placeholder={Translator("ISMS.Select")}
-                    onChange={(value) => {
-                      form.resetFields([["Device_ID"]]);
-                      filterNodebyModel(value);
-                    }}
-                  >
-                    {ModelList.map((item, index) => {
-                      return (
-                        <Option key={index} value={item}>
-                          {item}
-                        </Option>
-                      );
-                    })}
-                  </Select>
-                </Form.Item>
-              </Col>
-              <Col xs={24} sm={24} md={24} lg={6}>
-                <Form.Item
-                  label={Translator("Group")}
-                  name="group"
-                >
-                  <Select
-                    loading={Nodeloading || loading}
-                    showSearch
-                    showArrow
-                    disabled={true}
-                    placeholder={Translator("ISMS.Select")}
-                    onChange={() => {
-                    }}
-                  >
-                  </Select>
-                </Form.Item>
-              </Col>
-              <Col xs={24} sm={24} md={24} lg={9}>
-                <Form.Item
-                  label={Translator("ISMS.Device")}
-                  // className={styles.formitem}
-                  name="Device_ID"
+                  name={"yml_filename"}
+                  label= {t("ISMS.FileName")}
                   rules={[
-                    { required: true, message: "Deivce Id is required!" },
+                    {
+                      required: true,
+                    },
                   ]}
                 >
-                  <Select
-                    loading={Nodeloading || loading}
-                    disabled={Nodeloading || loading}
-                    mode="multiple"
-                    placeholder={Translator("ISMS.Select")}
-                    showArrow
-                    tagRender={tagRender}
-                    maxTagCount={1}
-                    dropdownRender={(menu) =>(
-                        <Fragment>
-                          {menu}
-                          <Divider style={{ margin: "4px 0" }} />
-                          <Button onClick={() => SelectAll() }  style={{ margin: "5px", padding:'3px 5px' }}>
-                            Select All
-                          </Button>
-                          <Button onClick={() => ClearAll()}  style={{ margin: "5px", padding:'3px 5px' }}>
-                            Clear All
-                          </Button>
-                        </Fragment>
-                      )
-                    }
-                  >
-                    {NodebyModel?.map((item, index) => {
-                      return (
-                        <Option key={index} value={item.id}>
-                          {item.name !== "" ? item.name : item.id}
-                        </Option>
-                      );
-                    })}
-                  </Select>
-                </Form.Item>
-              </Col>
-
-            </Row>
-            <Row gutter={24}>
-            <Col xs={24} sm={24} md={24} lg={5} className={styles.submitBtn}>
-                <Form.Item>
-                  <Button
-                    type="primary"
-                    htmlType="submit"
-                    loading={Nodeloading || loading}
-                    disabled={!showLan && !showWan && !showLte}
-                  >
-                    Submit
-                  </Button>
-                </Form.Item>
-                <Form.Item style={{ marginLeft: "5%" }}>
-                  <Button
-                    loading={Nodeloading || loading}
-                    onClick={() => {
-                      form.resetFields();
-                      setShowLan(true);
-                      setShowWan(true);
-                      setShowLte(true);
-                      setPriorityOrderOptions(["LTE", "ETH", "WiFi"]);
-                    }}
-                  >
-                    Reset
-                  </Button>
-                </Form.Item>
-                <Form.Item style={{ marginLeft: "5%" }}>
-                  <Button loading={Nodeloading || loading}>Save</Button>
+                  <Input placeholder= {t("ISMS.Inputafilename")} />
                 </Form.Item>
               </Col>
             </Row>
           </div>
         </Form>
+      </Modal>
+      <Modal
+        visible={Rebootvisible}
+        onCancel={() => {
+          setRebootvisible(false);
+          setResultList({ failureDevices: [], rebootDevices: [] });
+        }}
+        destroyOnClose={true}
+        className={styles.modal}
+        centered={true}
+        width={"50%"}
+        title="Result"
+        footer={[
+          resultList.rebootDevices.length ? (
+            <Button key="Cancel" onClick={() => setRebootvisible(false)}>
+              Cancel
+            </Button>
+          ) : null,
+          resultList.failureDevices.length ||
+          resultList.rebootfailDevices?.length ? (
+            <Button key="Confirm" onClick={() => setRebootvisible(false)}>
+              Confirm
+            </Button>
+          ) : null,
+          resultList.rebootDevices.length ? (
+            <Button
+              key="Reboot"
+              type="primary"
+              loading={loading}
+              onClick={() => {
+                RebootDevices("rebootByConfig");
+                setRebootvisible(false);
+                setResultList({ failureDevices: [], rebootDevices: [] });
+              }}
+            >
+              Reboot
+            </Button>
+          ) : null,
+        ]}
+      >
+        {resultList.failureDevices.length ? (
+          <div className={styles.rebootWording}>
+            <h2>No Response</h2>
+            <p>
+              Device:
+              {resultList.failureDevices.map((item, index) => (
+                <span key={index} className={styles.rebootdevice}>{item}</span>
+              ))}
+            </p>
+            <Divider />
+          </div>
+        ) : (
+          ""
+        )}
+
+        {resultList.rebootDevices.length ? (
+          <div className={styles.rebootWording}>
+            <h2>Reboot to implement new config</h2>
+            <p>
+              Click OK button to <span style={{ color: "red" }}>reboot </span>{" "}
+              or click Cancel to reboot manually.
+            </p>
+            <p>
+              Devices:
+              {resultList.rebootDevices.map((item, index) => (
+                <span className={styles.rebootdevice} key={index}>
+                  {item}
+                </span>
+              ))}
+            </p>
+          </div>
+        ) : (
+          ""
+        )}
+
+        {resultList.rebootfailDevices?.length ? (
+          <div className={styles.rebootWording}>
+            <h2>Reboot fail</h2>
+            <p>please try again later</p>
+            <p>
+              Device:
+              {resultList.rebootfailDevices.map((item, index) => (
+                <span key={index} className={styles.rebootdevice}>{item}</span>
+              ))}
+            </p>
+          </div>
+        ) : (
+          ""
+        )}
+      </Modal>
+      <Card className={styles.Card} title={t("ISMS.SettingFilter")} >
+        <BulkConfigFilter
+          SubmitConfigonFinish={SubmitConfigonFinish}
+          form={form}
+          ImportFrom={ImportFrom}
+          setImportFrom={setImportFrom}
+          handleDeviceChange={handleDeviceChange}
+          setFilterData={setFilterData}
+          setShowLan={setShowLan}
+          setShowWan={setShowWan}
+          setShowLte={setShowLte}
+          setShowAlarm={setShowAlarm}
+          setShowWifi={setShowWifi}
+          setShowPeriod={setShowPeriod}
+          showWan={showWan}
+          showLan={showLan}
+          showLte={showLte}
+          showWifi={showWifi}
+          showAlarm={showAlarm}
+          showPeriod={showPeriod}
+          // setPriorityOrderOptions={setPriorityOrderOptions}
+          setSavevisible={setSavevisible}
+          filterData={filterData}
+          OnChangeFilter={OnChangeFilter}
+          loading={loading}
+          dataSource={dataSource}
+          handleFileChange={handleFileChange}
+          Fileloading={Fileloading}
+          FileRepository={FileRepository}
+          Nodeloading={Nodeloading}
+          groups={groups}
+          cities={cities}
+          models={models}
+          level={level}
+          RebootDevices={RebootDevices}
+          NodeList={NodeList}
+          DeviceNum={DeviceNum}
+          setDeviceNum={setDeviceNum}
+          setSelectedModel = {setSelectedModel}
+          M300model={M300model}
+          
+
+        />
       </Card>
 
       <Card
@@ -559,229 +802,17 @@ const BulkConfigF = ({ NodeData, ModelList, FileRepository, Nodeloading, Fileloa
         }
       >
         {showLan && (
-          <Form onFinish={SubmitConfigonFinish} form={form}>
-            <div className={styles.FormWrapper}>
-              <Row gutter={24} justify="space-around">
-                <Col
-                  xs={{ span: 24 }}
-                  sm={{ span: 24 }}
-                  md={{ span: 24 }}
-                  lg={{ span: 10 }}
-                >
-                  <h2>IPv4</h2>
-                  <Divider className={styles.divider} />
-                  <Row gutter={24}>
-                    <Col xs={24} sm={24} md={24} lg={24}>
-                      <Form.Item
-                        name={"LAN_ipv4_address"}
-                        label="IP Address"
-                        className={styles.FormItem}
-                        rules={[
-                          {
-                            required: true,
-                          },
-                        ]}
-                      >
-                        <Input placeholder="192.168.20.20" />
-                      </Form.Item>
-                    </Col>
-                    <Col xs={24} sm={24} md={24} lg={24}>
-                      <Form.Item
-                        name={"LAN_ipv4_netmask"}
-                        label="IP Mask"
-                        rules={[
-                          {
-                            required: true,
-                          },
-                        ]}
-                      >
-                        <Input placeholder="255.255.255.0" />
-                      </Form.Item>
-                    </Col>
-                    <h3>DHCP Server Configuration</h3>
-                    <Col xs={24} sm={24} md={24} lg={24}>
-                      <Form.Item
-                        name={"LAN_ipv4_dhcpmode"}
-                        label="DHCP Server"
-                        initialValue={false}
-                        rules={[{ required: true }]}
-                      >
-                        <Select
-                          onChange={(value) => {
-                            setLanDHCServerEnable(value);
-                          }}
-                        >
-                          <Option key={0} value={true}>
-                            ON
-                          </Option>
-                          <Option key={1} value={false}>
-                            OFF
-                          </Option>
-                        </Select>
-                      </Form.Item>
-                    </Col>
-                    <Col xs={24} sm={24} md={24} lg={24}>
-                      <Form.Item
-                        name={"LAN_ipv4_dhcp_start"}
-                        label="IP Address Pool(From)"
-                        rules={[
-                          {
-                            required: true,
-                          },
-                        ]}
-                      >
-                        <Input placeholder="192.168.1.112" />
-                      </Form.Item>
-                    </Col>
-                    <Col xs={24} sm={24} md={24} lg={24}>
-                      <Form.Item
-                        name={"LAN_ipv4_dhcp_end"}
-                        label="IP Address Pool(To)"
-                        rules={[
-                          {
-                            required: true,
-                          },
-                        ]}
-                      >
-                        <Input placeholder="192.168.1.222" />
-                      </Form.Item>
-                    </Col>
-                    <Col xs={24} sm={24} md={24} lg={24}>
-                      <Form.Item
-                        name={"LAN_ipv4_fixed_enabled"}
-                        label="Statistic IP adress"
-                        initialValue={false}
-                        rules={[
-                          {
-                            required: true,
-                          },
-                        ]}
-                      >
-                        <Select
-                          onChange={(value) => {
-                            setLanStatisticIPEnable(value);
-                          }}
-                        >
-                          <Option key={0} value={true}>
-                            ON
-                          </Option>
-                          <Option key={1} value={false}>
-                            OFF
-                          </Option>
-                        </Select>
-                      </Form.Item>
-                    </Col>
-                    <Col xs={24} sm={24} md={24} lg={24}>
-                      {LanStatisticIPEnable && (
-                        <Row>
-                          <Col xs={24} sm={24} md={24} lg={24}>
-                            <Form.Item
-                              name={"LAN_ipv4_fixed_mac"}
-                              label="MAC"
-                              rules={[
-                                {
-                                  required: true,
-                                },
-                              ]}
-                            >
-                              <Input placeholder="aa:bb:dd:ff:ee:gg" />
-                            </Form.Item>
-                          </Col>
-                          <Col xs={24} sm={24} md={24} lg={24}>
-                            <Form.Item
-                              name={"LAN_ipv4_fixed_IP"}
-                              label="IP"
-                              rules={[
-                                {
-                                  required: true,
-                                },
-                              ]}
-                            >
-                              <Input placeholder="0.0.0.0" />
-                            </Form.Item>
-                          </Col>
-                        </Row>
-                      )}
-                    </Col>
-                  </Row>
-                </Col>
-                <Col
-                  xs={{ span: 24 }}
-                  sm={{ span: 24 }}
-                  md={{ span: 24 }}
-                  lg={{ span: 10 }}
-                >
-                  <h2>IPv6</h2>
-                  <Divider className={styles.divider} />
-                  <Form.Item
-                    name={"LAN_ipv6_type"}
-                    label="Type"
-                    rules={[
-                      {
-                        required: true,
-                      },
-                    ]}
-                  >
-                    <Select
-                      onChange={(value) => {
-                        setLANIPV6Static(value);
-                      }}
-                    >
-                      <Option key={0} value={"delegate-prefix-from-wan"}>
-                        Delegate Prefix from WAN
-                      </Option>
-                      <Option key={1} value={"static"}>
-                        Static Address
-                      </Option>
-                    </Select>
-                  </Form.Item>
-                  {LANIPV6Static === "static" && (
-                    <Row gutter={24}>
-                      <Col xs={24} sm={24} md={24} lg={24}>
-                        <Form.Item
-                          name={"LAN_ipv6_adress"}
-                          label="Static Address"
-                          rules={[
-                            {
-                              required: true,
-                            },
-                          ]}
-                        >
-                          <Input disabled={LANIPV6Static !== "static"} />
-                        </Form.Item>
-                      </Col>
-                    </Row>
-                  )}
-                  <h3>DHCP Server Configuration</h3>
-                  <Form.Item
-                    name={"LAN_ipv6_assignment"}
-                    label="Address Assign"
-                    rules={[
-                      {
-                        required: true,
-                      },
-                    ]}
-                  >
-                    <Select
-                      onChange={(value) => {
-                        setLANIPV6Static(value);
-                      }}
-                    >
-                      <Option key={0} value={"stateful"}>
-                        stateful
-                      </Option>
-                      <Option key={1} value={"stateless"}>
-                        stateless
-                      </Option>
-                    </Select>
-                  </Form.Item>
-                </Col>
-              </Row>
-            </div>
-          </Form>
+          <BulkConfigFLan
+            SubmitConfigonFinish={SubmitConfigonFinish}
+            form={form}
+            LANIPV6Static={LANIPV6Static}
+            setLANIPV6Static={setLANIPV6Static}
+            // LanStatisticIPEnable={LanStatisticIPEnable}
+            // setLanStatisticIPEnable={setLanStatisticIPEnable}
+            DeviceNum={DeviceNum}
+          />
         )}
       </Card>
-
       <Card
         className={styles.Card}
         title="WAN"
@@ -804,346 +835,28 @@ const BulkConfigF = ({ NodeData, ModelList, FileRepository, Nodeloading, Fileloa
             />
           )
         }
-        // bodyStyle={{display:'none'}}
       >
         {showWan && (
-          <Form onFinish={SubmitConfigonFinish} form={form}>
-            <div className={styles.FormWrapper}>
-              <Row gutter={24} justify="space-around">
-                <Col xs={24} sm={24} md={24} lg={10}>
-                  <h2>Priority</h2>
-                  <Divider className={styles.divider} />
-                  <Form.Item
-                    label="Priority"
-                    name="Priority"
-                    rules={[
-                      {
-                        required: true,
-                      },
-                    ]}
-                  >
-                    <Select
-                      // loading={uploading || Nodeloading || Fileloading}
-                      placeholder={"Priority"}
-                      onChange={(value) => {
-                        console.log(value);
-                        setWanPriority(value);
-                      }}
-                    >
-                      <Option key={0} value={"Auto"}>
-                        Auto
-                      </Option>
-                      <Option key={1} value={"lte"}>
-                        LTE only
-                      </Option>
-                      <Option key={2} value={"eth"}>
-                        ETH only
-                      </Option>
-                      <Option key={3} value={"wifi-2.4G"}>
-                        WiFi only
-                      </Option>
-                    </Select>
-                  </Form.Item>
-                  {WanPriority === "Auto" && (
-                    <Row gutter={24}>
-                      <Col xs={24} sm={24} md={24} lg={24}>
-                        <Form.Item
-                          name="WAN_priority_1"
-                          label="1st"
-                          rules={[{ required: true, message: "required!" }]}
-                        >
-                          <Select
-                            // loading={uploading || Nodeloading || Fileloading}
-                            placeholder={"Priority"}
-                            onChange={(value) => {
-                              PriorityOptionsChange(value);
-                            }}
-                          >
-                            {PriorityOrderOptions.map((item, index) => (
-                              <Option key={index} value={item}>
-                                {item}
-                              </Option>
-                            ))}
-                          </Select>
-                        </Form.Item>
-                        <Form.Item
-                          name="WAN_priority_2"
-                          label="2nd"
-                          rules={[{ required: true, message: "required!" }]}
-                        >
-                          <Select
-                            // loading={uploading || Nodeloading || Fileloading}
-                            placeholder={"Priority"}
-                            onChange={(value) => {
-                              PriorityOptionsChange(value);
-                            }}
-                          >
-                            {PriorityOrderOptions.map((item, index) => (
-                              <Option key={index} value={item}>
-                                {item}
-                              </Option>
-                            ))}
-                          </Select>
-                        </Form.Item>
-                        <Form.Item
-                          name="WAN_priority_3"
-                          label="3th"
-                          rules={[{ required: true, message: "required!" }]}
-                        >
-                          <Select
-                            // loading={uploading || Nodeloading || Fileloading}
-                            placeholder={"Priority"}
-                            onChange={(value) => {
-                              PriorityOptionsChange(value);
-                            }}
-                          >
-                            {PriorityOrderOptions.map((item, index) => (
-                              <Option key={index} value={item}>
-                                {item}
-                              </Option>
-                            ))}
-                          </Select>
-                        </Form.Item>
-
-                        {WanPriority === "lte" && (
-                          <Form.Item
-                            name="WAN_lte_mode"
-                            label="LTE Mode"
-                            rules={[{ required: true, message: "required!" }]}
-                          >
-                            <Select>
-                              <Option key={0} value={"bridge"}>
-                                bridge
-                              </Option>
-                              <Option key={1} value={"router"}>
-                                router
-                              </Option>
-                            </Select>
-                          </Form.Item>
-                        )}
-                      </Col>
-                    </Row>
-                  )}
-                </Col>
-
-                <Col xs={24} sm={24} md={24} lg={10}>
-                  <h2>Ethernet</h2>
-                  <Divider className={styles.divider} />
-                  <Form.Item
-                    name="WAN_ethernet_type"
-                    label="Ethernet Type"
-                    rules={[{ required: true, message: "required!" }]}
-                  >
-                    <Select
-                      onChange={(value) => {
-                        setWanEthernetType(value);
-                      }}
-                    >
-                      <Option key={1} value={"dhcp"}>
-                        DHCP Client
-                      </Option>
-                      <Option key={2} value={"pppoe"}>
-                        PPPoE Client
-                      </Option>
-                      <Option key={3} value={"static"}>
-                        Static IPv4
-                      </Option>
-                    </Select>
-                  </Form.Item>
-
-                  {WanEthernetType === "dhcp" && (
-                    <Fragment>
-                      <h3>DNS Server Configuration</h3>
-
-                      <Form.Item
-                        name="WAN_ipv4_type_1"
-                        label="IPv4 DNS Server #1"
-                        rules={[{ required: true, message: "required!" }]}
-                      >
-                        <Select
-                          onChange={(value) => {
-                            setWanDHCPServer1(value);
-                          }}
-                        >
-                          <Option key={1} value={"ISP"}>
-                            ISP
-                          </Option>
-                          <Option key={2} value={"manual"}>
-                            Manual
-                          </Option>
-                          <Option key={3} value={"none"}>
-                            None
-                          </Option>
-                        </Select>
-                      </Form.Item>
-                      {WanDHCPServer1 === "ISP" && (
-                        <Form.Item
-                          name="WAN_ipv4_address_1"
-                          label="Address #1"
-                          rules={[{ required: true, message: "required!" }]}
-                        >
-                          <Input
-                            placeholder="Input adress"
-                            disabled={WanDHCPServer1 !== "ISP"}
-                          />
-                        </Form.Item>
-                        // </Col>
-                      )}
-                      <Form.Item
-                        name="WAN_ipv4_type_2"
-                        label="IPv4 DNS Server #2"
-                        rules={[{ required: true, message: "required!" }]}
-                      >
-                        <Select
-                          onChange={(value) => {
-                            setWanDHCPServer2(value);
-                          }}
-                        >
-                          <Option key={1} value={"ISP"}>
-                            ISP
-                          </Option>
-                          <Option key={2} value={"manual"}>
-                            Manual
-                          </Option>
-                          <Option key={3} value={"none"}>
-                            None
-                          </Option>
-                        </Select>
-                      </Form.Item>
-                      {WanDHCPServer2 === "ISP" && (
-                        <Form.Item
-                          name="WAN_ipv4_address_2"
-                          label="Address #2"
-                          rules={[{ required: true, message: "required!" }]}
-                        >
-                          <Input
-                            placeholder="Input adress"
-                            disabled={WanDHCPServer2 !== "ISP"}
-                          />
-                        </Form.Item>
-                        // </Col>
-                      )}
-
-                      <Form.Item
-                        name="WAN_ipv4_type_3"
-                        label="IPv4 DNS Server #3"
-                        rules={[{ required: true, message: "required!" }]}
-                      >
-                        <Select
-                          onChange={(value) => {
-                            setWanDHCPServer3(value);
-                          }}
-                        >
-                          <Option key={1} value={"ISP"}>
-                            ISP
-                          </Option>
-                          <Option key={2} value={"manual"}>
-                            Manual
-                          </Option>
-                          <Option key={3} value={"none"}>
-                            None
-                          </Option>
-                        </Select>
-                      </Form.Item>
-                      {WanDHCPServer3 === "ISP" && (
-                        // <Col xs={24} sm={24} md={24} lg={7}>
-                        <Form.Item
-                          name="WAN_ipv4_address_3"
-                          label="Address #3"
-                          rules={[{ required: true, message: "required!" }]}
-                        >
-                          <Input
-                            placeholder="Input adress"
-                            disabled={WanDHCPServer3 !== "ISP"}
-                          />
-                        </Form.Item>
-                      )}
-                      {/* </Row> */}
-                    </Fragment>
-                  )}
-
-                  {WanEthernetType === "pppoe" && (
-                    <Fragment>
-                      <h3>PPPoE Client Configuration</h3>
-                      <Form.Item
-                        name="WAN_username"
-                        label="username"
-                        rules={[{ required: true, message: "required!" }]}
-                      >
-                        <Input placeholder="Input username" />
-                      </Form.Item>
-                      <Form.Item
-                        name="WAN_password"
-                        label="password"
-                        rules={[{ required: true, message: "required!" }]}
-                      >
-                        <Input placeholder="Input password" />
-                      </Form.Item>
-                      <Form.Item
-                        name="WAN_service_name"
-                        label="service_name"
-                        rules={[{ required: true, message: "required!" }]}
-                      >
-                        <Input placeholder="Input service_name" />
-                      </Form.Item>
-                    </Fragment>
-                  )}
-
-                  {WanEthernetType === "static" && (
-                    <Fragment>
-                      <h3>Static IPv4 Configuration</h3>
-                      <Form.Item
-                        name="WAN_static_ipv4_address"
-                        label="IP Address"
-                        rules={[{ required: true, message: "required!" }]}
-                      >
-                        <Input placeholder="Input adress" />
-                      </Form.Item>
-                      <Form.Item
-                        name="WAN_static_netmask"
-                        label="IP Mask"
-                        rules={[{ required: true, message: "required!" }]}
-                      >
-                        <Input placeholder="Input netmask" />
-                      </Form.Item>
-                      <Form.Item
-                        name="WAN_static_gateway"
-                        label="static_gateway"
-                        rules={[{ required: true, message: "required!" }]}
-                      >
-                        <Input placeholder="Input gateway" />
-                      </Form.Item>
-                      <h3>DNS Server Configuration</h3>
-                      <Form.Item
-                        name="WAN_static_ipv4_dns_address1"
-                        label="IPv4 DNS Server #1"
-                        rules={[{ required: true, message: "required!" }]}
-                      >
-                        <Input placeholder="Input dns adress" />
-                      </Form.Item>
-                      <Form.Item
-                        name="WAN_static_ipv4_dns_address2"
-                        label="IPv4 DNS Server #2"
-                        rules={[{ required: true, message: "required!" }]}
-                      >
-                        <Input placeholder="Input dns adress" />
-                      </Form.Item>
-                      <Form.Item
-                        name="WAN_static_ipv4_dns_address3"
-                        label="IPv4 DNS Server #3"
-                        rules={[{ required: true, message: "required!" }]}
-                      >
-                        <Input placeholder="Input dns adress" />
-                      </Form.Item>
-                    </Fragment>
-                  )}
-                </Col>
-              </Row>
-            </div>
-          </Form>
+          <BulkConfigFWan
+            SubmitConfigonFinish={SubmitConfigonFinish}
+            form={form}
+            // setPriorityOrderOptions={setPriorityOrderOptions}
+            // PriorityOrderOptions={PriorityOrderOptions}
+            WanPriority={WanPriority}
+            setWanPriority={setWanPriority}
+            WanEthernetType={WanEthernetType}
+            setWanEthernetType={setWanEthernetType}
+            WanDHCPServer1={WanDHCPServer1}
+            setWanDHCPServer1={setWanDHCPServer1}
+            WanDHCPServer2={WanDHCPServer2}
+            setWanDHCPServer2={setWanDHCPServer2}
+            WanDHCPServer3={WanDHCPServer3}
+            setWanDHCPServer3={setWanDHCPServer3}
+            SelectedModel={SelectedModel}
+            M300model={M300model}
+          />
         )}
       </Card>
-
       <Card
         className={styles.Card}
         title="LTE"
@@ -1168,270 +881,125 @@ const BulkConfigF = ({ NodeData, ModelList, FileRepository, Nodeloading, Fileloa
         }
       >
         {showLte && (
-          <Form onFinish={SubmitConfigonFinish} form={form}>
-            <div className={styles.FormWrapper}>
-              <Row gutter={24} justify="space-around">
-                <Col xs={24} sm={24} md={24} lg={10}>
-                  <h2>Ethernet</h2>
-                  <Divider className={styles.divider} />
-                  <Form.Item
-                    name="LTE_mode"
-                    label="LTE Config"
-                    rules={[{ required: true, message: "required!" }]}
-                  >
-                    <Select>
-                      <Option key={0} value={"auto"}>
-                        Auto
-                      </Option>
-                      <Option key={1} value={"2G-only"}>
-                        2G-only
-                      </Option>
-                      <Option key={3} value={"3G-only"}>
-                        3G-only
-                      </Option>
-                      <Option key={4} value={"4G-only"}>
-                        4G-only
-                      </Option>
-                    </Select>
-                  </Form.Item>
-                  <Form.Item
-                    name={"LTE_mtu"}
-                    label="MTU"
-                    rules={[{ required: true, message: "required!" }]}
-                  >
-                    <Input />
-                  </Form.Item>
-                </Col>
-                <Col xs={24} sm={24} md={24} lg={10}>
-                  <h2>APN Config</h2>
-                  <Divider className={styles.divider} />
-                  <h3>SIM Configuration</h3>
-                  <Form.Item
-                    name={"LTE_pin_enabled"}
-                    label="PIN Enable"
-                    rules={[{ required: true, message: "required!" }]}
-                  >
-                    <Select
-                      onChange={(value) => {
-                        setLTEPinEnable(value);
-                      }}
-                    >
-                      <Option key={0} value={true}>
-                        ON
-                      </Option>
-                      <Option key={1} value={false}>
-                        OFF
-                      </Option>
-                    </Select>
-                  </Form.Item>
+          <BulkConfigFLte
+            SubmitConfigonFinish={SubmitConfigonFinish}
+            form={form}
+            LTE1PinEnable={LTE1PinEnable}
+            setLTE1PinEnable={setLTE1PinEnable}
+            LTERecoverAPN1={LTERecoverAPN1}
+            setLTERecoverAPN1={setLTERecoverAPN1}
+            LTE2PinEnable={LTE2PinEnable}
+            setLTE2PinEnable={setLTE2PinEnable}
+            LTE1DataLimitEnable={LTE1DataLimitEnable}
+            setLTE1DataLimitEnable={setLTE1DataLimitEnable}
+            LTE2DataLimitEnable={LTE2DataLimitEnable}
+            setLTE2DataLimitEnable={setLTE2DataLimitEnable}
+            showDualSim={showDualSim}
+            setSelectedSIM={setSelectedSIM}
+            SelectedSIM={SelectedSIM}
+            SelectedModel = {SelectedModel}
+            M300model={M300model}
+          />
+        )}
+      </Card>
 
-                  {LTEPinEnable && (
-                    <Row gutter={24} justify="space-around">
-                      <Col xs={24} sm={24} md={24} lg={24}>
-                        <Form.Item
-                          name={"LTE_pin"}
-                          label="PIN"
-                          rules={[{ required: true, message: "required!" }]}
-                        >
-                          <Input />
-                        </Form.Item>
-                        <Form.Item
-                          name={"LTE_puk"}
-                          label="PUK"
-                          rules={[{ required: true, message: "required!" }]}
-                        >
-                          <Input />
-                        </Form.Item>
-                      </Col>
-                    </Row>
-                  )}
+      {!M300model.includes(SelectedModel) && <Card
+        className={styles.Card}
+        title="Wifi"
+        headStyle={{
+          boxShadow: "1px 1px 3px lightgray",
+          fontSize: "1.1rem",
+          fontWeight: "bold",
+        }}
+        bodyStyle={showWifi ? {} : { padding: 0 }}
+        extra={
+          showWifi ? (
+            <ImCross
+              className={styles.DeleteIcon}
+              onClick={() => setShowWifi(false)}
+            />
+          ) : (
+            <FcPlus
+              className={styles.AddIcon}
+              onClick={() => setShowWifi(true)}
+            />
+          )
+        }
+      >
+        {showWifi && (
+          <BulkConfigFWifi
+            SubmitConfigonFinish={SubmitConfigonFinish}
+            form={form}
+            SelectedWPS={SelectedWPS}
+            setSelectedWPS={setSelectedWPS}
+          />
+        )}
+      </Card>}
 
-                  <h3>APN1</h3>
-
-                  <Form.Item name={"LTE_apn"} label="APN">
-                    <Input />
-                  </Form.Item>
-                  <Form.Item name={"LTE_username"} label="UserName">
-                    <Input />
-                  </Form.Item>
-                  <Form.Item name={"LTE_password"} label="Password">
-                    <Input />
-                  </Form.Item>
-                  <Form.Item
-                    name="LTE_auth"
-                    label="Auth Type"
-                    rules={[{ required: true, message: "required!" }]}
-                  >
-                    <Select>
-                      <Option key={0} value={"none"}>
-                        NONE
-                      </Option>
-                      <Option key={1} value={"pap"}>
-                        PAP
-                      </Option>
-                      <Option key={3} value={"chap"}>
-                        CHAP
-                      </Option>
-                    </Select>
-                  </Form.Item>
-                  <Form.Item
-                    name={"LTE_ipv6_enabled"}
-                    label="Enable IPv6"
-                    initialValue={false}
-                    rules={[{ required: true, message: "required!" }]}
-                  >
-                    <Select
-                      onChange={(value) => {
-                        setLTEIpv6Enable(value);
-                      }}
-                    >
-                      <Option key={0} value={true}>
-                        ON
-                      </Option>
-                      <Option key={1} value={false}>
-                        OFF
-                      </Option>
-                    </Select>
-                    {/* <Switch /> */}
-                  </Form.Item>
-
-                  <h3>Data Limitation</h3>
-
-                  <Form.Item
-                    name={"LTE_limit_enabled"}
-                    label="limit enabled"
-                    initialValue={false}
-                    rules={[{ required: true, message: "required!" }]}
-                  >
-                    <Select
-                      onChange={(value) => {
-                        setLTEDataLimitEnable(value);
-                      }}
-                    >
-                      <Option key={0} value={true}>
-                        ON
-                      </Option>
-                      <Option key={1} value={false}>
-                        OFF
-                      </Option>
-                    </Select>
-                  </Form.Item>
-                  {LTEDataLimitEnable && (
-                    <Fragment>
-                      <Form.Item
-                        name={"LTE_limit_mbyte"}
-                        label="Max Data Limitation (MB)"
-                        rules={[{ required: true, message: "required!" }]}
-                      >
-                        <Input placeholder="0" />
-                      </Form.Item>
-                      <Form.Item
-                        name={"LTE_reset_day"}
-                        label="Reset Day"
-                        rules={[{ required: true, message: "required!" }]}
-                      >
-                        <Input placeholder="31" />
-                      </Form.Item>
-                      <Form.Item
-                        name={"LTE_reset_hour"}
-                        label="Hour"
-                        rules={[{ required: true, message: "required!" }]}
-                      >
-                        <Input placeholder="23" />
-                      </Form.Item>
-                      <Form.Item
-                        name={"LTE_reset_minute"}
-                        label="Minute"
-                        rules={[{ required: true, message: "required!" }]}
-                      >
-                        <Input placeholder="0" />
-                      </Form.Item>
-                      <Form.Item
-                        name={"LTE_reset_second"}
-                        label="Second"
-                        rules={[{ required: true, message: "required!" }]}
-                      >
-                        <Input placeholder="0" />
-                      </Form.Item>
-                    </Fragment>
-                  )}
-
-                  <h3>Connect Policy</h3>
-                  <Form.Item
-                    name={"LTE_roaming"}
-                    label="Roaming"
-                    initialValue={false}
-                    rules={[{ required: true, message: "required!" }]}
-                  >
-                    <Select
-                      onChange={(value) => {
-                        setLTERoamingEnable(value);
-                      }}
-                    >
-                      <Option key={0} value={true}>
-                        ON
-                      </Option>
-                      <Option key={1} value={false}>
-                        OFF
-                      </Option>
-                    </Select>
-                  </Form.Item>
-
-                  <h3>Recover APN1</h3>
-                  <Form.Item
-                    name={"LTE_recovery_apn_enabled"}
-                    label="Recover APN1"
-                    initialValue={false}
-                    rules={[{ required: true, message: "required!" }]}
-                  >
-                    <Select
-                      onChange={(value) => {
-                        setLTERecoverAPN1(value);
-                      }}
-                    >
-                      <Option key={0} value={true}>
-                        ON
-                      </Option>
-                      <Option key={1} value={false}>
-                        OFF
-                      </Option>
-                    </Select>
-                  </Form.Item>
-
-                  {LTERecoverAPN1 && (
-                    <Fragment>
-                      <Form.Item
-                        name={"LTE_recovery_down_time"}
-                        label="Recover DownTimes"
-                        rules={[{ required: true, message: "required!" }]}
-                        initialValue=""
-                      >
-                        <Input placeholder="3 ~ 15" />
-                      </Form.Item>
-                      <Form.Item
-                        name="LTE_recovery_apn_action"
-                        label="Recover action"
-                        rules={[{ required: true, message: "required!" }]}
-                        initialValue=""
-                      >
-                        <Select>
-                          <Option key={0} value={"reboot"}>
-                            Reboot
-                          </Option>
-                          <Option key={1} value={"default-apn"}>
-                            Recover to default APN
-                          </Option>
-                          <Option key={3} value={"previous-apn"}>
-                            Recover to previous working APN
-                          </Option>
-                        </Select>
-                      </Form.Item>
-                    </Fragment>
-                  )}
-                </Col>
-              </Row>
-            </div>
-          </Form>
+      {!M300model.includes(SelectedModel) && <Card
+        className={styles.Card}
+        title="Alarm"
+        headStyle={{
+          boxShadow: "1px 1px 3px lightgray",
+          fontSize: "1.1rem",
+          fontWeight: "bold",
+        }}
+        bodyStyle={showAlarm ? {} : { padding: 0 }}
+        extra={
+          showAlarm ? (
+            <ImCross
+              className={styles.DeleteIcon}
+              onClick={() => setShowAlarm(false)}
+            />
+          ) : (
+            <FcPlus
+              className={styles.AddIcon}
+              onClick={() => setShowAlarm(true)}
+            />
+          )
+        }
+      >
+        {showAlarm && (
+          <BulkConfigFAlarm
+            SubmitConfigonFinish={SubmitConfigonFinish}
+            form={form}
+            AlarmEnable={AlarmEnable}
+            setAlarmEnable={setAlarmEnable}
+            AlarmType={AlarmType}
+            setAlarmType={setAlarmType}
+            GPSReference={GPSReference}
+            setGPSReference={setGPSReference}
+          />
+        )}
+      </Card>}
+      <Card
+        className={styles.Card}
+        title="Period"
+        headStyle={{
+          boxShadow: "1px 1px 3px lightgray",
+          fontSize: "1.1rem",
+          fontWeight: "bold",
+        }}
+        bodyStyle={showPeriod ? {} : { padding: 0 }}
+        extra={
+          showPeriod ? (
+            <ImCross
+              className={styles.DeleteIcon}
+              onClick={() => setShowPeriod(false)}
+            />
+          ) : (
+            <FcPlus
+              className={styles.AddIcon}
+              onClick={() => setShowPeriod(true)}
+            />
+          )
+        }
+      >
+        {showPeriod && (
+          <BulkConfigFPeriod
+            SubmitConfigonFinish={SubmitConfigonFinish}
+            form={form}
+          />
         )}
       </Card>
     </Fragment>
@@ -1439,3 +1007,5 @@ const BulkConfigF = ({ NodeData, ModelList, FileRepository, Nodeloading, Fileloa
 };
 
 export const BulkConfigMF = React.memo(BulkConfigF);
+
+

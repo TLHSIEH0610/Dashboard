@@ -6,6 +6,7 @@ import {
   WanSettingMF,
   LteSettingMF,
   PeriodSettingMF,
+  GPSSettingMF
 } from "./DeviceSettingF";
 import { Modal, Tabs, Alert, Spin, Empty, Form, Button } from "antd";
 import axios from "axios";
@@ -134,7 +135,19 @@ const DeviceSettingC = ({
               setUploading={setUploading}
             />
           </TabPane>
-          <TabPane tab="Period" key="4" className={styles.tabpane}>
+          <TabPane tab="GPS" key="4" className={styles.tabpane}>
+            <GPSSettingMF
+              id={record.id}
+              setIsUpdate={setIsUpdate}
+              IsUpdate={IsUpdate}
+              DeviceConfig={DeviceConfig}
+              // form={PERIODform}
+              form={form}
+              uploading={uploading}
+              setUploading={setUploading}
+            />
+          </TabPane>
+          <TabPane tab="Period" key="5" className={styles.tabpane}>
             <PeriodSettingMF
               id={record.id}
               setIsUpdate={setIsUpdate}

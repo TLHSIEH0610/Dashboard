@@ -1,0 +1,143 @@
+{
+    "set": {
+        "device_cfg": {
+            "filter": {
+                "id": [
+                    "014CBL7VE3ZK0419"
+                ]
+            },
+            "nodeInf": {},
+            "obj": {
+                "lte": {
+                    "config": {
+                        "mode": "4G-only",
+                        "mtu": 1200
+                    },
+                    "sim": [
+                        {
+                            "pin": "********",
+                            "puk": "********",
+                            "pin_enabled": false,
+                            "apn": [
+                                {
+                                    "apn": "internet",
+                                    "ipv6_enabled": false,
+                                    "auth": {
+                                        "type": "chap",
+                                        "username": "test",
+                                        "password": "********"
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    "limit": [
+                        {
+                            "enabled": true,
+                            "limit_mbyte": 1024,
+                            "reset": {
+                                "day": 1,
+                                "hour": 11,
+                                "minute": 11,
+                                "second": 11
+                            }
+                        }
+                    ],
+                    "policy": {
+                        "roaming": true,
+                        "recovery": {
+                            "down_times": 10,
+                            "recover_apn": {
+                                "enabled": true,
+                                "action": "default-apn"
+                            }
+                        }
+                    }
+                },
+                "wan": {
+                    "priority": {
+                        "order": [
+                            "lte",
+                            "eth",
+                            "wifi-2.4G"
+                        ],
+                        "lte": {}
+                    },
+                    "ethernet": {
+                        "type": "dhcp",
+                        "dhcp": {
+                            "dns": {
+                                "ipv4": [
+                                    {
+                                        "type": "manual",
+                                        "address": "8.8.4.4"
+                                    },
+                                    {
+                                        "type": "ISP",
+                                        "address": ""
+                                    },
+                                    {
+                                        "type": "ISP",
+                                        "address": ""
+                                    }
+                                ]
+                            }
+                        },
+                        "pppoe": {},
+                        "static": {}
+                    }
+                },
+                "system": {
+                    "alarm": {
+                        "mode": true,
+                        "inputs": [
+                            "geofence"
+                        ],
+                        "geofence": {
+                            "radius_m": 150,
+                            "auto_detect": true
+                        }
+                    }
+                },
+                "report_period": {
+                    "alive": 30,
+                    "timeout": 60,
+                    "status": 30,
+                    "iot": 30,
+                    "gps": 30
+                },
+                "lan": {
+                    "ipv4": {
+                        "address": "192.168.20.123",
+                        "netmask": "255.255.255.0",
+                        "dhcp": {
+                            "mode": "off",
+                            "pool": [
+                                {
+                                    "start": "192.168.1.112",
+                                    "end": "192.168.1.222",
+                                    "fixed_ip": [
+                                        {
+                                            "enabled": false,
+                                            "mac": "",
+                                            "ip": "192.168.0.0"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    "ipv6": {
+                        "type": "delegate-prefix-from-wan",
+                        "static": {
+                                "address": ""
+                        },
+                        "dhcp": {
+                            "assigment": "stateful"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

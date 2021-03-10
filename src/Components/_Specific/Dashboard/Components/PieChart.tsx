@@ -1,4 +1,4 @@
-import React, { useContext, Fragment, useEffect, useState } from "react";
+import React, { useContext, Fragment, useEffect, useState, useCallback } from "react";
 import "echarts/lib/chart/pie";
 import ReactEchartsCore from "echarts-for-react/lib/core";
 import echarts from "echarts/lib/echarts";
@@ -7,26 +7,36 @@ import "echarts/lib/component/title";
 import "echarts/lib/component/legend";
 import { useHistory } from "react-router-dom";
 import Context from "../../../../Utility/Reduxx";
-import { Translator } from "../../../../i18n/index";
 import styles from "../dashboard.module.scss";
-import { Card, Spin } from "antd";
-import { BsFillSquareFill } from 'react-icons/bs'
-const PieChartC = ({
+import { Card, Spin, Tooltip } from "antd";
+import { BsFillSquareFill } from "react-icons/bs";
+// import axios from "axios";
+// import { UserLogOut } from "../../../../Utility/Fetch";
+import { PieChartPeriod } from './PieChart_Period'
+import { useTranslation } from "react-i18next";
+
+const PieChart_ = ({
   PieData,
   StatisticLoading,
   Cate,
+  IsUpdate
 }: {
-  PieData: any;
-  StatisticLoading: boolean;
+  PieData?: any;
+  StatisticLoading?: boolean;
   Cate: string;
+  IsUpdate: boolean;
 }) => {
   const history = useHistory();
   const { state, dispatch } = useContext(Context);
   const [HealthSum, setHealthSum] = useState();
   const [SignalSum, setSignalSum] = useState();
+  const { t } = useTranslation();
 
+  // console.log(PieData)
   useEffect(() => {
-    if (PieData.health) {
+
+    if (PieData?.health) {
+      
       const HealthSum = (() =>
         [
           PieData.health.up,
@@ -48,11 +58,6 @@ const PieChartC = ({
           return a + b;
         }, 0))();
       setSignalSum(SimSum);
-
-      // dispatch({
-      //   type: "setPieNum",
-      //   payload: {PieNum:{ SimNum:[PieData.sim.excellent, SimSum], HealthNum:[PieData.health.up, HealthSum] }},
-      // });
     } else {
       setHealthSum(undefined);
       setSignalSum(undefined);
@@ -60,36 +65,22 @@ const PieChartC = ({
 
     dispatch({
       type: "setIsUpdate",
-      payload: { IsUpdate: !state.Global.IsUpdate  },
+      payload: { IsUpdate: !state.Global.IsUpdate },
     });
   }, [PieData]);
 
-  const getOption = (dataSource: number[], data: string[]) => {
+  const getOption = useCallback((dataSource: number[], data: string[]) => {
     const option = {
-      // title: {
-      //   text: name,
-      //   left: "center",
-      //   padding: [10, 0],
-      // },
       color: ["#28a745", "#ffc107", "#dc3545", "#343a40"],
-      // tooltip: {
-      //   trigger: "item",
-      //   formatter: "{a} <br/>{b}: {c} ({d}%)",
-      // },
       series: [
         {
           name: "Counts",
           type: "pie",
           radius: ["50%", "80%"],
-          // avoidLabelOverlap: true,
-          // top: 0,
           label: {
             show: false,
             position: "inside",
-            // bleedMargin: 5,
-            // formatter: "{b} : {c}",
-            // fontWeight: "bold",
-            fontSize: 0
+            fontSize: 0,
           },
           emphasis: {
             label: {
@@ -105,29 +96,26 @@ const PieChartC = ({
             {
               value: dataSource ? dataSource[0] : null,
               name: data[0],
-              // label: { show: dataSource ? dataSource[0] : false },
             },
             {
               value: dataSource ? dataSource[1] : null,
               name: data[1],
-              // label: { show: dataSource ? dataSource[1] : false },
             },
             {
               value: dataSource ? dataSource[2] : null,
               name: data[2],
-              // label: { show: dataSource ? dataSource[2] : false },
             },
             {
               value: dataSource ? dataSource[3] : null,
               name: data[3],
-              // label: { show: dataSource ? dataSource[3] : false },
             },
           ],
         },
       ],
     };
     return option;
-  };
+  },[]);
+  
   type ParamName =
     | "excellent"
     | "good"
@@ -144,16 +132,18 @@ const PieChartC = ({
   }
   //Click事件
   const onChartClick = (params: Iparams) => {
-    // console.log('123', params)
-    if (params.data.name === ("excellent" || "good" || "fair" || "poor")) {
+    let paramsName = params.data.name.toLowerCase();
+    const strengthCate = ["excellent", "good", "fair", "poor"];
+
+    if (strengthCate.includes(paramsName)) {
       dispatch({
         type: "setPietoTopo",
-        payload: { strength: `${params.data.name}` },
+        payload: { strength: `${paramsName}` },
       });
     } else {
       dispatch({
         type: "setPietoTopo",
-        payload: { health: `${params.data.name}` },
+        payload: { health: `${paramsName}` },
       });
     }
     history.push("./topology");
@@ -165,127 +155,210 @@ const PieChartC = ({
   return (
     // <Fragment>
     <div className={styles.PieWrapper}>
-      {Cate ==='health'&& <Card
-        title={Translator("ISMS.DevicesHealth")}
-        className={styles.Card}
-        // bodyStyle={{ padding: 0 }}
-        headStyle={{ padding:0, backgroundColor:'#002FA7', color:'white', fontFamily:'Open Sans', textAlign:'center' }} bodyStyle={{ padding:0,  border:'2px solid #002FA7'}}
-      >
-        {StatisticLoading ? (
-          <Spin>
-            <ReactEchartsCore
-              className={styles.PieChart}
-              echarts={echarts}
-              //@ts-ignore
-              option={getOption(
-                [100, 0, 0, 0],
-                [
-                  Translator("ISMS.up"),
-                  Translator("ISMS.warning"),
-                  Translator("ISMS.critical"),
-                  Translator("ISMS.offline"),
-                ],
-              )}
-              notMerge={true}
-              lazyUpdate={true}
-              theme={"theme_name"}
-              onEvents={onEvents}
-            />
-          </Spin>
-        ) : (
-          <Fragment>
-            <p className={styles.PieSum}>{HealthSum}</p>
-            <div className={styles.legendWrapper}>
-            <div className={styles.legend} style={{color:"#28a745"}}><BsFillSquareFill/> <p>Up:{PieData.health && PieData.health.up} </p></div>
-            <div className={styles.legend} style={{color:"#ffc107"}}> <BsFillSquareFill/><p>Warning:{PieData.health && PieData.health.warning} </p></div>
-            <div className={styles.legend} style={{color:"#dc3545"}}> <BsFillSquareFill/><p>Critical:{PieData.health && PieData.health.critical} </p></div>
-            <div className={styles.legend} style={{color:"#343a40"}}>  <BsFillSquareFill/><p>Offline:{PieData.health && PieData.health.offline}</p> </div>
-            </div>
-            <ReactEchartsCore
-              className={styles.PieChart}
-              echarts={echarts}
-              //@ts-ignore
-              option={getOption(
-                PieData.health && [
-                  PieData.health.up,
-                  PieData.health.warning,
-                  PieData.health.critical,
-                  PieData.health.offline,
-                ],
-                [
-                  Translator("ISMS.up"),
-                  Translator("ISMS.warning"),
-                  Translator("ISMS.critical"),
-                  Translator("ISMS.offline"),
-                ]
-              )}
-              notMerge={true}
-              lazyUpdate={true}
-              theme={"theme_name"}
-              onEvents={onEvents}
-            />
-          </Fragment>
-        )}
-      </Card>}
-      {Cate ==='signal'&& <Card title={Translator("ISMS.DevicesStrength")} className={styles.Card} headStyle={{ padding:0, backgroundColor:'#002FA7', color:'white', fontFamily:'Open Sans', textAlign:'center' }} bodyStyle={{ padding:0,  border:'2px solid #002FA7'}}>
-        {StatisticLoading ? (
-          <Spin>
-            <ReactEchartsCore
-              className={styles.PieChart}
-              echarts={echarts}
-              //@ts-ignore
-              option={getOption(
-                [100, 0, 0, 0],
-                [
-                  Translator("ISMS.excellent"),
-                  Translator("ISMS.good"),
-                  Translator("ISMS.fair"),
-                  Translator("ISMS.poor"),
-                ]
-              )}
-              notMerge={true}
-              lazyUpdate={true}
-              theme={"theme_name"}
-              onEvents={onEvents}
-            />
-          </Spin>
-        ) : (
-          <Fragment>
-            <p className={styles.PieSum}>{SignalSum}</p>
-            <div className={styles.legendWrapper}>
-            <div className={styles.legend} style={{color:"#28a745"}}><BsFillSquareFill/> <p>Excellent:{PieData.sim && PieData.sim.excellent} </p></div>
-            <div className={styles.legend} style={{color:"#ffc107"}}> <BsFillSquareFill/><p>Good:{PieData.sim && PieData.sim.good} </p></div>
-            <div className={styles.legend} style={{color:"#dc3545"}}> <BsFillSquareFill/><p>Fair:{PieData.sim && PieData.sim.fair} </p></div>
-            <div className={styles.legend} style={{color:"#343a40"}}>  <BsFillSquareFill/><p>Poor:{PieData.sim && PieData.sim.poor}</p> </div>
-            </div>
-            <ReactEchartsCore
-              className={styles.PieChart}
-              echarts={echarts}
-              //@ts-ignore
-              option={getOption(
-                PieData.sim && [
-                  PieData.sim.excellent,
-                  PieData.sim.good,
-                  PieData.sim.fair,
-                  PieData.sim.poor,
-                ],
-                [
-                  Translator("ISMS.excellent"),
-                  Translator("ISMS.good"),
-                  Translator("ISMS.fair"),
-                  Translator("ISMS.poor"),
-                ],
-              )}
-              notMerge={true}
-              lazyUpdate={true}
-              theme={"theme_name"}
-              onEvents={onEvents}
-            />
-          </Fragment>
-        )}
-      </Card>}
+      {Cate === "health" && (
+        <Card
+          title={t("ISMS.DevicesHealth")}
+          className={styles.Card}
+          headStyle={{
+            padding: 0,
+            backgroundColor: "#002FA7",
+            color: "white",
+            fontFamily: "Open Sans",
+            textAlign: "center",
+          }}
+          bodyStyle={{ padding: 0, border: "2px solid #002FA7" }}
+        >
+          {StatisticLoading ? (
+            <Spin>
+              <ReactEchartsCore
+                className={styles.PieChart}
+                echarts={echarts}
+                //@ts-ignore
+                option={getOption(
+                  [100, 0, 0, 0],
+                  ["up", "warning", "critical", "offline"]
+                )}
+                notMerge={true}
+                lazyUpdate={true}
+                theme={"theme_name"}
+                onEvents={onEvents}
+              />
+            </Spin>
+          ) : (
+              <Fragment>
+                <p className={styles.PieSum}>{HealthSum}</p>
+                <div className={styles.legendWrapper}>
+                  <div className={styles.legend} style={{ color: "#28a745" }}>
+                    <BsFillSquareFill />
+                    <Tooltip title={t("ISMS.Up")}>
+                    <p>
+                    Up:
+                    {PieData.health && PieData.health.up}
+                    </p>
+                    </Tooltip>
+                  </div>
+                  <div className={styles.legend} style={{ color: "#ffc107" }}>
+                    
+                    <BsFillSquareFill />
+                    <Tooltip title={t("ISMS.Warning")}>
+                    <p>
+                    Warning:
+                    {PieData.health && PieData.health.warning}
+                    </p>
+                    </Tooltip>
+                  </div>
+                  <div className={styles.legend} style={{ color: "#dc3545" }}>
+                    
+                    <BsFillSquareFill />
+                    <Tooltip title={t("ISMS.FatalError")}>
+                    <p>
+                    Critical:
+                    {PieData.health && PieData.health.critical}
+                    </p>
+                    </Tooltip>
+                  </div>
+                  <div className={styles.legend} style={{ color: "#343a40" }}>
+                    
+                    <BsFillSquareFill />
+                    <Tooltip title={t("ISMS.Offline")}>
+                    <p>
+                    Offline:
+                    {PieData.health && PieData.health.offline}
+                    </p>
+                    </Tooltip>
+                  </div>
+                </div>
+                <ReactEchartsCore
+                  className={styles.PieChart}
+                  echarts={echarts}
+                  //@ts-ignore
+                  option={getOption(
+                    PieData.health && [
+                      PieData.health.up,
+                      PieData.health.warning,
+                      PieData.health.critical,
+                      PieData.health.offline,
+                    ],
+                    ["up", "warning", "critical", "offline"]
+                  )}
+                  notMerge={true}
+                  lazyUpdate={true}
+                  theme={"theme_name"}
+                  onEvents={onEvents}
+                />
+              </Fragment>
+            )}
+        </Card>
+      )}
+      {Cate === "signal" && (
+        <Card
+          title={t("ISMS.DevicesStrength")}
+          className={styles.Card}
+          headStyle={{
+            padding: 0,
+            backgroundColor: "#002FA7",
+            color: "white",
+            fontFamily: "Open Sans",
+            textAlign: "center",
+          }}
+          bodyStyle={{ padding: 0, border: "2px solid #002FA7" }}
+        >
+          {StatisticLoading ? (
+            <Spin>
+              <ReactEchartsCore
+                className={styles.PieChart}
+                echarts={echarts}
+                //@ts-ignore
+                option={getOption(
+                  [100, 0, 0, 0],
+                  [
+                   "Excellent",
+                    "Good",
+                   "Fair",
+                    "Poor",
+                  ]
+                )}
+                notMerge={true}
+                lazyUpdate={true}
+                theme={"theme_name"}
+                onEvents={onEvents}
+              />
+            </Spin>
+          ) : (
+              <Fragment>
+                <p className={styles.PieSum}>{SignalSum}</p>
+                <div className={styles.legendWrapper}>
+                  <div className={styles.legend} style={{ color: "#28a745" }}>
+                    <BsFillSquareFill />
+                    <Tooltip title={'rssi > -65 dbm'}>
+                    <p>
+                    Excellent: {PieData.sim && PieData.sim.excellent}
+                    </p>
+                    </Tooltip>
+                  </div>
+                  <div className={styles.legend} style={{ color: "#ffc107" }}>
+                    
+                    <BsFillSquareFill />
+                    <Tooltip title={'-75 dbm< rssi <= -65 dbm'}>
+                    <p>
+                    Good: {PieData.sim && PieData.sim.good}
+                    </p>
+                    </Tooltip>
+                  </div>
+                  <div className={styles.legend} style={{ color: "#dc3545" }}>
+                    
+                    <BsFillSquareFill />
+                    <Tooltip title={'-85 dbm< rssi <= -75 dbm'}>
+                    <p>
+                    Fair: {PieData.sim && PieData.sim.fair}
+                    </p>
+                    </Tooltip>
+                  </div>
+                  <div className={styles.legend} style={{ color: "#343a40" }}>
+                    
+                    <BsFillSquareFill />
+                    <Tooltip title={' rssi <= -85 dbm'}>
+                    <p>
+                    Poor: {PieData.sim && PieData.sim.poor}
+                    </p>
+                    </Tooltip>
+                  </div>
+                </div>
+                <ReactEchartsCore
+                  className={styles.PieChart}
+                  echarts={echarts}
+                  //@ts-ignore
+                  option={getOption(
+                    PieData.sim && [
+                      PieData.sim.excellent,
+                      PieData.sim.good,
+                      PieData.sim.fair,
+                      PieData.sim.poor,
+                    ],
+                    [
+                      "Excellent",
+                      "Good",
+                     "Fair",
+                      "Poor",
+                    ]
+                  )}
+                  notMerge={true}
+                  lazyUpdate={true}
+                  theme={"theme_name"}
+                  onEvents={onEvents}
+                />
+              </Fragment>
+            )}
+        </Card>
+      )}
+
+     {Cate ==='periodupdate' || Cate ==='period'  &&<PieChartPeriod Cate={Cate} IsUpdate={IsUpdate} />}
+
+
+
     </div>
     // </Fragment>
   );
 };
-export default PieChartC;
+
+export const PieChartC =   React.memo(PieChart_);

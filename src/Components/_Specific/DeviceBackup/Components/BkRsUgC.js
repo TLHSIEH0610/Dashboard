@@ -4,9 +4,9 @@ import { Card, Form } from "antd";
 import useURLloader from "../../../../hook/useURLloader";
 import Context from "../../../../Utility/Reduxx";
 import BkRsUgF from './BkRsUgF'
-import { Translator } from '../../../../i18n/index'
+import { useTranslation } from 'react-i18next';
 
-const BkRsUgC = ({ uploading, setUploading, IsUpdate }) => {
+const BkRsUgC = ({ uploading, setUploading, IsUpdate, setIsUpdate }) => {
   const { state } = useContext(Context);
   const [form] = Form.useForm();
   const [FileRepository, setFileRepository] = useState([]);
@@ -16,8 +16,8 @@ const BkRsUgC = ({ uploading, setUploading, IsUpdate }) => {
   const cid = localStorage.getItem("authUser.cid");
   const level = localStorage.getItem("authUser.level");
   const NodeUrl= '/cmd'
-  const NodeUrldata= `{"get":{"nodeInf":{"filter":{${level==='super_super'?  state.Login.Cid : `"cid":"${cid}"` }},"nodeInf":{"cid":{},"gid":{},"token":{},"id":{},"model":{},"name":{}}}}}`
-
+  const NodeUrldata= `{"get":{"nodeInf":{"filter":{${level==='super_super'?  state.Login.Cid : `"cid":"${cid}"` }},"nodeInf":{"cid":{},"gid":{},"token":{},"id":{},"model":{},"name":{},"health":{}}}}}`
+  const { t } = useTranslation();
 
   // const NodeUrl = `/cmd?get={"nodeInf":{"filter":{${level==='super_super'?  state.Login.Cid : `"cid":"${cid}"` }},"nodeInf":{"cid":{},"gid":{},"token":{},"id":{},"model":{},"name":{}}}}`;
   const [Nodeloading, Noderesponse] = useURLloader(NodeUrl, NodeUrldata, IsUpdate);
@@ -29,19 +29,21 @@ const BkRsUgC = ({ uploading, setUploading, IsUpdate }) => {
 
   // const FileRepostoryUrl = `repository?list_file={${level==='super_super'? state.Login.Cid : `"cid":"${cid}"`}}`;
   const [Fileloading, Filereponse] = useURLloader(FileRepostoryUrl, FileRepostoryUrldata, IsUpdate);
-  const props ={ uploading, setUploading, Nodeloading, Fileloading, form, FileRepository, userModel, NodeData, setUserModel, ModelList,  setSelectedModel, selectedModel }
+  const props ={ uploading, setUploading, Nodeloading, Fileloading, form, FileRepository, userModel, NodeData, setUserModel, ModelList,  setSelectedModel, selectedModel, setIsUpdate, IsUpdate }
 
   useEffect(() => {
-    if (Noderesponse && Noderesponse.response) {
+    if (Noderesponse?.response) {
       // console.log(Noderesponse)
       let NodeData = [];
       let Allmodel = new Set();
+
       Noderesponse.response.nodeInf.forEach((item, index) => {
         NodeData.push({
           key: index,
           id: item.nodeInf.id,
           name: item.nodeInf.name,
           model: item.nodeInf.model,
+          health: item.nodeInf.health
         });
         !Allmodel.has(item.nodeInf.model) && Allmodel.add(item.nodeInf.model);
       });
@@ -55,8 +57,13 @@ const BkRsUgC = ({ uploading, setUploading, IsUpdate }) => {
 
   useEffect(() => {
     // console.log(Filereponse)
-    if (Filereponse && Filereponse.response.repository.length) {
-      setFileRepository(Filereponse.response.repository[0].list);
+    if (Filereponse?.response?.repository.length) {
+      let FileList = new Set()
+      Filereponse.response.repository.map((item)=>{
+        item.list.map((file)=>FileList.add(file))
+      })
+      FileList = Array.from(FileList)
+      setFileRepository(FileList);
     }else{
       setFileRepository([])
     }
@@ -66,7 +73,7 @@ const BkRsUgC = ({ uploading, setUploading, IsUpdate }) => {
     <Fragment>
       <Card
         bordered={true}
-        title={Translator("ISMS.Action Request")} 
+        title={t("ISMS.Action Request")} 
         className={styles.card}
       >
         <BkRsUgF {...props}/>

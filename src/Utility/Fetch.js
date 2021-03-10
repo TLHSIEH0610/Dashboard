@@ -24,7 +24,10 @@ export async function UserLogOut() {
     try{
         response = await fetch(url, { credentials: 'include', method:'POST' })
         console.log(response)
-        localStorage.clear()
+        localStorage.removeItem("authUser.name")
+        localStorage.removeItem("authUser.cid")
+        localStorage.removeItem("authUser.level")
+        localStorage.removeItem("auth.isAuthed")
         return response
     }
     catch(error){

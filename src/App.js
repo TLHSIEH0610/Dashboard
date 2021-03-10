@@ -16,16 +16,19 @@ import "antd/dist/antd.css";
 import IoTGuage from './Pages/Dashboard/IoTGuage'
 import BulkConfig from './Pages/Topology/BulkConfig'
 import AllRouter from './Pages/Topology/AllRouter'
+import Menu from './Pages/Menu'
 
 const App = () => {
 
-  const [level, setLevel] = useState(undefined)
-  useEffect(()=>{
-    setLevel(localStorage.getItem("authUser.level"))
-  },[localStorage.getItem("authUser.level")])
+  // const [level, setLevel] = useState(undefined)
+  // useEffect(()=>{
+  //   setLevel(localStorage.getItem("authUser.level"))
+  // },[localStorage.getItem("authUser.level")])
 
   return (
     <BrowserRouter>
+    <Switch>
+    <Route path="/menu" exact component={Menu}></Route>    
       <Provider>
         <div className="container_">
           <div>
@@ -34,7 +37,7 @@ const App = () => {
           <div className="rightPage">
             <Header/>
             <div className="content">
-              <Switch>
+              
            
                 {/* <Route path="/management" exact component={Management}></Route> */}
                 {/* <Route path="/management" exact render={() =>
@@ -60,7 +63,7 @@ const App = () => {
                       exact
                       render={() =>
                         localStorage.getItem("auth.isAuthed") ? (
-                          <item.component />
+                          <item.component key={Date.now()}/>
                         ) : (
                           <Redirect to="/userlogin" />
                         )
@@ -68,13 +71,15 @@ const App = () => {
                     />
                   );
                 })}
-                <Route component={WrongPage}></Route>
                 
-              </Switch>
+                
+              
             </div>
           </div>
         </div>
       </Provider>
+      <Route component={WrongPage}></Route>
+      </Switch>
     </BrowserRouter>
   );
 };

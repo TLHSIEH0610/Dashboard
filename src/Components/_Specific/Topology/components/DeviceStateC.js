@@ -14,6 +14,7 @@ import {
 import { UserLogOut } from "../../../../Utility/Fetch";
 import { useHistory } from 'react-router-dom'
 import Context from "../../../../Utility/Reduxx";
+import { useTranslation } from "react-i18next";
 
 const { TabPane } = Tabs;
 
@@ -28,7 +29,8 @@ const DeviceStateC = ({
   const [DeviceIdentity, setDeviceIdentity] = useState([]);
   const history = useHistory()
   const { dispatch } = useContext(Context);
-  
+  const { t } = useTranslation();
+
   useEffect(() => {
     if (record.id) {
       setUploading(true)
@@ -82,7 +84,7 @@ const DeviceStateC = ({
           type="primary"
           onClick={() => setDeviceStatevisible(false)}
         >
-          Confirm
+           {t("ISMS.Confirm")}
         </Button>,
       ]}
     >
@@ -101,7 +103,7 @@ const DeviceStateC = ({
               className={styles.connection}
             />
           </TabPane>
-          <TabPane tab="Strength" key="3" className={styles.tabpane}>
+          <TabPane tab="SIM" key="3" className={styles.tabpane}>
             <StatusStrengthMF
               uploading={uploading}
               DeviceStatus={DeviceStatus}

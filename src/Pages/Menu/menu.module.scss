@@ -1,0 +1,377 @@
+#components-layout-demo-side .logo {
+  height: 32px;
+  margin: 16px;
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.sitelayout .sitebackground {
+  background: #fff;
+  display: flex;
+  h1{
+    // margin-left: auto;
+    font-weight: bold;
+    font-size: 2rem;
+    margin-left: 20px;
+    // margin-right: 15vw;
+  }
+}
+
+.title2{
+  margin-left: 15px;
+  margin-top: 25px;
+  margin-bottom: -10px;
+
+}
+.wordingBelowTitle{
+  margin-left: 15px;
+  margin-bottom: -10px;
+}
+.up {
+  color: green;
+  font-size: 1.4rem;
+  margin-right:5px;
+  p {
+    padding-bottom: 0px;
+  }
+}
+.critical {
+  color: gold;
+  margin-right:5px;
+  font-size: 1.4rem;
+}
+
+.warning {
+  color: red;
+  margin-right:5px;
+  font-size: 1.4rem;
+}
+
+.offline {
+  color: black;
+  margin-right:5px;
+  font-size: 1.4rem;
+}
+
+//   .override-ant-descriptions-view {
+//     :global(.ant-descriptions-view) {
+//         overflow: auto !important;
+//     }
+//   }
+
+.desc {
+  th {
+    vertical-align: middle;
+  }
+  td {
+    vertical-align: middle;
+  }
+}
+
+.alarmlog {
+  color: red;
+  margin-right: 5px;
+  font-size: 1.4rem;
+  cursor: pointer;
+
+}
+
+
+.IoT {
+  margin-right: 5px;
+  font-size: 1.4rem;
+  cursor: pointer;
+  color:#1890ff;
+}
+.Status,
+.Map,
+.Setting {
+  margin-right:5px;
+  font-size: 1.4rem;
+  cursor: pointer;
+  color:red;
+}
+
+
+
+.renameIcon {
+  color: #1890ff;
+  margin-right: 3px;
+  
+}
+
+.iconDrop {
+  li {
+    white-space: pre-wrap !important;
+  }
+}
+.TopoTable {
+  th{
+    padding:12px !important;
+    transform: translate(0, 0);
+
+  }
+  td {
+    padding: 12px !important;
+    text-align: center !important;
+  }
+}
+
+.editcity{
+  cursor: pointer;
+  text-decoration: underline;
+  font-size: 0.6rem;
+  color: blue;
+  font-weight: 600;
+}
+.Description{
+  margin-top: 20px;
+  width:100%;
+  // background-color: white !important;
+  tr{
+    transform: translate(0, 0);
+    background-color: white !important;
+    th{
+      text-align: left !important;
+    }
+    td{
+      text-align: left !important;
+    }
+  }
+  h3{
+    font-weight: bold;
+  }
+  .tableheader{
+    font-size: 1rem;
+    font-weight: bold;
+    background: #fafafa !important;
+    text-align: center !important;
+
+
+  }
+  :global(.ant-descriptions-header){
+    margin-bottom: 3px;
+    margin-top:20px;
+    padding-left: 10px;
+  }
+
+  :global(.ant-descriptions-item-label){
+    width: 240px !important;
+  }
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////// Management
+.management{
+  width: 75vw;
+}
+.createCustomer{
+  width: 60vw;
+}
+.editCustomerInfo{
+  width: 30vw;
+}
+.scheme{
+  width: 60vw;
+}
+.editUser{
+  width: 60vw;
+}
+.createUser{
+  width: 60vw;
+}
+.editGroup{
+  width: 60vw;
+}
+.createGroup{
+  width: 60vw;
+}
+.token{
+  width: 30vw;
+}
+.APIkey{
+  width: 30vw;
+}
+.notification{
+  width: 30vw;
+}
+.InformationBtnWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.CreateUserIcon{
+  width:1.2rem;
+  margin-right: 7px;
+}
+.EditIcon,
+.TokenIcon,
+.NotificationIcon,
+.DeleteIcon,
+.ViewSchemeIcon,
+.EditGroupIcon {
+  font-size: 1.2rem;
+  margin-right: 10px !important;
+  cursor: pointer;
+}
+.DeleteIcon{
+  color: red;
+  font-size: 0.95rem;
+  margin-top: 3px;
+}
+.EditIcon {
+  color: #a52a2a;
+}
+.trashIcon{
+  color:red;
+  margin-bottom:0.7rem;
+  margin-left: 0.6rem;
+  cursor: pointer;
+  font-size: 1rem;
+}
+.UserInfoTable {
+  overflow-x: auto;
+  th, td{
+    text-align: center !important;
+  }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////  Upgrade
+.actionRequest{
+  width:75vw;
+}
+.actionStatus{
+  width:75vw;
+}
+.actionStatus2{
+  width:30vw;
+}
+.repository{
+  width:75vw;
+}
+.actiontype{
+  width:10vw;
+}
+.uploadfile{
+  width:25vw;
+}
+.repositoryMD5{
+  width:20vw;
+}
+.formwrap {
+  :global(.ant-form-item-label) {
+    position: absolute !important;
+    z-index: 1 !important;
+    background:  linear-gradient(#fff 16px,transparent 0,transparent);
+    padding: 0 4px !important;
+    margin-top: -11px;
+    margin-left: 7px;
+  }
+  :global(input) {
+    height: 45px !important;
+    border: 1px #e5e5e5 solid;
+    border-radius: 4px;
+  }
+  :global(.ant-select-selector) {
+    height: 45px !important;
+    border: 1px #e5e5e5 solid;
+    border-radius: 4px;
+  }
+  :global(.ant-form-item) {
+    position: relative !important;
+  }
+  .submitBtn {
+    margin-bottom:5px;
+  }
+  :global(.ant-select-selection-placeholder){
+    margin-top: 8px;
+  }
+  :global(.ant-select-multiple){
+    span{
+      margin-top:2px;
+    }
+  }
+  :global(.ant-select-selection-item){
+    margin-top: 8px;
+  }
+  :global(.ant-select-arrow){
+    margin-top: -5px !important;
+  }
+  :global(.ant-select-clear){
+    margin-top: -5px!important;
+  }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////Dashboard
+
+.dashboardIMG{
+  width: 75vw;
+}
+.dashboardMapIMG{
+  width: 83vw;
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////Basic
+
+.helpContainer{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin:0 auto;
+  width:75vw;
+  h2{
+    margin-right: auto;
+    font-size: 1.1rem;
+    font-weight: bold;
+  }
+  p{
+    margin-right: auto;
+  }
+}
+.index{
+  background-color: #FFC000;
+  border-radius: 50%;
+  text-align: center;
+  border: 1px solid black;
+  display: inline-block;
+  width:26px;
+  margin-right: 5px;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.permissionIMG{
+  width:60vw
+}
+
+///////////////////////////////////////////////////////////////Topology
+.location1{
+  width: 10vw;
+  margin-bottom:10px;
+}
+.location2{
+  width: 20vw;
+}
+.deviceRename{
+  width: 30vw;
+  margin-bottom: 25px;
+}
+.setting{
+  width: 75vw;
+}
+.saveToRepository{
+  width: 40vw;
+}
+.routerStatusColumn{
+  width: 50vw;
+}
+.topologyHover{
+  width: 10vw;
+}
+.topologyMap{
+  width: 60vw;
+}

@@ -10,7 +10,7 @@ import {
   FcTimeline,
   FcConferenceCall,
   FcSpeaker,
-  FcFinePrint
+  FcFinePrint,
 } from "react-icons/fc";
 import { NotifiModalMC } from "./NotificationC";
 import { SchemeModalC } from "./SchemeC";
@@ -21,8 +21,7 @@ import { Translator } from "../../../../i18n/index";
 import { ImCross } from "react-icons/im";
 import { UserLogOut } from "../../../../Utility/Fetch";
 import { useHistory } from "react-router-dom";
-import { EventLogMC } from './EventLogC'
-
+import { EventLogMC } from "./EventLogC";
 
 const ManagementC = () => {
   const { state, dispatch } = useContext(Context);
@@ -48,24 +47,26 @@ const ManagementC = () => {
   const [EventLogRecord, setEventLogRecord] = useState("");
   const [CustomerInfoRecord, setCustomerInfoRecord] = useState(false);
 
-  const CustInfoUrl= '/inf_mgnt'
-  const CustInfoUrldata= `{"list_inf":{${level === "super_super" ? state.Login.Cid : `"cid":"${cid}"`}}}`
-
+  const CustInfoUrl = "/inf_mgnt";
+  const CustInfoUrldata = `{"list_inf":{${
+    level === "super_super" ? state.Login.Cid : `"cid":"${cid}"`
+  }}}`;
 
   // const CustInfoUrl = `/inf_mgnt?list_inf={${
   //   level === "super_super" ? state.Login.Cid : `"cid":"${cid}"`
   // }} `;
   const [CustInfoLoading, CustInfoResponse] = useURLloader(
-    CustInfoUrl, CustInfoUrldata,
+    CustInfoUrl,
+    CustInfoUrldata,
     IsUpdate
   );
   const history = useHistory();
 
   useEffect(() => {
     if (CustInfoResponse) {
-      console.log(CustInfoUrldata)
+      // console.log(CustInfoUrldata);
       setCustomerList(CustInfoResponse.response);
-      console.log(CustInfoResponse.response)
+      // console.log(CustInfoResponse.response);
     }
   }, [CustInfoResponse]);
 
@@ -75,18 +76,21 @@ const ManagementC = () => {
     // const DeleteUrl = `/inf_mgnt?delete_inf={"cid":"${record.cid}"}`;
     // console.log(DeleteUrl);
     const config = {
-      method: 'post',
-      headers: { 'Content-Type': 'application/json' },
-      url: '/inf_mgnt',
+      method: "post",
+      headers: { "Content-Type": "application/json" },
+      url: "/inf_mgnt",
       data: JSON.parse(`{"delete_inf":{"cid":"${record.cid}"}}`),
-    }
+    };
 
     axios(config)
       .then(() => {
         setUploading(false);
         setIsUpdate(!IsUpdate);
         message.success("Delete successfully.");
-        dispatch({ type: "setIsUpdate", payload: { IsUpdate: !state.Global.IsUpdate } });
+        dispatch({
+          type: "setIsUpdate",
+          payload: { IsUpdate: !state.Global.IsUpdate },
+        });
         // console.log(res);
       })
       .catch((error) => {
@@ -114,7 +118,7 @@ const ManagementC = () => {
       render: (_, record) => {
         return (
           <div className={styles.InformationBtnWrapper}>
-            <Tooltip title="Information">
+            <Tooltip title={Translator("ISMS.EditInformation")}>
               <a
                 href="/#"
                 onClick={(e) => {
@@ -126,19 +130,21 @@ const ManagementC = () => {
                 <RiEdit2Fill className={styles.EditIcon} />
               </a>
             </Tooltip>
-            <Tooltip title="Scheme">
-              <a
-                href="/#"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setSchemeRecord(record);
-                  setSchemeModalvisible(true);
-                }}
-              >
-                <FcTimeline className={styles.ViewSchemeIcon} />
-              </a>
-            </Tooltip>
-            <Tooltip title="User">
+            {level === "super_super" && (
+              <Tooltip title={Translator("ISMS.Scheme")}>
+                <a
+                  href="/#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setSchemeRecord(record);
+                    setSchemeModalvisible(true);
+                  }}
+                >
+                  <FcTimeline className={styles.ViewSchemeIcon} />
+                </a>
+              </Tooltip>
+            )}
+            <Tooltip title={Translator("ISMS.User")}>
               <a
                 href="/#"
                 onClick={(e) => {
@@ -147,11 +153,14 @@ const ManagementC = () => {
                   setCreateUserRecord(record);
                 }}
               >
-                <img src={require("../../../../image/customer.png")} className={styles.CreateUserIcon}/>
+                <img
+                  src={require("../../../../image/customer.png")}
+                  className={styles.CreateUserIcon}
+                />
               </a>
             </Tooltip>
 
-            <Tooltip title="Device Group">
+            <Tooltip title={Translator("ISMS.DeviceGroup")}>
               <a
                 href="/#"
                 onClick={(e) => {
@@ -163,7 +172,7 @@ const ManagementC = () => {
                 <FcConferenceCall className={styles.EditGroupIcon} />
               </a>
             </Tooltip>
-            <Tooltip title="Device Token">
+            <Tooltip title={Translator("ISMS.DeviceTokenAPIKey")}>
               <a
                 href="/#"
                 onClick={(e) => {
@@ -175,7 +184,7 @@ const ManagementC = () => {
                 <FcKey className={styles.TokenIcon} />
               </a>
             </Tooltip>
-            <Tooltip title="Notification">
+            <Tooltip title={Translator("ISMS.Notification")}>
               <a
                 href="/#"
                 onClick={(e) => {
@@ -187,7 +196,7 @@ const ManagementC = () => {
                 <FcSpeaker className={styles.NotificationIcon} />
               </a>
             </Tooltip>
-            <Tooltip title="Event Log">
+            <Tooltip title={Translator("ISMS.EventLog")}>
               <a
                 href="/#"
                 onClick={(e) => {
@@ -199,10 +208,12 @@ const ManagementC = () => {
                 <FcFinePrint className={styles.ViewSchemeIcon} />
               </a>
             </Tooltip>
-            {level === "super_super" && state.Login.Cid === "" && (
-              <Tooltip title="Delete Customer">
+            {level === "super_super" && (
+              <Tooltip title={Translator("ISMS.DeleteCustomer")}>
                 <Popconfirm
-                  title="Sure to Delete?"
+                  title={Translator("ISMS.Suretodelete")}
+                  okText={Translator("ISMS.OK")}
+                  cancelText={Translator("ISMS.Cancel")}
                   onConfirm={() => {
                     deleteUserInfo(record);
                   }}
@@ -278,9 +289,8 @@ const ManagementC = () => {
         setRecord={setEventLogRecord}
       />
 
-
       <Card>
-        {(level=== "super_super")&& (
+        {level === "super_super" && (
           <Button
             type="primary"
             onClick={() => setCreateVisible(true)}
@@ -289,7 +299,7 @@ const ManagementC = () => {
           >
             {Translator("ISMS.Create Customer")}
           </Button>
-        ) }
+        )}
 
         <Form form={form} component={false}>
           <Table

@@ -2,27 +2,19 @@ import React, { useContext, useEffect, Fragment } from "react";
 import styles from "./Navbar.module.scss";
 import { NavRoutes } from "../../../Routes/NavbarRoutes";
 import { BiChevronsLeft, BiChevronsRight } from "react-icons/bi";
-// import { UserLogOut } from "../../../Utility/Fetch";
-// import axios from 'axios'
 import { Link } from "react-router-dom";
-// import Swal from "sweetalert2";
 import Context from "../../../Utility/Reduxx";
 import { Tooltip } from "antd";
-// import { FcExternal } from "react-icons/fc";
 import { useTranslation } from "react-i18next";
-// import { UserLogOut } from "../../../Utility/Fetch";
-// import { BiLogOut } from "react-icons/bi";
+
 
 const Nav = () => {
   // const history = useHistory();
   const { state, dispatch } = useContext(Context);
-  // const [uploading, setUploading] = useState(false);
   const showNav = state.Global.showNav;
   const IsMD = state.Global.IsMD;
   const User = localStorage.getItem("authUser.name");
   const level = localStorage.getItem("authUser.level");
-  // const [level, setLevel] = useState(undefined)
-  // console.log(state.Login.IsLogin)
   const { t } = useTranslation();
 
   const ShowBar = () => {
@@ -34,12 +26,9 @@ const Nav = () => {
       },
     });
   };
-  // useEffect(()=>{
-  //   setLevel(localStorage.getItem("authUser.level"))
-  // },[])
+
   useEffect(() => {
     if (state.Global.innerWidth < 1200) {
-      // setShowNav(false);
       dispatch({
         type: "setShowNav",
         payload: {
@@ -47,7 +36,6 @@ const Nav = () => {
         },
       });
     } else {
-      // setShowNav(true);
       dispatch({
         type: "setShowNav",
         payload: {
@@ -83,8 +71,6 @@ const Nav = () => {
     });
   };
 
-  useEffect(() => {}, [showNav]);
-
   useEffect(() => {
     window.addEventListener("resize", updateWidthAndHeight);
     return () => window.removeEventListener("resize", updateWidthAndHeight);
@@ -104,7 +90,7 @@ const Nav = () => {
 
   return (
     state.Login.IsLogin &&
-    User &&(
+    User && (
       <div className={styles.container}>
         <div
           className={
@@ -116,13 +102,11 @@ const Nav = () => {
               ? `${styles.MDhideNav} `
               : `${styles.navwrap} ${styles.ChangeBGforHide}`
           }
-          // style={IsMD ? {display:'none'}: null}
         >
           <div
             className={styles.title}
             style={showNav ? null : { background: "white" }}
           >
-            {/* {showNav ? <h2>ISMS</h2> : null} */}
             {showNav ? (
               <div
                 style={{
@@ -171,114 +155,53 @@ const Nav = () => {
           </div>
 
           <ul className={styles.navitems}>
-            {level && NavRoutes.map((item, index) => {
-              if(item.super && (level!=='super_super' && level !== 'super' && level !== 'admin')){
-                return
-              }
-              return (
-                <Fragment  key={index}>
-                {<li className={item.navitem} key={index}>
-                  <Link to={item.path}>
-                    <Tooltip title={item.title} placement="right" key={index}>
-                      {/* {item.icon}</Tooltip> {showNav ? <span>{item.title}</span> : null} */}
-                      <span
-                        style={
-                          showNav
-                            ? { margin: 0, width: "auto" }
-                            : { color: "#042b57", margin: 0, width: "auto" }
-                        }
-                      >
-                        {item.icon}
-                      </span>
-                    </Tooltip>
-                    {showNav ? (
-                      <span className={"Oswald"} style={{ textAlign: "left" }}>
-                        {t(`ISMS.${item.title}`)}{" "}
-                      </span>
-                    ) : null}
-                  </Link>
-                  {/* {t('ISMS.goRegister1')} */}
-                </li>}
-                </Fragment>
-              );
-            })}
-
-            {/* {NavRoutes.map((item, index) => {
-            // item.super? ShowSuperOnNav
-            if (item.super && !ShowSuperOnNav) {
-              return;
-            }
-            return (
-              <li className={item.navitem} key={index}>
-                <Link to={item.path}>
-                  <Tooltip title={item.title} placement="right" key={index}>
-                    {item.icon}
-                  </Tooltip>{" "}
-                  {showNav ? <span>{t(`ISMS.${item.title}`)} </span> : null}
-                </Link>
-              </li>
-            );
-          })} */}
+            {level &&
+              NavRoutes.map((item, index) => {
+                if (!item.level.includes(level)) {
+                  return;
+                }
+                return (
+                  <Fragment key={index}>
+                    {
+                      <li className={item.navitem} key={index} >
+                        <Link to={item.path}>
+                          <Tooltip
+                            title={item.title}
+                            placement="right"
+                            key={index}
+                          >
+                            <span
+                              style={
+                                showNav
+                                  ? { margin: 0, width: "auto" }
+                                  : {
+                                      color: "#042b57",
+                                      margin: 0,
+                                      width: "auto",
+                                    }
+                              }
+                            >
+                              {item.icon}
+                            </span>
+                          </Tooltip>
+                          {showNav ? (
+                            <span
+                              className={"Oswald"}
+                              style={{ textAlign: "left" }}
+                            >
+                              {t(`ISMS.${item.title}`)}{" "}
+                            </span>
+                          ) : null}
+                        </Link>
+                      </li>
+                    }
+                  </Fragment>
+                );
+              })}
           </ul>
 
-          {/* Logout */}
-
-          {/* {
-            (showNav ? (
-              <Button
-                className={styles.LogoutBtn}
-                loading={uploading}
-                onClick={async () => {
-                  setUploading(true);
-                  dispatch({ type: "setLogin", payload: { IsLogin: false } });
-                  await UserLogOut();
-                  // setAuth(false);
-
-                  Swal.fire({
-                    title: "Sign Out Success",
-                    icon: "success",
-                    showConfirmButton: false,
-                    timer: 1200,
-                  });
-                  setUploading(false);
-                  // dispatch({ type: "setUser", payload: { User: "" } });
-
-                  history.push("/userlogin");
-                }}
-              >
-                {t("ISMS.LogOut")}
-              </Button>
-            ) : (
-              <Tooltip title={"Sign-out"} placement="right">
-                <BiLogOut
-                  style={{
-                    fontSize: "1.6rem",
-                    cursor: "pointer",
-                    marginRight: "8px",
-                    color: "#042b57",
-                  }}
-                  onClick={async () => {
-                    setUploading(true);
-                    dispatch({ type: "setLogin", payload: { IsLogin: false } });
-                    await UserLogOut();
-                    // setAuth(false);
-                    Swal.fire({
-                      title: "Sign Out Success",
-                      icon: "success",
-                      showConfirmButton: false,
-                      timer: 1200,
-                    });
-                    setUploading(false);
-                    // dispatch({ type: "setUser", payload: { User: "" } });
-
-                    history.push("/userlogin");
-                  }}
-                />
-              </Tooltip>
-            ))
-        } */}
         </div>
-        <p className={styles.version}>Ver.KS201231</p>
+        <p className={styles.version}>Ver.210310</p>
       </div>
     )
   );

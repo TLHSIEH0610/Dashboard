@@ -7,7 +7,7 @@ export default Context;
 //建立全局Reducer
 const iniState = {
   Global: { innerWidth:'', innerHeight:'', IsMD: false, showNav: true, Lang:'en', IsUpdate:false, PieData: undefined },
-  Login: { IsLogin: true, LogPath: "/", User: null, Cid: ""},
+  Login: { IsLogin: true, LogPath: "/", User: null, Cid: "", Level:''},
   Topology: { id: "id", deviceStatusByID: "", health: null, strength: null, device: null },
   BackupRestore: {
     BackupReq: "",
@@ -27,6 +27,10 @@ const reducer = (state = iniState, action) => {
     case "setLogin":
       newState = { ...state };
       newState.Login.IsLogin = action.payload.IsLogin;
+      return newState;
+    case "setLevel":
+      newState = { ...state };
+      newState.Login.Level = action.payload.Level;
       return newState;
     case "setUser":
       newState = { ...state };

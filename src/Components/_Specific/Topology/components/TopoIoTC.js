@@ -19,7 +19,7 @@ import { FcSynchronize } from "react-icons/fc";
 import { useHistory } from "react-router-dom";
 import Context from "../../../../Utility/Reduxx";
 import { UserLogOut } from "../../../../Utility/Fetch";
-
+import { useTranslation } from "react-i18next";
 
 const { TabPane } = Tabs;
 const { Option } = Select;
@@ -41,8 +41,8 @@ const TopoIoTC = ({ IoTvisible, setIoTvisible, record, setRecord }) => {
   const [haveContent, setHaveContent] = useState(false);
   const [Deviceindex, setDeviceindex] = useState(0);
   const [Editable, setEditable] = useState(false) 
-  const [CurrentPage,setCurrentPage] =useState('1')
-  const level = localStorage.getItem('authUser.level')
+  // const [CurrentPage,setCurrentPage] =useState('1')
+  const { t } = useTranslation();
 
   const onFinish = (values) => {
     console.log(values);
@@ -187,9 +187,9 @@ const TopoIoTC = ({ IoTvisible, setIoTvisible, record, setRecord }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [record.id, Refresh, Deviceindex]);
 
-  const callback = (page) => {
-    setCurrentPage(page)
-  };
+  // const callback = (page) => {
+  //   setCurrentPage(page)
+  // };
 
   return (
     <Modal
@@ -205,15 +205,15 @@ const TopoIoTC = ({ IoTvisible, setIoTvisible, record, setRecord }) => {
       destroyOnClose={true}
       className={styles.modal}
       footer={[
-        (level==='super_super' && CurrentPage ==='5' )&& 
-        <Button
-        key="Edit"
-        onClick={() => {
-          setEditable(!Editable)
-        }}
-      >
-        Edit
-      </Button>,
+      //   (level==='super_super' && CurrentPage ==='5' )&& 
+      //   <Button
+      //   key="Edit"
+      //   onClick={() => {
+      //     setEditable(!Editable)
+      //   }}
+      // >
+      //   Edit
+      // </Button>,
         <Button
           key="confirm"
           type="primary"
@@ -225,7 +225,7 @@ const TopoIoTC = ({ IoTvisible, setIoTvisible, record, setRecord }) => {
             setHaveContent(false);
           }}
         >
-          Confirm
+           {t('ISMS.Confirm')}
         </Button>,      
       ]}
     >
@@ -247,10 +247,12 @@ const TopoIoTC = ({ IoTvisible, setIoTvisible, record, setRecord }) => {
           </Select>
 
           <div style={{ display: "flex" }}>
-            <p>LastUpdate: {FourEightFiveList[`${Deviceindex}`].timestamp}</p>
-            <Tooltip title="Re-get data from Device">
+            <p>{t('ISMS.LastUpdate')}: {FourEightFiveList[`${Deviceindex}`].timestamp}</p>
+            <Tooltip title={t("ISMS.RegetDatafromDevice")}>
               <Popconfirm
-                title="Will cause extra data usage, sure to refresh?"
+                title= {t("ISMS.Will cause extra data usage, sure to refresh")}
+                okText={t("ISMS.OK")}
+                cancelText={t("ISMS.Cancel")}
                 onConfirm={() => {
                   setRefresh(true);
                   setHaveContent(false);
@@ -261,7 +263,7 @@ const TopoIoTC = ({ IoTvisible, setIoTvisible, record, setRecord }) => {
             </Tooltip>
           </div>
 
-          <Tabs defaultActiveKey="1" onChange={callback}>
+          <Tabs defaultActiveKey="1" >
             <TabPane tab="Today" key="1" className={styles.tabpane}>
               <Descriptions
                 bordered

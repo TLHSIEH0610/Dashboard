@@ -1,6 +1,13 @@
 :global(.ant-descriptions-view) {
   overflow: auto !important;
 }
+:global(.ant-table-column-sorters) {
+  span {
+    font-family: Oswald !important;
+    letter-spacing: 0.02em !important;
+    font-size: 1.1rem !important;
+  }
+}
 
 :global(.ant-tabs-tab-btn) {
   font-family: Oswald !important;
@@ -26,16 +33,16 @@
   font-size: 1.1rem !important;
 }
 
-:global(.ant-table-thead){
-  th{
+:global(.ant-table-thead) {
+  th {
     font-family: Oswald !important;
     font-size: 1rem;
     // letter-spacing: 0.06em !important;
   }
 }
-:global(.ant-table-filter-column-title){
-    font-family: Oswald !important;
-    font-size: 1rem;
+:global(.ant-table-filter-column-title) {
+  font-family: Oswald !important;
+  font-size: 1rem;
 }
 
 .up {
@@ -71,6 +78,19 @@
 //   }
 
 .desc {
+  :global(.ant-descriptions-item-label) {
+    width: 200px;
+  }
+  :global(.ant-descriptions-item-content) {
+    width: 200px;
+  }
+  :global(.ant-descriptions-header) {
+    margin-bottom: 3px;
+    margin-top: 10px;
+  }
+  :global(.ant-descriptions-title) {
+    font-size: 0.85rem !important;
+  }
   th {
     vertical-align: middle;
   }
@@ -106,6 +126,9 @@
 .modal {
   width: 70% !important;
   overflow-x: auto !important;
+  &.Citymodal {
+    width: 30% !important;
+  }
 }
 
 .IoT {
@@ -123,7 +146,11 @@
   margin-right: 4%;
   font-size: 1.4rem;
   cursor: pointer;
+  &.inhibit {
+    cursor: not-allowed;
+  }
 }
+
 .Map {
   color: red;
 }
@@ -151,17 +178,17 @@
     cursor: pointer;
   }
 }
-.AllStatusCard{
-  :global(.ant-card-head-wrapper){
+.AllStatusCard {
+  :global(.ant-card-head-wrapper) {
     // position:relative;
     flex-wrap: wrap !important;
-    justify-content:space-between;
+    justify-content: space-between;
     align-items: center;
   }
-  :global(.ant-card-head-title){
-    flex:none;
+  :global(.ant-card-head-title) {
+    flex: none;
   }
-  :global(.ant-card-extra){
+  :global(.ant-card-extra) {
     margin-right: 15px;
     display: flex;
   }
@@ -174,48 +201,75 @@
     // top:15px !important;
   }
 }
-
-.columnSettingIcon {
-  font-size: 1.5rem;
+.refreshIcon {
+  // font-size: 1.3rem;
   cursor: pointer;
-  margin-left:10px ;
 }
 
-// .FilterForm {
-//   display: flex;
-//   flex-wrap: wrap;
-//   align-items: flex-start;
-//   .FilterDevice {
-//     width: 295px;
-//     margin-left: 15px;
-//   }
-//   .FilterModel {
-//     width: 170px;
-//     margin-left: 15px;
-//   }
-//   .FilterHealth {
-//     width: 180px;
-//     margin-left: 15px;
-//   }
-//   .FilterStrength {
-//     width: 200px;
-//     margin-left: 15px;
-//   }
-// }
+
+.BulkFormWrapper {
+  :global(.ant-form-item) {
+    margin-bottom: 20px !important;
+  }
+}
 .iconDrop {
   li {
     white-space: pre-wrap !important;
   }
 }
 .TopoTable {
-  th,
+  th {
+    padding: 12px !important;
+    transform: translate(0, 0);
+  }
   td {
+    padding: 12px !important;
     text-align: center !important;
   }
 }
+
+.autoRefresh {
+  position: relative;
+  // font-size: 1.6rem !important;
+  .alphet{
+    font-weight: bold;
+    color:#002fa7;
+    display: inline-block;
+    font-size: 17px;
+    position: absolute;
+    right: 7px;
+    top:5px;
+    z-index: 50;
+  }
+}
+.RebootWrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.RebootIcon{
+  color:#002fa7;
+  font-size: 1.4rem !important;
+}
+
+.IconWrapper{
+  align-items: center;
+  // min-width: 130px;
+  display: flex;
+  justify-content: space-around;
+}
+
+// .autoIcon {
+//   color: blue;
+//   &span {
+//     font-size: 2px !important;
+//   }
+// }
+
+
 .Card {
   margin-bottom: 1% !important;
-  label{
+  label {
     margin-top: -4px;
   }
   h2 {
@@ -232,6 +286,7 @@
   .divider {
     margin-top: -0.5rem;
   }
+
   .DeleteIcon {
     color: red;
     cursor: pointer;
@@ -251,46 +306,80 @@
     margin-bottom: 24px;
   }
 }
-
+.rebootWording {
+  h2 {
+    font-weight: bolder;
+    font-size: 1rem;
+  }
+  .rebootdevice {
+    margin-left: 3px;
+    background: gray;
+    border-radius: 5px;
+    padding: 1px 5px;
+    margin-right: 3px;
+    color: white;
+  }
+}
+.SSIDtag {
+  margin-bottom: 30px !important;
+}
+.editcity {
+  cursor: pointer;
+  text-decoration: underline;
+  font-size: 0.6rem;
+  color: blue;
+  font-weight: 600;
+}
 
 .FormWrapper {
   // margin-left: 5%;
   // margin-bottom: 1% !important;
   :global(.ant-form-item-label) {
     position: absolute !important;
-    z-index: 1 !important;
+    z-index: 96 !important;
     // background: #fff;
-    background: linear-gradient(#fff 16px,transparent 0,transparent);
+    background: linear-gradient(#fff 13px, transparent 0, transparent);
     padding: 0 4px !important;
     margin-top: -11px;
     margin-left: 7px;
   }
+  :global(.ant-input-number) {
+    border: #fff 1px solid;
+  }
   :global(input) {
-    height: 43px !important;
+    height: 45px !important;
+    // height: 100% !important;
     border: 1px #e5e5e5 solid;
     border-radius: 4px;
   }
   :global(.ant-select-selector) {
-    height: 43px !important;
+    height: 45px !important;
+    // height: 100% !important;
     border: 1px #e5e5e5 solid;
     border-radius: 4px;
-    span{
-      // margin-top: 8px;
-    }
+
   }
-  :global(.ant-select-selection-item){
-      margin-top: 8px !important;
+  :global(.ant-select-selection-item) {
+    margin-top: 8px !important;
   }
   :global(.ant-form-item) {
     position: relative !important;
+    margin-bottom: 0px;
   }
-  :global(.ant-select-selection-placeholder){
-      margin-top: 6px !important;
+  :global(.ant-select-selection-placeholder) {
+    margin-top: 6px !important;
   }
-  :global(.ant-select-multiple){
-    span{
+  :global(.ant-select-multiple) {
+    span {
       margin-top: 0px !important;
     }
+  }
+  :global(.ant-form-item-explain-error) {
+    // margin-bottom: 10x;
+    z-index: 96;
+  }
+  :global(.ant-select-arrow) {
+    top: 40%;
   }
   h2 {
     font-size: 1.1rem;
@@ -312,7 +401,6 @@
   }
 }
 
-
 .FourEightFiveBar {
   width: 50%;
   margin-bottom: 10px !important;
@@ -324,7 +412,7 @@
 }
 .allstatusTable {
   // overflow-x: auto;
-  th,
+
   th {
     vertical-align: middle !important;
     transform: translate(0%, 0%);
@@ -364,14 +452,18 @@
   }
 }
 
+// @media(min-width: 300px) and(max-width: 1140px){
+//   .modal {
+//     transform: translateY(-10%) !important;
+//   }
+// }
+
+
 @media (max-width: 576px) {
   // .groupSelect{
   //   position:inherit !important;
   // }
   .TopoTable {
-    // th{
-    //     font-size: 1rem;
-    // }
     td {
       padding: 1px !important;
       padding-right: 0px;
@@ -406,8 +498,14 @@
   }
 }
 
-@media(max-width: 992px){
-  .ImportRadio{
+@media (max-width: 992px) {
+  .ImportRadio {
     margin-bottom: 20px !important;
+  }
+}
+
+@media (max-width: 1600px) {
+  .colum {
+    margin-bottom: 15px;
   }
 }

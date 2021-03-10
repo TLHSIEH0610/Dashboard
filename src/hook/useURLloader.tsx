@@ -6,15 +6,16 @@ import { UserLogOut } from "../Utility/Fetch";
 
 
 
-const useURLloader = (url:string, urldata:string, dep?:any):[boolean, any] => {
+const useURLloader = (url:string, urldata:string, dep?:any, ...res:any):[boolean, any] => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const history = useHistory();
   const { dispatch } = useContext(Context);
   const location = useLocation();  
+  // console.log(dep, res)
 
-  
   useEffect(() => {
+    
     if(url && urldata){
       setLoading(true);
       const config = {
@@ -48,7 +49,7 @@ const useURLloader = (url:string, urldata:string, dep?:any):[boolean, any] => {
     }
 
       // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dep, urldata]);
+  }, [dep, urldata, ...res]);
 
   return [loading, data];
 };
